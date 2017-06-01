@@ -8,7 +8,7 @@ from scipy.sparse import csr_matrix
 import sys
 from time import time
 from multiprocessing import Pool
-
+import os
 
 def window(seq, k=3):
     """ 
@@ -16,6 +16,8 @@ def window(seq, k=3):
     Params:
         seq....dna sequence
         k......length of kmer
+    Returns:
+        Returns kmer generator
     """
     it = iter(seq)
     result = tuple(islice(it, k))
@@ -31,6 +33,8 @@ def reverse_complement(kmer):
     Generate a kmers complement
     Params:
         kmer....The kmer to generate the complement for
+    Returns:
+        A single kmer complement
     """
     comp = {'a': 't', 'c': 'g', 't': 'a', 'g': 'c'}
     rc = ()
@@ -40,6 +44,13 @@ def reverse_complement(kmer):
 
 
 def gen_comp_dict(all_kmers):
+    """ 
+    Generates mapping of kmers to their complements
+    Params:
+        all_kmers...All possible kmers for a given k
+    Returns:
+        Dictionary mapping kmer to their complement and vice-versa
+    """
     comps = {}
     for kmer in all_kmers:
         comps[kmer] = reverse_complement(kmer)
@@ -51,6 +62,8 @@ def gen_vocab(k=3):
     Generate index kmer pairs for all possible kmers, binning complements together
     Params:
         k....length of kmer
+    Returns:
+        Dictionary mapping kmers and their complements to an index (column) in feature matrix
     """
     all_kmers = list(product('acgt', repeat=k))
     vocab = {}
@@ -71,6 +84,8 @@ def convert_labels(labels):
     Convert labels to indexes
     Params:
         labels...Original k class string labels
+    Returns:
+        Categorical label vector
     """
     label_idxs = {}
     new_labels = np.empty(len(labels))
@@ -80,6 +95,14 @@ def convert_labels(labels):
 
 
 def normalize_tfidf(vocab, frequencies):
+    """ 
+    Convert labels to indexes
+    Params:
+        vocab.........mapping of kmers to their feature vector index
+        frequencies...kmer counts (complements combined)
+    Returns:
+        complete feature matrix
+    """
     N = len(frequencies)
     df = Counter()
 
@@ -100,6 +123,14 @@ def normalize_tfidf(vocab, frequencies):
 
 
 def combine_complements(kmer_counters, comps):
+    """ 
+    Convert labels to indexes
+    Params:
+        kmer_counters...kmer counts for all sequences
+        comps...........dict mapping kmers to their complements
+    Returns:
+        kmer counters with complements combined
+    """
     new_kmer_counters = []
     for kmers in kmer_counters:
         new_counts = Counter()
@@ -116,21 +147,37 @@ def combine_complements(kmer_counters, comps):
 
 #def gen_meta_features(data):
 
-def work(pair, k=3):
-    seq = pair[1]
-    seqnum = pair[0]
-
+def work(seqnum_seq_k):
+    """ 
+    Function for workers to count kmers in parallel
+    Params:
+        seqnum_seq_k...Sequence number, dna sequence and k
+    Returns:
+        sequence number paired with that sequences kmer counts
+    """
+    seq = seqnum_seq_k[1]
+    seqnum = seqnum_seq_k[0]
+    k = seqnum_seq_k[2]
     kmers = window(seq.lower(), k)
     counts = Counter(kmers)
 
     return [seqnum, counts]
 
 
-def get_kmer_counts(data):
-    data = zip(range(len(data)), data)
-
+def get_kmer_counts(data, k):
+    """ 
+    Pools workers and resequences results to match original order
+    Params:
+        data...Dna sequences
+        k......kmer length
+    Returns:
+        kmer counts for all sequences in dataset
+    """
+    data = zip(range(len(data)), data, [k]*len(data))
     pool = Pool(processes=12)
+
     res = np.array(pool.map(work, data))
+
     indices = np.array(res[:,0],dtype=int)
     data = np.array(res[:,1])
     counts = data[indices]
@@ -149,7 +196,7 @@ def featurize_data(file, k=3):
     # labels = data.label
     start = time()
     #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
-    kmers = get_kmer_counts(data.dna)
+    kmers = get_kmer_counts(data.dna, k)
 
     print "Counted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
     vocab, comps = gen_vocab(k)
@@ -182,25 +229,39 @@ def featurize_data(file, k=3):
 
 
 def save_sparse_csr(filename,array, labels, vocab):
+    """ 
+    Save csr matrix in loadable format
+    Params:
+        filename...save path
+        array......csr matrix
+        labels.....ordered true labels
+        vocab......maps kmer to feature vector index
+    """
     np.savez(filename,data = array.data ,indices=array.indices,
              indptr =array.indptr, shape=array.shape, labels=labels, vocab=vocab)
 
 
-def main():
+def main(lg_file=False, k=3):
     print "Generating labels and features"
-    sm_file = "data/ref.100ec.pgf.seqs.filter"
-    lg_file = "data/rep.1000ec.pgf.seqs.filter"
-    k = 3
+    if lg_file:
+        file = "data/rep.1000ec.pgf.seqs.filter"
+        f = "lg"
+    else:
+        file = "data/ref.100ec.pgf.seqs.filter"
+        f = "sm"
+
     start = time()
-    labels, features, vocab = featurize_data(sm_file, k)
+    labels, features, vocab = featurize_data(file, k)
     print "Time elapsed to build %d mers is %f" % (k, time()-start)
     #print "There are %d unique kmers" % len(features[0])
     print "Size of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    #save_sparse_csr("data/feature_matrix." + str(k) + ".csr", features, labels, vocab)
+    save_sparse_csr("data/feature_matrix." + f + "."  + str(k) + ".csr", features, labels, vocab)
 
 
 if __name__ == '__main__':
-    #os.chdir("/home/ngetty/examples/protein-pred")
-    main()
-
-#6.329024
+    if len(sys.argv) > 1:
+        os.chdir("/home/ngetty/examples/protein-pred")
+        args = sys.argv[1:]
+        main(args[0], args[1])
+    else:
+        main()

@@ -4,6 +4,8 @@ Train ResNet-18 on the CIFAR10 small images dataset.
 GPU run command with Theano backend (with TensorFlow, the GPU is automatically used):
     THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python cifar10.py
 """
+
+#adapted from https://github.com/raghakot/keras-resnet/blob/master/cifar10.py
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import np_utils
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping

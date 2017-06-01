@@ -1,3 +1,5 @@
+#adapted from https://github.com/raghakot/keras-resnet/blob/master/resnet.py
+
 from __future__ import division
 
 import six
