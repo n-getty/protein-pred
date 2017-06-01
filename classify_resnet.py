@@ -18,7 +18,7 @@ csv_logger = CSVLogger('resnet18_protein.csv')
 
 batch_size = 1000
 nb_classes = 100
-nb_epoch = 200
+nb_epoch = 50
 data_augmentation = False
 
 # The data, shuffled and split between train and test sets:

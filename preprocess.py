@@ -7,6 +7,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import sys
 from time import time
+from multiprocessing import Pool
 
 
 def window(seq, k=3):
@@ -115,6 +116,27 @@ def combine_complements(kmer_counters, comps):
 
 #def gen_meta_features(data):
 
+def work(pair, k=3):
+    seq = pair[1]
+    seqnum = pair[0]
+
+    kmers = window(seq.lower(), k)
+    counts = Counter(kmers)
+
+    return [seqnum, counts]
+
+
+def get_kmer_counts(data):
+    data = zip(range(len(data)), data)
+
+    pool = Pool(processes=12)
+    res = np.array(pool.map(work, data))
+    indices = np.array(res[:,0],dtype=int)
+    data = np.array(res[:,1])
+    counts = data[indices]
+
+    return counts
+
 
 def featurize_data(file, k=3):
     """ 
@@ -126,7 +148,9 @@ def featurize_data(file, k=3):
     labels = convert_labels(data.label)
     # labels = data.label
     start = time()
-    kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
+    #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
+    kmers = get_kmer_counts(data.dna)
+
     print "Counted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
     vocab, comps = gen_vocab(k)
     start = time()
@@ -172,10 +196,11 @@ def main():
     print "Time elapsed to build %d mers is %f" % (k, time()-start)
     #print "There are %d unique kmers" % len(features[0])
     print "Size of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    save_sparse_csr("data/feature_matrix." + str(k) + ".csr", features, labels, vocab)
+    #save_sparse_csr("data/feature_matrix." + str(k) + ".csr", features, labels, vocab)
 
 
 if __name__ == '__main__':
     #os.chdir("/home/ngetty/examples/protein-pred")
     main()
 
+#6.329024
