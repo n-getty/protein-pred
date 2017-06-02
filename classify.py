@@ -17,6 +17,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
 from xgboost import XGBClassifier
 from scipy.sparse import csr_matrix
+import sys
 
 
 def cross_validation_accuracy(clf, X, labels, skf):
@@ -107,14 +108,12 @@ def load_sparse_csr(filename):
                          shape = loader['shape']), loader['labels']
 
 
-def main():
-    folds = 5
-    clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=2), AdaBoostClassifier(n_estimators=10)]
-    model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    #clfs = [RandomForestClassifier(n_jobs=2), XGBClassifier()]
-    #model_names = ["Random Forest", "XGBoost"]
-    k = 3
-    features, labels = load_sparse_csr("feature_matrix." + k + ".csr.npz")
+def main(folds=5, k=3):
+    #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
+    #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200)]
+    model_names = ["Random Forest"]
+    features, labels = load_sparse_csr("data/feature_matrix." + str(k) + ".csr.npz")
     features = features.toarray()
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("CV Score", inplace=True, ascending=False)
@@ -123,7 +122,11 @@ def main():
 
 
 if __name__ == '__main__':
-    #os.chdir("/home/ngetty/examples/protein-pred")
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-    main()
+    if len(sys.argv) > 1:
+        os.chdir("/home/ngetty/examples/protein-pred")
+        args = sys.argv[1:]
+        main(args[0], args[1])
+    else:
+        main()

@@ -10,6 +10,7 @@ from time import time
 from multiprocessing import Pool
 import os
 
+
 def window(seq, k=3):
     """ 
     Generate generate all kmers for a sequence
