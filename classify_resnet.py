@@ -8,7 +8,7 @@ GPU run command with Theano backend (with TensorFlow, the GPU is automatically u
 # adapted from https://github.com/raghakot/keras-resnet/blob/master/cifar10.py
 from keras.utils import np_utils
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, hstack
 import numpy as np
 import resnet
 from sklearn.model_selection import train_test_split
@@ -78,10 +78,14 @@ def classify(features, labels, shape, use_batches):
                             callbacks=[lr_reducer, early_stopper, csv_logger])
 
 
-def main(file="feature_matrix.sm.3.csr_2d.npy"):
+def main(file="feature_matrix.sm.3.csr_2d.npy", file2=False):
     use_batches = False
 
     features, labels = load_sparse_csr("data/" + file)
+
+    if file2:
+        features2, _ = load_sparse_csr("data/" + file)
+        features = hstack(features, features2)
 
     # input image dimensions
     img_rows, img_cols = features.shape[1], features.shape[2]
@@ -101,6 +105,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0])
+        main(args[0], args[1])
     else:
         main()

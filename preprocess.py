@@ -209,22 +209,28 @@ def featurize_data(file, k=3):
 
     nrows = len(data.label)
     ncols = len(vocab)/2 if k % 2 == 1 else (len(vocab) + 2**k)/2
-    row = []
+    '''row = []
     col = []
-    csr_data = []
+    csr_data = []'''
     print "Bulding feature matrix"
+    features = csr_matrix((nrows, ncols))
     for x in range(nrows):
         counts = kmers[x]
         cols = [vocab[kmer] for kmer in counts.keys()]
-        csr_data.extend(counts.values())
+        '''csr_data.extend(counts.values())
         col.extend(cols)
-        row.extend([x]*len(counts))
+        row.extend([x]*len(counts))'''
+        features = features + csr_matrix((counts.values(), ([x]*len(counts), cols)), shape=(nrows, ncols))
+
         '''
         for kmer in kmers[x].keys():
             features[x][vocab[kmer]] += kmers[x][kmer]'''
 
-    print("Constructing sparse matrix")
-    features = csr_matrix((csr_data, (row, col)), shape=(nrows, ncols))
+    #print "Size of sparse data vector is %f (mbs)" % (float(sys.getsizeof(csr_data)) / 1024 ** 2)
+
+
+    #print("Constructing sparse matrix")
+    #features = csr_matrix((csr_data, (row, col)), shape=(nrows, ncols))
     # normalize(features, copy=True)
     return labels, features, vocab
 

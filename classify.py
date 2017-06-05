@@ -109,6 +109,8 @@ def load_sparse_csr(filename):
 
 
 def main(folds=5, k=3):
+    folds = int(5)
+    k = int(k)
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
     clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200)]
