@@ -113,8 +113,8 @@ def main(folds=5, k=3):
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
     clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200)]
     model_names = ["Random Forest"]
-    features, labels = load_sparse_csr("data/feature_matrix." + str(k) + ".csr.npz")
-    features = features.toarray()
+    features, labels = load_sparse_csr("data/feature_matrix.lg." + str(k) + ".csr.npz")
+    #features = features.toarray()
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("CV Score", inplace=True, ascending=False)
     results.to_csv("results/results.csv", sep="\t")

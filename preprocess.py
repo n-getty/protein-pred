@@ -250,13 +250,13 @@ def main(lg_file=False, k=3):
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
         f = "sm"
-
+    k = int(k)
     start = time()
     labels, features, vocab = featurize_data(file, k)
     print "Time elapsed to build %d mers is %f" % (k, time()-start)
     #print "There are %d unique kmers" % len(features[0])
     print "Size of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    save_sparse_csr("data/feature_matrix." + f + "."  + str(k) + ".csr", features, labels, vocab)
+    save_sparse_csr("data/feature_matrix." + f + "." + str(k) + ".csr", features, labels, vocab)
 
 
 if __name__ == '__main__':
