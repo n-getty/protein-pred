@@ -177,8 +177,16 @@ def get_kmer_counts(data, k):
     data = zip(range(len(data)), data, [k]*len(data))
     pool = Pool(processes=12)
 
-    res = np.array(pool.map(work, data))
+    res = [None] * len(data)
+    #res = np.empty(len(data), dtype=object)
+    #res = np.array(pool.map(work, data))
 
+    for i, r in enumerate(pool.imap_unordered(work, data)):
+        res[i] = r
+        sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(data)))
+
+    res = np.array(res)
+    #print res.dtype
     indices = np.array(res[:,0],dtype=int)
     data = np.array(res[:,1])
     counts = data[indices]
@@ -186,53 +194,58 @@ def get_kmer_counts(data, k):
     return counts
 
 
-def featurize_data(file, k=3):
+def featurize_data(data, k=3):
     """ 
     Featurize sequences and index labels
     Params:
         file....Delimited data file
     """
-    data = pd.read_csv(file, names=["label", "dna"], usecols=[0,7], delimiter = '\t', header=0)
-    labels = convert_labels(data.label)
+
+    # labels = convert_labels(data.label)
     # labels = data.label
     start = time()
     #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
     kmers = get_kmer_counts(data.dna, k)
 
-    print "Counted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
-    vocab, comps = gen_vocab(k)
+    print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
+    nrows = len(data.label)
+
+    vocab, _ = gen_vocab(k)
+
+    ncols = len(vocab) / 2 if k % 2 == 1 else (len(vocab) + 2 ** k) / 2
     start = time()
     print "Generated vocab for complements in %d seconds" % (time() - start)
     # comb_kmers = combine_complements(kmers, comps)
 
     # features = normalize_tfidf(vocab, comb_kmers)
+    nonzero_data = 0
+    print "Counting nonzero data"
+    for kmer in kmers:
+        nonzero_data += len(kmer)
 
-    nrows = len(data.label)
-    ncols = len(vocab)/2 if k % 2 == 1 else (len(vocab) + 2**k)/2
-    '''row = []
-    col = []
-    csr_data = []'''
+
+
+    indptr = np.zeros(nrows+1, dtype="int32")
+    col = np.empty(nonzero_data, dtype="int32")
+    csr_data = np.empty(nonzero_data, dtype="int8")
     print "Bulding feature matrix"
-    features = csr_matrix((nrows, ncols))
+    #features = csr_matrix((nrows, ncols))
+    data_counter = 0
     for x in range(nrows):
+        sys.stderr.write('\rdone {0:%}'.format(float(x + 1) / nrows))
         counts = kmers[x]
-        cols = [vocab[kmer] for kmer in counts.keys()]
-        '''csr_data.extend(counts.values())
-        col.extend(cols)
-        row.extend([x]*len(counts))'''
-        features = features + csr_matrix((counts.values(), ([x]*len(counts), cols)), shape=(nrows, ncols))
-
-        '''
-        for kmer in kmers[x].keys():
-            features[x][vocab[kmer]] += kmers[x][kmer]'''
+        for k, v in counts.items():
+            col[data_counter] = vocab[k]
+            csr_data[data_counter] = v
+            data_counter += 1
+        indptr[x+1] = data_counter
 
     #print "Size of sparse data vector is %f (mbs)" % (float(sys.getsizeof(csr_data)) / 1024 ** 2)
 
-
     #print("Constructing sparse matrix")
-    #features = csr_matrix((csr_data, (row, col)), shape=(nrows, ncols))
+    features = csr_matrix((csr_data, col, indptr), shape=(nrows, ncols))
     # normalize(features, copy=True)
-    return labels, features, vocab
+    return features, vocab
 
 
 def save_sparse_csr(filename,array, labels, vocab):
@@ -248,27 +261,52 @@ def save_sparse_csr(filename,array, labels, vocab):
              indptr =array.indptr, shape=array.shape, labels=labels, vocab=vocab)
 
 
-def main(lg_file=False, k=3):
+def read_chunks(file,f,k,chunksize):
+    c = 0
+    path ="data/feature_matrix." + f + str(k) + "/"
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+    for data in pd.read_csv(file, chunksize=chunksize, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0):
+        labels = data.label
+        features, vocab = featurize_data(data, k)
+        # print "There are %d unique kmers" % len(features[0])
+        print "\nSize of sparse matrix chunk %d is %f (mbs)" % (c, float(sys.getsizeof(features)) / 1024 ** 2)
+        save_sparse_csr(path + "chunk." + str(c) + ".csr", features, labels, vocab)
+        c += 1
+
+
+def read_whole(file,f,k):
+    data = pd.read_csv(file, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0)
+    labels = data.label
+    features, vocab = featurize_data(data, k)
+    #print "There are %d unique kmers" % len(features[0])
+    print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
+    save_sparse_csr("data/feature_matrix." + f + str(k) + ".csr", features, labels, vocab)
+
+
+def main(lg_file=False, k=3, chunksize=100000):
+    start = time()
+    k = int(k)
+    chunksize = int(chunksize)
+
     print "Generating labels and features"
-    if lg_file:
+
+    if lg_file == "True":
         file = "data/rep.1000ec.pgf.seqs.filter"
-        f = "lg"
+        f = "lg."
+        read_chunks(file, f, k, chunksize)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
-        f = "sm"
-    k = int(k)
-    start = time()
-    labels, features, vocab = featurize_data(file, k)
-    print "Time elapsed to build %d mers is %f" % (k, time()-start)
-    #print "There are %d unique kmers" % len(features[0])
-    print "Size of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    save_sparse_csr("data/feature_matrix." + f + "." + str(k) + ".csr", features, labels, vocab)
+        f = "sm."
+        read_whole(file, f, k)
+
+    print "Time elapsed to build %d mers is %f" % (k, time() - start)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1])
+        main(args[0], args[1], args[2])
     else:
         main()

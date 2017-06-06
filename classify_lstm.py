@@ -28,10 +28,10 @@ def nn_batch_generator(X_data, y_data, batch_size):
             counter=0
 
 
-def classify(features, labels, use_batches):
+def classify(features, labels, use_batches, file):
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
-    csv_logger = CSVLogger('lstm_sm_3mer_protein.csv')
+    csv_logger = CSVLogger(file + '.lstm.log.csv')
     nb_classes = 100
 
     # Convolution
@@ -88,16 +88,14 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr_2d.npy", file2=False):
+def main(file="feature_matrix.sm.3.csr.npz", file2="feature_matrix.sm.10.csr.npz"):
     use_batches = False
-
-
 
     features, labels = load_sparse_csr("data/" + file)
 
     if file2:
-        features2, _ = load_sparse_csr("data/" + file)
-        features = hstack(features, features2)
+        features2, _ = load_sparse_csr("data/" + file2)
+        features = hstack([features, features2])
 
 
     # input image dimensions
@@ -111,7 +109,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2=False):
     features = features.reshape(features.shape[0],features.shape[1], 1)
 
     #shape = (img_channels, img_rows, img_cols)
-    classify(features, labels, use_batches)
+    classify(features, labels, use_batches, file)
 
 
 if __name__ == '__main__':
