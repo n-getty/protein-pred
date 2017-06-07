@@ -15,7 +15,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, DMatrix
 from scipy.sparse import csr_matrix
 import sys
 
@@ -80,6 +80,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     for x in range(len(clfs)):
         start = time.time()
+
         print "Classiying with", model_names[x]
         logging.info("Classifying with %s", model_names[x])
 
@@ -113,8 +114,8 @@ def main(folds=5, k=3):
     k = int(k)
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200)]
-    model_names = ["Random Forest"]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=1), XGBClassifier()]
+    model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/feature_matrix.sm." + str(k) + ".csr.npz")
     #features = features.toarray()
     results = classify_all(labels, features, clfs, folds, model_names)

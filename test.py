@@ -2,10 +2,8 @@ import numpy as np
 import sys
 
 
-x = np.ndarray((10),dtype=dict)
-x[0] = dict()
+csr_2d = False
 
-print x
+rows = 2 if csr_2d else 1
 
-y = np.empty(10, dtype=dict)
-print y
+print rows

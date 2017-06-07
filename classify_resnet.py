@@ -1,3 +1,4 @@
+#/home/ngetty/dev/anaconda2/bin/python
 """
 Adapted from keras example cifar10_cnn.py
 Train ResNet-18 on the CIFAR10 small images dataset.
@@ -38,6 +39,21 @@ def load_sparse_csr(filename):
                          shape = loader['shape']), loader['labels']
 
 
+def convert_labels(labels):
+    """ 
+    Convert labels to indexes
+    Params:
+        labels...Original k class string labels
+    Returns:
+        Categorical label vector
+    """
+    label_idxs = {}
+    new_labels = np.empty(len(labels))
+    for x in range(len(labels)):
+        new_labels[x] = label_idxs.setdefault(labels[x], len(label_idxs))
+    return new_labels
+
+
 def classify(features, labels, shape, use_batches):
     batch_size = 10000
     nb_epoch = 20
@@ -45,7 +61,7 @@ def classify(features, labels, shape, use_batches):
 
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
-    csv_logger = CSVLogger('resnet101_protein.csv')
+    csv_logger = CSVLogger("results/" + file + '.res.log.csv')
 
     X_train, X_test, y_train, y_test = train_test_split(
         features, labels, test_size=0.2, random_state=0, stratify=labels)
@@ -78,12 +94,13 @@ def classify(features, labels, shape, use_batches):
                             callbacks=[lr_reducer, early_stopper, csv_logger])
 
 
-def main(file="feature_matrix.sm.3.csr_2d.npy", file2=False):
+def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False"):
     use_batches = False
 
     features, labels = load_sparse_csr("data/" + file)
+    labels = convert_labels(labels)
 
-    if file2:
+    if file2 != "False":
         features2, _ = load_sparse_csr("data/" + file)
         features = hstack(features, features2)
 
@@ -94,8 +111,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2=False):
     if not use_batches:
         features = features.toarray()
         normalize(features, copy=False)
-
-    features = features.reshape(features.shape[0],img_rows, img_cols, img_channels)
+        features = features.reshape(features.shape[0],img_rows, img_cols, img_channels)
 
     shape = (img_channels, img_rows, img_cols)
     classify(features, labels, shape, use_batches)

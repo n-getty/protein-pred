@@ -1,10 +1,6 @@
 import numpy as np
 from scipy.sparse import csr_matrix
-import pandas as pd
-
-def save_sparse_csr(filename,array, labels):
-    np.savez(filename,data = array.data ,indices=array.indices,
-             indptr =array.indptr, shape=array.shape, labels=labels)
+import sys,os
 
 
 def load_sparse_csr(filename):
@@ -31,7 +27,7 @@ def convert_csr_2d(csr_matrix):
     max_len = 0
     for x in range(csr_matrix.shape[0]):
         l = len(csr_matrix.getrow(x).data)
-        if l > 0: max_len = l
+        if l > max_len: max_len = l
 
     for x in range(csr_matrix.shape[0]):
         row = csr_matrix.getrow(x)
@@ -44,11 +40,19 @@ def convert_csr_2d(csr_matrix):
             indices = np.append(indices, pad)
 
         csr_2d.append(np.column_stack((data,indices)))
-
-    return np.array(csr_2d)
-
+    return np.array(csr_2d, dtype="int32")
 
 
-M, labels = load_sparse_csr("data/feature_matrix.3.csr.npz")
-csr_2d = convert_csr_2d(M)
-np.savez("data/feature_matrix.sm.3.csr_2d", data = csr_2d, labels = labels)
+def main(file="feature_matrix.sm.10.csr.npz"):
+    M, labels = load_sparse_csr("data/" + file)
+    csr_2d = convert_csr_2d(M)
+    np.savez("data/" + file[:-4] + "_2d", data = csr_2d, labels = labels)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        os.chdir("/home/ngetty/examples/protein-pred")
+        args = sys.argv[1:]
+        main(args[0])
+    else:
+        main()

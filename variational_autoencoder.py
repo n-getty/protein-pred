@@ -12,9 +12,9 @@ import os, sys
 
 def encode(features):
     batch_size = 11890
-    original_dim = 524800
+    original_dim = 32
     latent_dim = 2
-    intermediate_dim = 1024
+    intermediate_dim = 16
     epochs = 50
     epsilon_std = 1.0
 
@@ -91,7 +91,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.10.csr.npz", file2=False):
+def main(file="feature_matrix.sm.3.csr.npz", file2=False):
     use_batches = False
 
     features, _ = load_sparse_csr("data/" + file)
