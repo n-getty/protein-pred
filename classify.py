@@ -80,26 +80,30 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     for x in range(len(clfs)):
         start = time.time()
+        mn = model_names[x]
+        if mn == "XGBoost":
+            features = DMatrix(features)
 
-        print "Classiying with", model_names[x]
-        logging.info("Classifying with %s", model_names[x])
+        print "Classiying with", mn
+        logging.info("Classifying with %s", mn)
 
         clf = clfs[x]
-        cv_score = cross_validation_accuracy(clf, features, labels, skf)
-
-        print "%s %d fold cross validation mean accuracy: %f" % (model_names[x], folds, cv_score)
-        logging.info("%s %d fold cross validation mean accuracy: %f" % (model_names[x], folds, cv_score))
+        #cv_score = cross_validation_accuracy(clf, features, labels, skf)
+        cv_score = 0
+        #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
+        #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
         tts_score, cm = test_train_split(clf, tts_split)
 
         print "test/train split accuracy:", tts_score
         logging.info("test/train split accuracy: %f", tts_score)
-        np.savetxt("results/" + model_names[x] + "_cm.txt", cm, fmt='%i', delimiter="\t")
+        np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
         end = time.time()
         elapsed = end-start
-        print "Time elapsed for model %s is %f" % (model_names[x], elapsed)
-        logging.info("Time elapsed for model %s is %f" % (model_names[x], elapsed))
-        results.loc[results.shape[0]] = ([model_names[x], cv_score, tts_score, elapsed])
+        print "Time elapsed for model %s is %f" % (mn, elapsed)
+        logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
+        results.loc[results.shape[0]] = ([mn, cv_score, tts_score, elapsed])
+        
     return results
 
 
@@ -109,14 +113,14 @@ def load_sparse_csr(filename):
                          shape = loader['shape']), loader['labels']
 
 
-def main(folds=5, k=3):
+def main(folds=5, k=3, f="sm"):
     folds = int(folds)
     k = int(k)
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=1), XGBClassifier()]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=100), XGBClassifier(nthread=-1)]
     model_names = ["Random Forest", "XGBoost"]
-    features, labels = load_sparse_csr("data/feature_matrix.sm." + str(k) + ".csr.npz")
+    features, labels = load_sparse_csr("data/feature_matrix." + f + "." + str(k) + ".csr.npz")
     #features = features.toarray()
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("CV Score", inplace=True, ascending=False)
@@ -130,6 +134,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1])
+        main(args[0], args[1], args[2])
     else:
         main()
