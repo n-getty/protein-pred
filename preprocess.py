@@ -4,7 +4,7 @@ import math
 from itertools import islice, product
 from collections import Counter
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, hstack
 import sys
 from time import time
 from multiprocessing import Pool
@@ -178,8 +178,6 @@ def get_kmer_counts(data, k):
     pool = Pool(processes=12)
 
     res = [None] * len(data)
-    #res = np.empty(len(data), dtype=object)
-    #res = np.array(pool.map(work, data))
 
     for i, r in enumerate(pool.imap_unordered(work, data)):
         res[i] = r
@@ -275,10 +273,22 @@ def read_chunks(file,f,k,chunksize):
         c += 1
 
 
+def featurize_nuc_counts(data):
+    nuc_counts = [Counter(x) for x in data]
+    M = [[c['a'], c['c'], c['g'], c['t']] for c in nuc_counts]
+    return csr_matrix(np.array(M))
+
+
 def read_whole(file,f,k):
     data = pd.read_csv(file, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0)
     labels = data.label
+    nuc_features = featurize_nuc_counts(data.dna)
     features, vocab = featurize_data(data, k)
+    #nonz = features.getnnz(0) > 0
+    #features = features[:, nonz]
+    seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
+    #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
+    features = hstack([features, nuc_features, seq_lens], format='csr')
     #print "There are %d unique kmers" % len(features[0])
     print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
     save_sparse_csr("data/feature_matrix." + f + str(k) + ".csr", features, labels, vocab)

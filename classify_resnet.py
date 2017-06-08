@@ -101,8 +101,8 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False"):
     labels = convert_labels(labels)
 
     if file2 != "False":
-        features2, _ = load_sparse_csr("data/" + file)
-        features = hstack(features, features2)
+        features2, _ = load_sparse_csr("data/" + file2)
+        features = hstack([features, features2])
 
     # input image dimensions
     img_rows, img_cols = features.shape[1], features.shape[2]

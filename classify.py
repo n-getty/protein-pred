@@ -16,9 +16,9 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
 from xgboost import XGBClassifier, DMatrix
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, hstack
 import sys
-
+from sklearn.decomposition import TruncatedSVD
 
 def cross_validation_accuracy(clf, X, labels, skf):
     """ 
@@ -33,14 +33,18 @@ def cross_validation_accuracy(clf, X, labels, skf):
         over each fold of cross-validation.
     """
     scores = []
+    train_scores = []
     for train_index, test_index in skf:
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
         clf.fit(X_train, y_train)
         scores.append(accuracy_score(y_test, clf.predict(X_test)))
+        train_scores.append(accuracy_score(y_train, clf.predict(X_train)))
 
     scores = [x for x in scores if str(x) != 'Nan']
-    return np.mean(scores)
+    train_scores = [x for x in train_scores if str(x) != 'Nan']
+
+    return np.mean(scores), np.mean(train_scores)
 
 
 def test_train_split(clf, split):
@@ -56,9 +60,11 @@ def test_train_split(clf, split):
     X_train, X_test, y_train, y_test = split
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
+    train_pred = clf.predict(X_train)
     score = accuracy_score(y_test, y_pred)
+    train_score = accuracy_score(y_train, train_pred)
     cm = confusion_matrix(y_test, y_pred)
-    return score, cm
+    return score, train_score, cm
 
 
 def classify_all(labels, features, clfs, folds, model_names):
@@ -76,7 +82,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Score", "Test Score", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time"])
 
     for x in range(len(clfs)):
         start = time.time()
@@ -88,12 +94,13 @@ def classify_all(labels, features, clfs, folds, model_names):
         logging.info("Classifying with %s", mn)
 
         clf = clfs[x]
-        #cv_score = cross_validation_accuracy(clf, features, labels, skf)
+        #cv_score, cv_train_score = cross_validation_accuracy(clf, features, labels, skf)
         cv_score = 0
+        cv_train_score = 0
         #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
-        tts_score, cm = test_train_split(clf, tts_split)
+        tts_score, tts_train_score, cm = test_train_split(clf, tts_split)
 
         print "test/train split accuracy:", tts_score
         logging.info("test/train split accuracy: %f", tts_score)
@@ -102,7 +109,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_score, tts_score, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed])
         
     return results
 
@@ -110,21 +117,44 @@ def classify_all(labels, features, clfs, folds, model_names):
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
-                         shape = loader['shape']), loader['labels']
+                         shape=loader['shape']), loader['labels']
 
 
-def main(folds=5, k=3, f="sm"):
-    folds = int(folds)
-    k = int(k)
+def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
+    folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=100), XGBClassifier(nthread=-1)]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=300), XGBClassifier(nthread=12, n_estimators=300)]
     model_names = ["Random Forest", "XGBoost"]
-    features, labels = load_sparse_csr("data/feature_matrix." + f + "." + str(k) + ".csr.npz")
+    features, labels = load_sparse_csr("data/" + file)
+    #features = features[:, :-5]
+    normalize(features[:, :-5], copy=False)
+    normalize(features[:, -5:-1], copy=False)
+    print "Normalizing cols and rows, kmers and nuc counts"
+    logging.info("Normalizing rows and cols")
+
+    if file2 != "False":
+        print "Combining kmer feature matrices"
+        features2, _ = load_sparse_csr("data/" + file2)
+        features2 = features2[:,:-5]
+        normalize(features2, copy=False)
+        features = hstack([features, features2])
+    if file3 != "False":
+        print "Combining kmer feature matrices with 3rd file"
+        features3, _ = load_sparse_csr("data/" + file3)
+        features3 = features2[:,:-5]
+        normalize(features3, copy=False)
+        features = hstack([features, features3])
+
+    print features.shape
+    normalize(features, copy=False,axis=0)
+    #svd = TruncatedSVD(n_components=100, n_iter=7, random_state=42)
+    #svd.fit(features)
+    #features = svd.transform(features)
     #features = features.toarray()
     results = classify_all(labels, features, clfs, folds, model_names)
-    results.sort("CV Score", inplace=True, ascending=False)
-    results.to_csv("results/results.csv", sep="\t")
+    results.sort("Split Val Acc", inplace=True, ascending=False)
+    results.to_csv("results/results." + file, sep="\t")
     print results
 
 
@@ -134,6 +164,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1], args[2])
+        main(args[0], args[1])
     else:
         main()
