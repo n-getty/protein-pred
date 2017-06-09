@@ -304,7 +304,10 @@ def main(lg_file=False, k=3, chunksize=100000):
     if lg_file == "True":
         file = "data/rep.1000ec.pgf.seqs.filter"
         f = "lg."
-        read_chunks(file, f, k, chunksize)
+        if chunksize > 0:
+            read_chunks(file, f, k, chunksize)
+        else:
+            read_whole(file, f, k)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
         f = "sm."

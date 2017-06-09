@@ -64,7 +64,8 @@ def test_train_split(clf, split):
     score = accuracy_score(y_test, y_pred)
     train_score = accuracy_score(y_train, train_pred)
     cm = confusion_matrix(y_test, y_pred)
-    return score, train_score, cm
+
+    return score, train_score, cm, clf
 
 
 def classify_all(labels, features, clfs, folds, model_names):
@@ -82,7 +83,9 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time", "top_10"])
+
+    #top_10 = []
 
     for x in range(len(clfs)):
         start = time.time()
@@ -100,7 +103,14 @@ def classify_all(labels, features, clfs, folds, model_names):
         #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
-        tts_score, tts_train_score, cm = test_train_split(clf, tts_split)
+        tts_score, tts_train_score, cm, clf = test_train_split(clf, tts_split)
+
+        if mn == "XGBoost":
+            feat_score = clf.get_fscore
+        else:
+            feat_score = clf.feature_importances_
+
+        top_10_features = np.argsort(feat_score)[::-1][:10]
 
         print "test/train split accuracy:", tts_score
         logging.info("test/train split accuracy: %f", tts_score)
@@ -109,7 +119,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed, top_10_features])
         
     return results
 
@@ -124,14 +134,14 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=300), XGBClassifier(nthread=12, n_estimators=300)]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), +XGBClassifier(nthread=12, n_estimators=200)]
     model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
     normalize(features[:, :-5], copy=False)
     normalize(features[:, -5:-1], copy=False)
-    print "Normalizing cols and rows, kmers and nuc counts"
-    logging.info("Normalizing rows and cols")
+    print "Dimensionality reduction with 3,5 and 10mers"
+    logging.info("Dimensionality reduction with 3,5 and 10mers")
 
     if file2 != "False":
         print "Combining kmer feature matrices"
@@ -148,13 +158,14 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
 
     print features.shape
     normalize(features, copy=False,axis=0)
-    #svd = TruncatedSVD(n_components=100, n_iter=7, random_state=42)
-    #svd.fit(features)
-    #features = svd.transform(features)
-    #features = features.toarray()
+
+    svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
+    svd.fit(features)
+    features = svd.transform(features)
+
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("Split Val Acc", inplace=True, ascending=False)
-    results.to_csv("results/results." + file, sep="\t")
+    results.to_csv("results/results.svd." + file, sep="\t")
     print results
 
 
