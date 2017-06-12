@@ -178,8 +178,9 @@ def load_sparse_csr(filename):
 
 def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     folds = 5
-    clfs = [SVC(probability=True), GaussianNB(), MultinomialNB(), LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1), RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)]
-    model_names = ["SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "XGBoost"]
+    # SVC(probability=True),
+    clfs = [GaussianNB(), MultinomialNB(), LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1), RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)]
+    model_names = ["Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "XGBoost"]
     #clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)
     #        ]
     #model_names = ["Random Forest", "XGBoost"
