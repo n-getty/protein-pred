@@ -18,7 +18,7 @@ from sklearn.preprocessing import normalize
 from xgboost import XGBClassifier, DMatrix
 from scipy.sparse import csr_matrix, hstack
 import sys
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 
 def cross_validation_accuracy(clf, X, labels, skf):
     """ 
@@ -159,9 +159,9 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     print features.shape
     normalize(features, copy=False,axis=0)
 
-    svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
-    svd.fit(features)
-    features = svd.transform(features)
+    #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
+    #svd.fit(features)
+    #features = svd.transform(features)
 
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("Split Val Acc", inplace=True, ascending=False)
