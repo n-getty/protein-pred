@@ -155,9 +155,9 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     model_names = ["Random Forest"#, "XGBoost"
                    ]
     features, labels = load_sparse_csr("data/" + file)
-    #features = features[:, :-5]
+    features = features[:, :-5]
     #normalize(features[:, :-5], copy=False)
-    #normalize(features[:, -5:-1], copy=False)
+    normalize(features[:, -5:-1], copy=False)
     #log_info = "Dimensionality reduction with 3,5 and 10mers"
     log_info = "Testing tfidf transformation"
     print log_info
@@ -176,18 +176,17 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
-        features3 = features3[:,:-5]
+        #features3 = features3[:,:-5]
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
         features = hstack([features, features3])
 
-    tfer.fit(features)
-    features = tfer.transform(features)
+    tfer.fit(features[:, :-5])
+    tfer.transform(features[:, :-5], copy=False)
 
+    normalize(features[-1], copy=False,axis=0)
     print features.shape
-    #normalize(features, copy=False,axis=0)
-
 
     #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
     #svd.fit(features)
