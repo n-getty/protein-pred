@@ -3,10 +3,11 @@ import sys
 from scipy.sparse import csr_matrix
 from collections import Counter
 from sklearn.preprocessing import normalize
+import pandas as pd
 
 
-x = [1,2,3,4]
+file = "data/coreseed.train.tsv"
+data = pd.read_csv(file, names=["label", "dna"], usecols=[1, 5], delimiter='\t', header=0)
 
-y = 3
-
-print np.in1d(y,x)[0]
+print data.shape
+print len(Counter(data.label))

@@ -126,6 +126,7 @@ def classify_all(labels, features, clfs, folds, model_names):
                 feat_score = clf.coef_
             top_10_features = np.argsort(feat_score)[::-1][:10]
             print "Top ten feature idxs", top_10_features
+            logging.info("Top ten feature idxs: %s", str(top_10_features))
 
         print "Training generalization accuracy:", tts_train_score
         print "Validation accuracy:", tts_score
