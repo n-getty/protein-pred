@@ -173,7 +173,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
     if len(sys.argv) > 1:
-        os.chdir("/home/ngetty/examples/protein-pred")
+        #os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
         main(args[0], args[1], args[2])
     else:
