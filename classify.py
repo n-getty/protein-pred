@@ -88,8 +88,6 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time"])
 
-    #top_10 = []
-
     for x in range(len(clfs)):
         start = time.time()
         mn = model_names[x]
@@ -184,8 +182,8 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     tfer.transform(features[:, :-5], copy=False)
 
     # normalize(features[:, :-5], copy=False)
-    normalize(features[:, -5:-1], copy=False)
-    normalize(features[-1], copy=False,axis=0)
+    #normalize(features[:, -5:-1], copy=False)
+    #normalize(features[-1], copy=False,axis=0)
     print features.shape
 
     #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
