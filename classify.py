@@ -145,20 +145,25 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
-    features = TfidfTransformer.fit_transform(features)
-
+    tfer = TfidfTransformer()
+    tfer.fit(features)
+    features = tfer.transform(features)
     if file2 != "False":
         print "Combining kmer feature matrices"
         features2, _ = load_sparse_csr("data/" + file2)
         features2 = features2[:,:-5]
-        features2 = TfidfTransformer.fit_transform(features2)
+        tfer = TfidfTransformer()
+        tfer.fit(features2)
+        features2 = tfer.transform(features2)
         normalize(features2, copy=False)
         features = hstack([features, features2])
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
         features3 = features3[:,:-5]
-        features3 = TfidfTransformer.fit_transform(features3)
+        tfer = TfidfTransformer()
+        tfer.fit(features3)
+        features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
         features = hstack([features, features3])
 
