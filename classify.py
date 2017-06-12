@@ -135,7 +135,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), XGBClassifier(nthread=160, n_estimators=200)]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), XGBClassifier(nthread=320, n_estimators=200)]
     model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
