@@ -321,7 +321,7 @@ def main(lg_file=False, k=3, chunksize=100000):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        os.chdir("/home/ngetty/examples/protein-pred")
+        #os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
         main(args[0], args[1], args[2])
     else:
