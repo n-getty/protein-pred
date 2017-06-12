@@ -64,9 +64,9 @@ def test_train_split(clf, split):
     train_pred = clf.predict(X_train)
     score = accuracy_score(y_test, y_pred)
     train_score = accuracy_score(y_train, train_pred)
-    cm = confusion_matrix(y_test, y_pred)
+    #cm = confusion_matrix(y_test, y_pred)
 
-    return score, train_score, cm, clf
+    return score, train_score, clf
 
 
 def classify_all(labels, features, clfs, folds, model_names):
@@ -104,8 +104,10 @@ def classify_all(labels, features, clfs, folds, model_names):
         #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
-        tts_score, tts_train_score, cm, clf = test_train_split(clf, tts_split)
+        tts_score, tts_train_score, clf = test_train_split(clf, tts_split)
 
+        #if mn == "Random Forest":
+            #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
         '''if mn == "XGBoost":
             feat_score = clf.get_fscore
         else:
@@ -115,7 +117,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         print "test/train split accuracy:", tts_score
         logging.info("test/train split accuracy: %f", tts_score)
-        np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
+        #np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
         end = time.time()
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
@@ -123,6 +125,17 @@ def classify_all(labels, features, clfs, folds, model_names):
         results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed])
         
     return results
+
+
+def top_5_accuracy(probs, y_true):
+
+    top5 = np.argsort(probs, axis=1)[:,-5:]
+    c = 0
+    for x in range(len(top5)):
+        if y_true[x] in top5[x]:
+            c+=1
+
+    return float(c)/len(y_true)
 
 
 def load_sparse_csr(filename):
@@ -152,20 +165,22 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
         print "Combining kmer feature matrices"
         features2, _ = load_sparse_csr("data/" + file2)
         features2 = features2[:,:-5]
-        tfer = TfidfTransformer()
         tfer.fit(features2)
         features2 = tfer.transform(features2)
-        normalize(features2, copy=False)
+        #normalize(features2, copy=False)
         features = hstack([features, features2])
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
         features3 = features3[:,:-5]
-        tfer = TfidfTransformer()
         tfer.fit(features3)
         features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
         features = hstack([features, features3])
+
+    '''tfer = TfidfTransformer()
+    tfer.fit(features)
+    features = tfer.transform(features)'''
 
     print features.shape
     #normalize(features, copy=False,axis=0)
