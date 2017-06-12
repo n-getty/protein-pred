@@ -79,7 +79,7 @@ def test_train_split(clf, split, m):
     #logging.info("Top 1 accuracy: %f", score)
     #cm = confusion_matrix(y_test, y_pred)
 
-    return score, train_score, clf
+    return score, train_score, clf, t5
 
 
 def classify_all(labels, features, clfs, folds, model_names):
@@ -97,7 +97,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Time"])
 
     for x in range(len(clfs)):
         start = time.time()
@@ -115,7 +115,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
-        tts_score, tts_train_score, clf = test_train_split(clf, tts_split, mn)
+        tts_score, tts_train_score, clf, t5 = test_train_split(clf, tts_split, mn)
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
@@ -136,7 +136,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, t5, elapsed])
         
     return results
 
