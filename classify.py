@@ -156,8 +156,6 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
                    ]
     features, labels = load_sparse_csr("data/" + file)
     features = features[:, :-5]
-    #normalize(features[:, :-5], copy=False)
-    normalize(features[:, -5:-1], copy=False)
     #log_info = "Dimensionality reduction with 3,5 and 10mers"
     log_info = "Testing tfidf transformation"
     print log_info
@@ -185,6 +183,8 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     tfer.fit(features[:, :-5])
     tfer.transform(features[:, :-5], copy=False)
 
+    # normalize(features[:, :-5], copy=False)
+    normalize(features[:, -5:-1], copy=False)
     normalize(features[-1], copy=False,axis=0)
     print features.shape
 
