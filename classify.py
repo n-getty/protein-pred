@@ -128,12 +128,12 @@ def classify_all(labels, features, clfs, folds, model_names):
 
 
 def top_5_accuracy(probs, y_true):
-
+    print "Calculating top 5 accuracy"
     top5 = np.argsort(probs, axis=1)[:,-5:]
     c = 0
     for x in range(len(top5)):
         if y_true[x] in top5[x]:
-            c+=1
+            c += 1
 
     return float(c)/len(y_true)
 
@@ -184,7 +184,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     tfer.fit(features)
     features = tfer.transform(features)
 
-    # normalize(features[:, :-5], copy=False)
+    normalize(features[:, :-5], copy=False)
     #normalize(features[:, -5:-1], copy=False)
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
