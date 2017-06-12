@@ -159,9 +159,9 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     print features.shape
     normalize(features, copy=False,axis=0)
 
-    svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
-    svd.fit(features)
-    features = svd.transform(features)
+    #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
+    #svd.fit(features)
+    #features = svd.transform(features)
 
     results = classify_all(labels, features, clfs, folds, model_names)
     results.sort("Split Val Acc", inplace=True, ascending=False)
@@ -175,6 +175,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1])
+        main(args[0], args[1], args[2])
     else:
         main()

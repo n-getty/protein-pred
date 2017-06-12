@@ -282,13 +282,17 @@ def featurize_nuc_counts(data):
 def read_whole(file,f,k):
     data = pd.read_csv(file, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0)
     labels = data.label
-    nuc_features = featurize_nuc_counts(data.dna)
+
     features, vocab = featurize_data(data, k)
     #nonz = features.getnnz(0) > 0
     #features = features[:, nonz]
-    seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
+
+    if k == 3:
+        nuc_features = featurize_nuc_counts(data.dna)
+        seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
+        features = hstack([features, nuc_features, seq_lens], format='csr')
+
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
-    features = hstack([features, nuc_features, seq_lens], format='csr')
     #print "There are %d unique kmers" % len(features[0])
     print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
     save_sparse_csr("data/feature_matrix." + f + str(k) + ".csr", features, labels, vocab)
