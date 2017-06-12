@@ -65,7 +65,7 @@ def test_train_split(clf, split):
     score = accuracy_score(y_test, y_pred)
     #train_score = accuracy_score(y_train, train_pred)
     train_score = clf.oob_score_
-    print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(X_test),y_test)
+    print "Top 5 accuracy:", top_5_accuracy(clf.predict_proba(X_test),y_test)
     #cm = confusion_matrix(y_test, y_pred)
 
     return score, train_score, clf
@@ -132,7 +132,7 @@ def top_5_accuracy(probs, y_true):
     top5 = np.argsort(probs, axis=1)[:,-5:]
     c = 0
     for x in range(len(top5)):
-        if y_true[x] in top5[x]:
+        if np.in1d(y_true[x], top5[x], assume_unique=True):
             c += 1
 
     return float(c)/len(y_true)
