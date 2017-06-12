@@ -175,7 +175,7 @@ def get_kmer_counts(data, k):
         kmer counts for all sequences in dataset
     """
     data = zip(range(len(data)), data, [k]*len(data))
-    pool = Pool(processes=300)
+    pool = Pool(processes=100)
 
     res = [None] * len(data)
 
