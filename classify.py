@@ -184,8 +184,8 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     tfer.fit(features)
     features = tfer.transform(features)
 
-    normalize(features[:, :-5], copy=False)
-    #normalize(features[:, -5:-1], copy=False)
+    #normalize(features[:, :-5], copy=False)
+    normalize(features[:, -5:-1], copy=False)
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
 
