@@ -169,7 +169,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
                    ]
     features, labels = load_sparse_csr("data/" + file)
     labels = convert_labels(labels)
-    
+
     features = features[:, :-5]
     #log_info = "Dimensionality reduction with 3,5 and 10mers"
     log_info = "Testing tfidf transformation"
@@ -195,15 +195,15 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
         #normalize(features3, copy=False)
         features = hstack([features, features3],format='csr', dtype="Float32")
 
-    tfer.fit(features[:, :-5])
-    tfer.transform(features[:, :-5], copy=False)
+    #tfer.fit(features[:, :-5])
+    #tfer.transform(features[:, :-5], copy=False)
 
-    #tfer.fit(features)
-    #features = tfer.transform(features)
+    tfer.fit(features)
+    features = tfer.transform(features)
 
     #normalize(features[:, :-5], copy=False)
-    normalize(features[:, -5:-1], copy=False)
-    normalize(features[-1], copy=False,axis=0)
+    #normalize(features[:, -5:-1], copy=False)
+    #normalize(features[-1], copy=False,axis=0)
     print features.shape
 
     #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
