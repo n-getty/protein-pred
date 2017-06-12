@@ -176,7 +176,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
-        features = hstack([features, features3],format='csr')
+        features = hstack([features, features3],format='csr', dtype="Float32")
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
