@@ -82,7 +82,7 @@ def classify_all(labels, features, clfs, folds, model_names):
     tts_split = train_test_split(
         features, labels, test_size=0.2, random_state=0)
 
-    skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
+    #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Time", "top_10"])
 
@@ -106,12 +106,12 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         tts_score, tts_train_score, cm, clf = test_train_split(clf, tts_split)
 
-        if mn == "XGBoost":
+        '''if mn == "XGBoost":
             feat_score = clf.get_fscore
         else:
             feat_score = clf.feature_importances_
 
-        top_10_features = np.argsort(feat_score)[::-1][:10]
+        top_10_features = np.argsort(feat_score)[::-1][:10]'''
 
         print "test/train split accuracy:", tts_score
         logging.info("test/train split accuracy: %f", tts_score)
@@ -120,7 +120,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed, top_10_features])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, elapsed])
         
     return results
 
@@ -135,7 +135,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=50), XGBClassifier(nthread=320, n_estimators=50)]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=25), XGBClassifier(nthread=320, n_estimators=25)]
     model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
