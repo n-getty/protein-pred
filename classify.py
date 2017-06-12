@@ -63,7 +63,9 @@ def test_train_split(clf, split):
     y_pred = clf.predict(X_test)
     train_pred = clf.predict(X_train)
     score = accuracy_score(y_test, y_pred)
-    train_score = accuracy_score(y_train, train_pred)
+    #train_score = accuracy_score(y_train, train_pred)
+    train_score = clf.oob_score_
+    print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(X_test),y_test)
     #cm = confusion_matrix(y_test, y_pred)
 
     return score, train_score, clf
@@ -148,8 +150,10 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), XGBClassifier(nthread=300, n_estimators=200)]
-    model_names = ["Random Forest", "XGBoost"]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200)#, XGBClassifier(nthread=300, n_estimators=200)
+            ]
+    model_names = ["Random Forest"#, "XGBoost"
+                   ]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
     #normalize(features[:, :-5], copy=False)
