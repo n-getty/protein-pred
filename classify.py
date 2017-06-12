@@ -93,7 +93,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         model_names..Readable names of each classifier
     """
     tts_split = train_test_split(
-        features, labels, test_size=0.2, random_state=0)
+        features, labels, test_size=0.2, random_state=0, stratify=labels)
 
     #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
@@ -179,12 +179,9 @@ def load_sparse_csr(filename):
 def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     folds = 5
     # SVC(probability=True),
-    clfs = [LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1), RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)]
-    model_names = ["Logistic Regression", "Random Forest", "XGBoost"]
-    #clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)
-    #        ]
-    #model_names = ["Random Forest", "XGBoost"
-    #              ]
+    # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)]
+    model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     labels = convert_labels(labels)
 
@@ -223,11 +220,16 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     #normalize(features[:, -5:-1], copy=False)
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
-
-    #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
-    #svd.fit(features)
-    #features = svd.transform(features)
-
+    
+    print "Starting dimensionality reduction via TruncatedSVD"
+    start = time()
+    svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
+    svd.fit(features)
+    features = svd.transform(features)
+    end = time.time()
+    elapsed = end - start
+    print "Time elapsed for dimensionality reduction is %f" %  elapsed
+    logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/results.svd." + file, sep="\t")
