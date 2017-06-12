@@ -138,13 +138,28 @@ def top_5_accuracy(probs, y_true):
     return float(c)/len(y_true)
 
 
+def convert_labels(labels):
+    """ 
+    Convert labels to indexes
+    Params:
+        labels...Original k class string labels
+    Returns:
+        Categorical label vector
+    """
+    label_idxs = {}
+    new_labels = np.empty(len(labels))
+    for x in range(len(labels)):
+        new_labels[x] = label_idxs.setdefault(labels[x], len(label_idxs))
+    return new_labels
+
+
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
+def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
@@ -153,6 +168,8 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     model_names = ["Random Forest"#, "XGBoost"
                    ]
     features, labels = load_sparse_csr("data/" + file)
+    labels = convert_labels(labels)
+    
     features = features[:, :-5]
     #log_info = "Dimensionality reduction with 3,5 and 10mers"
     log_info = "Testing tfidf transformation"
