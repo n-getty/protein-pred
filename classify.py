@@ -21,6 +21,7 @@ from scipy.sparse import csr_matrix, hstack
 import sys
 from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 
+
 def cross_validation_accuracy(clf, X, labels, skf):
     """ 
     Compute the average testing accuracy over k folds of cross-validation. 
@@ -60,17 +61,18 @@ def test_train_split(clf, split, m):
     """
     X_train, X_test, y_train, y_test = split
     clf.fit(X_train, y_train)
-
-    if m == "XGBoost":
-        train_pred = clf.predict(X_train)
-        train_score = accuracy_score(y_train, train_pred)
+    if m != "XGBoost":
+        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
+    else:
         y_pred = clf.predict(X_test)
         score = accuracy_score(y_test, y_pred)
         t5 = "NA"
-        #t5, score = top_5_accuracy(clf.evaluate(X_test), y_test)
+    if m != "Random Forest":
+        train_pred = clf.predict(X_train)
+        train_score = accuracy_score(y_train, train_pred)
     else:
         train_score = clf.oob_score_
-        t5, score = top_5_accuracy(clf.predict_proba(X_test),y_test)
+
     print "Top 5 accuracy:", t5
     #print "Top 1 accuracy:", score
     logging.info("Top 5 accuracy: %f", t5)
@@ -117,11 +119,11 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
-        if mn == "XGBoost":
-            pass
-            #feat_score = clf.get_fscore
-        else:
-            feat_score = clf.feature_importances_
+        if mn != "XGBoost":
+            if mn == "Random Forest":
+                feat_score = clf.feature_importances_
+            else:
+                feat_score = clf.coef_
             top_10_features = np.argsort(feat_score)[::-1][:10]
             print "Top ten feature idxs", top_10_features
 
@@ -176,12 +178,12 @@ def load_sparse_csr(filename):
 
 def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     folds = 5
-    #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
-    #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)
-            ]
-    model_names = ["Random Forest", "XGBoost"
-                   ]
+    clfs = [SVC(probability=True), GaussianNB(), MultinomialNB(), LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1), RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)]
+    model_names = ["SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "XGBoost"]
+    #clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True), XGBClassifier(nthread=320, n_estimators=200)
+    #        ]
+    #model_names = ["Random Forest", "XGBoost"
+    #              ]
     features, labels = load_sparse_csr("data/" + file)
     labels = convert_labels(labels)
 
