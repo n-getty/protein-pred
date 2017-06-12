@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
 from xgboost import XGBClassifier, DMatrix
@@ -138,26 +139,32 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
-    normalize(features[:, :-5], copy=False)
-    normalize(features[:, -5:-1], copy=False)
-    print "Dimensionality reduction with 3,5 and 10mers"
-    logging.info("Dimensionality reduction with 3,5 and 10mers")
+    #normalize(features[:, :-5], copy=False)
+    #normalize(features[:, -5:-1], copy=False)
+    #log_info = "Dimensionality reduction with 3,5 and 10mers"
+    log_info = "Testing tfidf transformation"
+    print log_info
+    logging.info(log_info)
+    features = TfidfTransformer.fit_transform(features)
 
     if file2 != "False":
         print "Combining kmer feature matrices"
         features2, _ = load_sparse_csr("data/" + file2)
         features2 = features2[:,:-5]
+        features2 = TfidfTransformer.fit_transform(features2)
         normalize(features2, copy=False)
         features = hstack([features, features2])
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
         features3 = features3[:,:-5]
-        normalize(features3, copy=False)
+        features3 = TfidfTransformer.fit_transform(features3)
+        #normalize(features3, copy=False)
         features = hstack([features, features3])
 
     print features.shape
-    normalize(features, copy=False,axis=0)
+    #normalize(features, copy=False,axis=0)
+
 
     #svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
     #svd.fit(features)
