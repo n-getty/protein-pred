@@ -152,7 +152,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
-        features3 = features2[:,:-5]
+        features3 = features3[:,:-5]
         normalize(features3, copy=False)
         features = hstack([features, features3])
 
