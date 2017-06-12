@@ -186,8 +186,8 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     labels = convert_labels(labels)
 
     features = features[:, :-5]
-    #log_info = "Dimensionality reduction with 3,5 and 10mers"
-    log_info = "Testing tfidf transformation"
+    log_info = "Dimensionality reduction with 3,5 and 10mers"
+    #log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
     tfer = TfidfTransformer()
@@ -220,7 +220,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     #normalize(features[:, -5:-1], copy=False)
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
-    
+
     print "Starting dimensionality reduction via TruncatedSVD"
     start = time()
     svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
