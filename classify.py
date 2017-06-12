@@ -135,7 +135,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     folds = 5
     #clfs = [XGBClassifier(), SVC(), GaussianNB(), MultinomialNB(), LogisticRegression(), RandomForestClassifier(n_jobs=-1), AdaBoostClassifier(n_estimators=10)]
     #model_names = ["XGBoost", "SVC", "Gaussian bayes", "Multinomial bayes", "Logistic Regression", "Random Forest", "AdaBoost"]
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), XGBClassifier(nthread=320, n_estimators=25)]
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200), XGBClassifier(nthread=320, n_estimators=200)]
     model_names = ["Random Forest", "XGBoost"]
     features, labels = load_sparse_csr("data/" + file)
     #features = features[:, :-5]
@@ -176,7 +176,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
     #features = svd.transform(features)
 
     results = classify_all(labels, features, clfs, folds, model_names)
-    results.sort("Split Val Acc", inplace=True, ascending=False)
+    #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/results.svd." + file, sep="\t")
     print results
 
