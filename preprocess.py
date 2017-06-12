@@ -287,10 +287,9 @@ def read_whole(file,f,k):
     #nonz = features.getnnz(0) > 0
     #features = features[:, nonz]
 
-    if k == 3:
-        nuc_features = featurize_nuc_counts(data.dna)
-        seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
-        features = hstack([features, nuc_features, seq_lens], format='csr')
+    nuc_features = featurize_nuc_counts(data.dna)
+    seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
+    features = hstack([features, nuc_features, seq_lens], format='csr')
 
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])

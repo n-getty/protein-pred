@@ -72,7 +72,9 @@ def test_train_split(clf, split, m):
         train_score = clf.oob_score_
         t5, score = top_5_accuracy(clf.predict_proba(X_test),y_test)
     print "Top 5 accuracy:", t5
-    print "Top 1 accuracy:", score
+    #print "Top 1 accuracy:", score
+    logging.info("Top 5 accuracy: %f", t5)
+    #logging.info("Top 1 accuracy: %f", score)
     #cm = confusion_matrix(y_test, y_pred)
 
     return score, train_score, clf
@@ -115,14 +117,17 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
-        '''if mn == "XGBoost":
-            feat_score = clf.get_fscore
+        if mn == "XGBoost":
+            pass
+            #feat_score = clf.get_fscore
         else:
             feat_score = clf.feature_importances_
+            top_10_features = np.argsort(feat_score)[::-1][:10]
+            print "Top ten feature idxs", top_10_features
 
-        top_10_features = np.argsort(feat_score)[::-1][:10]'''
-
-        print "test/train split accuracy:", tts_score
+        print "Training generalization accuracy:", tts_train_score
+        print "Validation accuracy:", tts_score
+        logging.info("Training generalization accuracy: %f", tts_train_score)
         logging.info("test/train split accuracy: %f", tts_score)
         #np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
         end = time.time()
