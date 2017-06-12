@@ -172,7 +172,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
         #tfer.fit(features2)
         #features2 = tfer.transform(features2)
         #normalize(features2, copy=False)
-        features = hstack([features, features2])
+        features = hstack([features, features2],type='csr')
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
@@ -180,7 +180,7 @@ def main(file="feature_matrix.sm.3.csr_2d.npy", file2="False", file3="False"):
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
-        features = hstack([features, features3])
+        features = hstack([features, features3],type='csr')
 
     tfer.fit(features[:, :-5])
     tfer.transform(features[:, :-5], copy=False)
