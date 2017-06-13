@@ -1,6 +1,5 @@
 #/home/ngetty/dev/anaconda2/bin/python
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 import pandas as pd
 import numpy as np
@@ -18,6 +17,7 @@ from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xgboost import XGBClassifier, DMatrix
 from scipy.sparse import csr_matrix, hstack
 import sys
