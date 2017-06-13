@@ -219,6 +219,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
     if tfidf != "False":
+        print "Converting features to tfidf"
         tfer = TfidfTransformer()
         tfer.fit(features)
         features = tfer.transform(features)
