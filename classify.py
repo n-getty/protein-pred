@@ -180,7 +180,8 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="False", tfidf="False"):
+def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
+    path = "data/" + size + '/'
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
@@ -188,7 +189,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
              ]
     model_names = ["Random Forest" #"XGBoost"
              ]
-    features, labels = load_sparse_csr("data/" + file)
+    features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
     labels = convert_labels(labels)
 
     #features = features[:, :-5]
@@ -199,18 +200,21 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
 
     #tfer.fit(features)
     #features = tfer.transform(features)
-    if file2 != "False":
-        print "Combining kmer feature matrices"
-        features2, _ = load_sparse_csr("data/" + file2)
+    if file2:
+        print "Adding 5mer features"
+        features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
         features2 = features2[:,:-5]
         #tfer.fit(features2)
         #features2 = tfer.transform(features2)
         #normalize(features2, copy=False)
         features = hstack([features, features2],format='csr')
-    if file3 != "False":
-        print "Combining kmer feature matrices with 3rd file"
-        features3, _ = load_sparse_csr("data/" + file3)
+    if file3:
+        print "Adding 10mer features"
+        features3, _ = load_sparse_csr(path + "feature_matrix.10.csr.npz")
         features3 = features3[:,:-5]
+        nonzero_counts = features3.getnnz(0)
+        nonz = nonzero_counts > prune10
+        features = features[:, nonz]
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
