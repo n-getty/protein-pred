@@ -178,7 +178,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
+def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="False"):
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
@@ -223,15 +223,16 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
 
-    print "Starting dimensionality reduction via TruncatedSVD"
-    start = time()
-    svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
-    svd.fit(features)
-    features = svd.transform(features)
-    end = time.time()
-    elapsed = end - start
-    print "Time elapsed for dimensionality reduction is %f" %  elapsed
-    logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
+    if red != "False":
+        print "Starting dimensionality reduction via TruncatedSVD"
+        start = time()
+        svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
+        svd.fit(features)
+        features = svd.transform(features)
+        end = time.time()
+        elapsed = end - start
+        print "Time elapsed for dimensionality reduction is %f" %  elapsed
+        logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/results.svd." + file, sep="\t")
