@@ -101,7 +101,7 @@ def classify_all(labels, features, clfs, folds, model_names):
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Time"])
 
     for x in range(len(clfs)):
-        start = time
+        start = time()
         mn = model_names[x]
         if mn == "XGBoost":
             features = DMatrix(features)
@@ -134,7 +134,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         logging.info("Training generalization accuracy: %f", tts_train_score)
         logging.info("test/train split accuracy: %f", tts_score)
         #np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
-        end = time
+        end = time()
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
@@ -229,7 +229,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
         svd = TruncatedSVD(n_components=10000, n_iter=7, random_state=42)
         svd.fit(features)
         features = svd.transform(features)
-        end = time
+        end = time()
         elapsed = end - start
         print "Time elapsed for dimensionality reduction is %f" %  elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
@@ -248,6 +248,7 @@ if __name__ == '__main__':
         mem_usage = memory_usage((main,args), interval=1.0)
         print('Average memory usage: %s' % np.mean(mem_usage))
         print('Maximum memory usage: %s' % max(mem_usage))
+        np.savez("results/mem-usage" + file, mem_usage)
 
     else:
         main()
