@@ -20,7 +20,7 @@ from xgboost import XGBClassifier, DMatrix
 from scipy.sparse import csr_matrix, hstack
 import sys
 from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
-
+from memory_profiler import memory_usage
 
 def cross_validation_accuracy(clf, X, labels, skf):
     """ 
@@ -243,6 +243,9 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         #os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1], args[2])
+        mem_usage = memory_usage((main,args), interval=1.0)
+        print('Average memory usage: %s' % np.mean(mem_usage))
+        print('Maximum memory usage: %s' % max(mem_usage))
+
     else:
         main()
