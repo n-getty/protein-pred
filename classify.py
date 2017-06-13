@@ -180,7 +180,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
+def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune10=0):
     path = "data/" + size + '/'
     folds = 5
     # SVC(probability=True),
@@ -200,7 +200,7 @@ def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
 
     #tfer.fit(features)
     #features = tfer.transform(features)
-    if file2:
+    if file2 != '0':
         print "Adding 5mer features"
         features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
         features2 = features2[:,:-5]
@@ -208,7 +208,7 @@ def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
         #features2 = tfer.transform(features2)
         #normalize(features2, copy=False)
         features = hstack([features, features2],format='csr')
-    if file3:
+    if file3 != '0':
         print "Adding 10mer features"
         features3, _ = load_sparse_csr(path + "feature_matrix.10.csr.npz")
         features3 = features3[:,:-5]
@@ -222,7 +222,7 @@ def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
-    if tfidf != "False":
+    if tfidf != "0":
         print "Converting features to tfidf"
         tfer = TfidfTransformer()
         tfer.fit(features)
@@ -233,7 +233,7 @@ def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
     #normalize(features[-1], copy=False,axis=0)
     print features.shape
 
-    if red != "False":
+    if red != "0":
         print "Starting dimensionality reduction via TruncatedSVD"
         start = time()
         svd = TruncatedSVD(n_components=int(red), n_iter=5, random_state=42)
@@ -246,7 +246,7 @@ def main(size, file2=0, file3=0, red=0, tfidf=0, prune10=0):
 
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
-    results.to_csv("results/results.svd." + file, sep="\t")
+    results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune10 , sep="\t")
     print results
 
 
