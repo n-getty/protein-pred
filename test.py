@@ -4,10 +4,9 @@ from scipy.sparse import csr_matrix
 from collections import Counter
 from sklearn.preprocessing import normalize
 import pandas as pd
+from memory_profiler import memory_usage
 
 
-file = "data/coreseed.train.tsv"
-data = pd.read_csv(file, names=["label", "dna"], usecols=[1, 5], delimiter='\t', header=0)
-
-print data.shape
-print len(Counter(data.label))
+mem_usage = memory_usage(-1, interval=.2)
+x = np.zeros((50000,50000))
+print(mem_usage)
