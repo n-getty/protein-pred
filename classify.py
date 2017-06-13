@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 import numpy as np
-import time
+from time import time
 import logging
 import math
 from itertools import islice, product
@@ -21,6 +21,7 @@ from scipy.sparse import csr_matrix, hstack
 import sys
 from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 from memory_profiler import memory_usage
+
 
 def cross_validation_accuracy(clf, X, labels, skf):
     """ 
