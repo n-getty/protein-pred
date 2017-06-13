@@ -232,7 +232,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
     if red != "False":
         print "Starting dimensionality reduction via TruncatedSVD"
         start = time()
-        svd = TruncatedSVD(n_components=100, n_iter=5, random_state=42)
+        svd = TruncatedSVD(n_components=red, n_iter=5, random_state=42)
         svd.fit(features)
         features = svd.transform(features)
         end = time()
