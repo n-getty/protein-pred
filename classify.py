@@ -182,7 +182,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=64, oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
              ]
     model_names = ["Random Forest" #"XGBoost"
              ]
@@ -216,7 +216,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
-    if tfidf:
+    if tfidf != "False":
         tfer = TfidfTransformer()
         tfer.fit(features)
         features = tfer.transform(features)
