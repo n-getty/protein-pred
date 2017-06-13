@@ -255,7 +255,7 @@ if __name__ == '__main__':
         mem_usage = memory_usage((main,args), interval=1.0)
         print('Average memory usage: %s' % np.mean(mem_usage))
         print('Maximum memory usage: %s' % max(mem_usage))
-        np.savez("results/mem-usage." + str(file), mem_usage)
+        np.savez("results/mem-usage/mem." + args[0], mem_usage)
 
     else:
         main()
