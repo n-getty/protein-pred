@@ -178,7 +178,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="False"):
+def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="False", tfidf="False"):
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
@@ -192,7 +192,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
     #log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
-    tfer = TfidfTransformer()
+
     #tfer.fit(features)
     #features = tfer.transform(features)
     if file2 != "False":
@@ -214,9 +214,10 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
-
-    tfer.fit(features)
-    features = tfer.transform(features)
+    if tfidf:
+        tfer = TfidfTransformer()
+        tfer.fit(features)
+        features = tfer.transform(features)
 
     #normalize(features[:, :-5], copy=False)
     #normalize(features[:, -5:-1], copy=False)
