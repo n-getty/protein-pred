@@ -218,7 +218,8 @@ def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune=0, est=32):
         features = hstack([features, features3],format='csr', dtype="Float32")
 
     nonzero_counts = features.getnnz(0)
-    nonz = nonzero_counts > prune
+    nonz = nonzero_counts > int(prune)
+    print "Removing %d features that do not have more than %d nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
 
     #tfer.fit(features[:, :-5])
