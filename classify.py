@@ -180,12 +180,12 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune10=0):
+def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune=0, est=32):
     path = "data/" + size + '/'
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=128, oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
              ]
     model_names = ["Random Forest" #"XGBoost"
              ]
@@ -212,13 +212,14 @@ def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune10=0):
         print "Adding 10mer features"
         features3, _ = load_sparse_csr(path + "feature_matrix.10.csr.npz")
         features3 = features3[:,:-5]
-        nonzero_counts = features3.getnnz(0)
-        nonz = nonzero_counts > prune10
-        features = features[:, nonz]
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
         features = hstack([features, features3],format='csr', dtype="Float32")
+
+    nonzero_counts = features.getnnz(0)
+    nonz = nonzero_counts > prune
+    features = features[:, nonz]
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
@@ -246,7 +247,7 @@ def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune10=0):
 
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
-    results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune10 , sep="\t")
+    results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
     print results
 
 
