@@ -186,7 +186,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     features, labels = load_sparse_csr("data/" + file)
     labels = convert_labels(labels)
 
-    features = features[:, :-5]
+    #features = features[:, :-5]
     log_info = "Dimensionality reduction with 3,5 and 10mers"
     #log_info = "Testing tfidf transformation"
     print log_info
@@ -205,7 +205,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False"):
     if file3 != "False":
         print "Combining kmer feature matrices with 3rd file"
         features3, _ = load_sparse_csr("data/" + file3)
-        #features3 = features3[:,:-5]
+        features3 = features3[:,:-5]
         #tfer.fit(features3)
         #features3 = tfer.transform(features3)
         #normalize(features3, copy=False)
