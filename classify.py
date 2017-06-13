@@ -219,7 +219,7 @@ def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune=0, est=32):
 
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
-    print "Removing %d features that do not have more than %d nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
+    print "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
 
     #tfer.fit(features[:, :-5])
