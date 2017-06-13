@@ -1,4 +1,6 @@
 #/home/ngetty/dev/anaconda2/bin/python
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 import pandas as pd
 import numpy as np
@@ -9,7 +11,7 @@ from itertools import islice, product
 from collections import Counter
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.model_selection import train_test_split#, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
@@ -236,6 +238,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
         elapsed = end - start
         print "Time elapsed for dimensionality reduction is %f" %  elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
+
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/results.svd." + file, sep="\t")
