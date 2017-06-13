@@ -9,7 +9,7 @@ from itertools import islice, product
 from collections import Counter
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split#, StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
@@ -182,7 +182,7 @@ def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=64, oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=300, oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
              ]
     model_names = ["Random Forest" #"XGBoost"
              ]
