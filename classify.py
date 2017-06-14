@@ -220,6 +220,14 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
 
+        if file2 != '0':
+            print "Adding 5mer features"
+            features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
+            features2 = features2[:, :-5]
+            # tfer.fit(features2)
+            # features2 = tfer.transform(features2)
+            # normalize(features2, copy=False)
+            features = hstack([features, features2], format='csr')
     labels = convert_labels(labels)
 
     #features = features[:, :-5]
@@ -227,20 +235,6 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     #log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
-
-
-
-    #tfer.fit(features)
-    #features = tfer.transform(features)
-    if file2 != '0':
-        print "Adding 5mer features"
-        features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
-        features2 = features2[:,:-5]
-        #tfer.fit(features2)
-        #features2 = tfer.transform(features2)
-        #normalize(features2, copy=False)
-        features = hstack([features, features2],format='csr')
-
 
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
