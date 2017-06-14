@@ -91,7 +91,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2=False):
+def main(file="feature_matrix.3.csr.npz", file2=False):
     use_batches = False
 
     features, _ = load_sparse_csr("data/" + file)

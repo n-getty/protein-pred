@@ -168,7 +168,7 @@ def load_sparse_csr(filename):
                       shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2="False", file3="False", red="False"):
+def main(file="feature_matrix.3.csr.npz", file2="False", file3="False", red="False"):
     folds = 5
     clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=200, oob_score=True, warm_start=True)]
     model_names = ["Random Forest"]

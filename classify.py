@@ -180,14 +180,14 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(size='sm', file2=0, file3=0, red=0, tfidf=0, prune=0, est=32):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32'):
     path = "data/" + size + '/'
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) #, XGBClassifier(nthread=320, n_estimators=200)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(nthread=8, n_estimators=int(est), objective="multi:softmax")
              ]
-    model_names = ["Random Forest" #"XGBoost"
+    model_names = ["Random Forest" ,"XGBoost"
              ]
     features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
     labels = convert_labels(labels)

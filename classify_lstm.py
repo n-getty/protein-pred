@@ -124,7 +124,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(file="feature_matrix.sm.3.csr.npz", file2="feature_matrix.sm.10.csr.npz", use_batches=False):
+def main(file="feature_matrix.3.csr.npz", file2="feature_matrix.sm.10.csr.npz", use_batches=False):
 
     use_batches = use_batches == "True"
 
