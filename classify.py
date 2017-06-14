@@ -189,14 +189,20 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
              ]
     model_names = ["Random Forest" ,"XGBoost"
              ]
-    features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-    labels = convert_labels(labels)
+
+    if file2 * file3 == 1:
+        features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
+    else:
+        features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
+        labels = convert_labels(labels)
 
     #features = features[:, :-5]
     log_info = "Dimensionality reduction with 3,5 and 10mers"
     #log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
+
+
 
     #tfer.fit(features)
     #features = tfer.transform(features)
@@ -208,14 +214,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         #features2 = tfer.transform(features2)
         #normalize(features2, copy=False)
         features = hstack([features, features2],format='csr')
-    if file3 != '0':
-        print "Adding 10mer features"
-        features3, _ = load_sparse_csr(path + "feature_matrix.10.csr.npz")
-        features3 = features3[:,:-5]
-        #tfer.fit(features3)
-        #features3 = tfer.transform(features3)
-        #normalize(features3, copy=False)
-        features = hstack([features, features3],format='csr', dtype="Float32")
+
 
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
