@@ -36,7 +36,7 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels'], loader['vocab']
 
 
-path = "data/lg/"
+path = "data/sm/"
 features, labels, vocab = load_sparse_csr(path + "feature_matrix.3.csr.npz")
 vocab = dict(vocab.tolist())
 
