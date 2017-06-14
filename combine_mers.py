@@ -58,6 +58,6 @@ features = hstack([features, features3],format='csr', dtype="Float32")
 for key, value in vocab3.iteritems():
     vocab3[key] = value + features.shape[1] + features2.shape[1]
 
-vocab = vocab + vocab2 + vocab3
+vocab = dict(vocab.items() + vocab2.items() + vocab3.items())
 
 save_sparse_csr("data/lg/feature_matrix.3.5.10.csr", features, labels, vocab)
