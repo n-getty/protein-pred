@@ -71,8 +71,9 @@ def test_train_split(clf, split, m):
 
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        score = accuracy_score(y_test, y_pred)
-        t5 = 0
+        #score = accuracy_score(y_test, y_pred)
+        #t5 = 0
+        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
         train_pred = clf.predict(X_train)
         train_score = accuracy_score(y_train, train_pred)
         '''
@@ -210,7 +211,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(n_estimators=int(est), objective="multi:softmax", max_depth=6, learning_rate=0.1)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(n_estimators=int(est), objective="multi:softprob", max_depth=6, learning_rate=0.1)
              ]
     model_names = ["Random Forest" ,"XGBoost"
              ]
