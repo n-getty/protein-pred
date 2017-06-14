@@ -60,4 +60,4 @@ for key, value in vocab3.iteritems():
 
 vocab = dict(vocab.items() + vocab2.items() + vocab3.items())
 
-save_sparse_csr("data/lg/feature_matrix.3.5.10.csr", features, labels, vocab)
+save_sparse_csr("data/sm/feature_matrix.3.5.10.csr", features, labels, vocab)
