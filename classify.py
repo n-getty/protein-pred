@@ -210,7 +210,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(nthread=8, n_estimators=int(est), objective="multi:softmax", max_depth=6, learning_rate=0.1)
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(n_estimators=int(est), objective="multi:softmax", max_depth=6, learning_rate=0.1)
              ]
     model_names = ["Random Forest" ,"XGBoost"
              ]
