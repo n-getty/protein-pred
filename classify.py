@@ -19,7 +19,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import normalize
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xgboost import XGBClassifier, DMatrix
-from scipy.sparse import csr_matrix, hstack
+from scipy.sparse import csr_matrix, hstack, issparse
 import sys
 from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 from memory_profiler import memory_usage
@@ -206,7 +206,8 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32'):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32', thresh='0'):
+    thresh = int(thresh)
     path = "data/" + size + '/'
     folds = 5
     # SVC(probability=True),
@@ -230,17 +231,23 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
             # normalize(features2, copy=False)
             features = hstack([features, features2], format='csr')
     labels = convert_labels(labels)
-
+    
     #features = features[:, :-5]
     log_info = "Dimensionality reduction with 3,5 and 10mers"
     #log_info = "Testing tfidf transformation"
     print log_info
     logging.info(log_info)
 
+    if thresh > 0:
+        print "Values less than threshhold,", np.sum(features.data <= thresh)
+        features.data *= features.data > thresh
+
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
     print "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
+
+
 
     #tfer.fit(features[:, :-5])
     #tfer.transform(features[:, :-5], copy=False)
