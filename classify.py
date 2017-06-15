@@ -260,10 +260,13 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     # Remove feature columns that have sample below threshhold
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
-    features = features[:, nonz]
 
-    print "Removing %d features that do not have more than %s nonzero counts"  % (features.shape[1] - np.sum(nonz), prune)
-    logging.info("Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
+    print "Removing %d features that do not have more than %s nonzero counts" % (
+    features.shape[1] - np.sum(nonz), prune)
+    logging.info(
+        "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
+
+    features = features[:, nonz]
 
     if tfidf != "0":
         print "Converting features to tfidf"
