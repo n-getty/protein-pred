@@ -109,7 +109,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
     #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Max Mem", "Avg Mem", "Time"])
 
     for x in range(len(clfs)):
         start = time()
@@ -127,7 +127,17 @@ def classify_all(labels, features, clfs, folds, model_names):
         #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
-        tts_score, tts_train_score, clf, t5 = test_train_split(clf, tts_split, mn)
+        args = (clf, tts_split, mn)
+        mem_usage, ret_val = memory_usage((test_train_split, args), interval=1.0, ret_val=True)
+        tts_score, tts_train_score, clf, t5 = ret_val
+
+        avg_mem = np.mean(mem_usage)
+        max_mem = max(mem_usage)
+        print('Average memory usage: %s' % avg_mem)
+        print('Maximum memory usage: %s' % max_mem)
+        #np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
+
+        #tts_score, tts_train_score, clf, t5 = test_train_split(clf, tts_split, mn)
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
@@ -154,7 +164,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, t5, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
         
     return results
 
@@ -303,10 +313,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         #os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        mem_usage = memory_usage((main,args), interval=1.0)
-        print('Average memory usage: %s' % np.mean(mem_usage))
-        print('Maximum memory usage: %s' % max(mem_usage))
-        np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
+        main(*args)
 
     else:
         main()
