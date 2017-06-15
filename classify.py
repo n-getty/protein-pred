@@ -25,7 +25,7 @@ from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 from memory_profiler import memory_usage
 import operator
 import xgboost as xgb
-import lightgbm as lgb
+from lightgbm import LGBMClassifier
 
 
 def cross_validation_accuracy(clf, X, labels, skf):
@@ -67,41 +67,28 @@ def test_train_split(clf, split, m):
     """
 
     X_train, X_test, y_train, y_test = split
+    clf.fit(X_train, y_train)
+    t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
+    train_pred = clf.predict(X_train)
+    train_score = accuracy_score(y_train, train_pred)
 
-    if m == "XGBoost":
+    '''
+    X_train = DMatrix(X_train, y_train)
+    X_test = DMatrix(X_test, y_test)
 
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        #score = accuracy_score(y_test, y_pred)
-        #t5 = 0
-        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
-        train_pred = clf.predict(X_train)
-        train_score = accuracy_score(y_train, train_pred)
-        '''
+    param = {'n_jobs': 8, 'n_estimators': 32, 'objective': "multi:softmax", "num_class": 100, "silent":1, "max_depth": 6, "eta": 0.3}
+    clf = xgb.train(param, X_train, 10)
+    preds = clf.predict(X_test)
+    score = accuracy_score(y_test,preds)
+    t5=0
+    train_preds = clf.predict(X_train)
+    train_score = accuracy_score(y_train, train_preds)'''
 
-        X_train = DMatrix(X_train, y_train)
-        X_test = DMatrix(X_test, y_test)
-
-        param = {'n_jobs': 8, 'n_estimators': 32, 'objective': "multi:softmax", "num_class": 100, "silent":1, "max_depth": 6, "eta": 0.3}
-        clf = xgb.train(param, X_train, 10)
-        preds = clf.predict(X_test)
-        score = accuracy_score(y_test,preds)
-        t5=0
-        train_preds = clf.predict(X_train)
-        train_score = accuracy_score(y_train, train_preds)'''
-
-    #elif m == "Random Forest":
-    else:
-        clf.fit(X_train, y_train)
-        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
-        train_score = clf.oob_score_
-
+    #if m == "Random Forest":
+        #train_score = clf.oob_score_
 
     print "Top 5 accuracy:", t5
-    #print "Top 1 accuracy:", score
     logging.info("Top 5 accuracy: %f", t5)
-    #logging.info("Top 1 accuracy: %f", score)
-    #cm = confusion_matrix(y_test, y_pred)
 
     return score, train_score, clf, t5
 
@@ -163,7 +150,6 @@ def classify_all(labels, features, clfs, folds, model_names):
         print "Validation accuracy:", tts_score
         logging.info("Training generalization accuracy: %f", tts_train_score)
         logging.info("test/train split accuracy: %f", tts_score)
-        #np.savetxt("results/" + mn + "_cm.txt", cm, fmt='%i', delimiter="\t")
         end = time()
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
@@ -174,7 +160,15 @@ def classify_all(labels, features, clfs, folds, model_names):
 
 
 def top_5_accuracy(probs, y_true):
-    #print "Calculating top 5 accuracy"
+    """ 
+    Calculates top 5 and top 1 accuracy in 1 go
+    Params:
+        probs.....NxC matrix, class probabilities for each class
+        y_true....True class labels
+    Returns:
+        top5 accuracy
+        top1 accuracy
+    """
     top5 = np.argsort(probs, axis=1)[:,-5:]
     c = 0
     top1c = 0
@@ -208,55 +202,69 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels']
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32', thresh='0'):
-    thresh = int(thresh)
+def load_data(size, file2, file3):
+
     path = "data/" + size + '/'
-    folds = 5
-    # SVC(probability=True),
-    # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True),XGBClassifier(n_estimators=int(est), objective="multi:softprob", max_depth=6, learning_rate=0.1)
-             ,lgb.LGBMClassifier(num_leaves=63,
-                        learning_rate=0.1,
-                        n_estimators=int(est))]
-    model_names = ["Random Forest" ,"XGBoost", "LightGBM"
-             ]
 
     if int(file2) * int(file3) == 1:
+        print "Using 3, 5 and 10mer count features"
         features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
 
         if file2 != '0':
-            print "Adding 5mer features"
+            print "Adding 5mer count features"
             features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
             features2 = features2[:, :-5]
-            # tfer.fit(features2)
-            # features2 = tfer.transform(features2)
-            # normalize(features2, copy=False)
             features = hstack([features, features2], format='csr')
+
     labels = convert_labels(labels)
 
-    #features = features[:, :-5]
-    log_info = "Dimensionality reduction with 3,5 and 10mers"
-    #log_info = "Testing tfidf transformation"
-    print log_info
-    logging.info(log_info)
+    return features, labels
 
+
+def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32', thresh='0'):
+    thresh = int(thresh)
+    folds = 5
+
+    # SVC(probability=True),
+    # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
+
+    clfs = [RandomForestClassifier(n_jobs=-1,
+                                   n_estimators=int(est),
+                                   oob_score=False),
+
+            XGBClassifier(n_estimators=int(est),
+                          objective="multi:softprob",
+                          max_depth=6,
+                          learning_rate=0.1),
+
+            LGBMClassifier(num_leaves=63,
+                           learning_rate=0.1,
+                           n_estimators=int(est))
+            ]
+
+    model_names = ["Random Forest",
+                   "XGBoost",
+                   "LightGBM"
+             ]
+
+    features, labels = load_data(size, file2, file3)
+
+    # Zero-out counts below the given threshold
     if thresh > 0:
         print "Values less than threshhold,", np.sum(features.data <= thresh)
         logging.info("Values less than threshhold,", np.sum(features.data <= thresh))
         features.data *= features.data > thresh
 
+    # Remove feature columns that have sample below threshhold
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
-    print "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
-    logging.info("Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
     features = features[:, nonz]
 
+    print "Removing %d features that do not have more than %s nonzero counts"  % (features.shape[1] - np.sum(nonz), prune)
+    logging.info("Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
 
-
-    #tfer.fit(features[:, :-5])
-    #tfer.transform(features[:, :-5], copy=False)
     if tfidf != "0":
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
@@ -264,11 +272,10 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         tfer.fit(features)
         features = tfer.transform(features)
 
-    #normalize(features[:, :-5], copy=False)
-    #normalize(features[:, -5:-1], copy=False)
-    #normalize(features[-1], copy=False,axis=0)
-    print features.shape
+    print "Final data shape:", features.shape
+    logging.info("Final data shape: %s" (features.shape,))
 
+    # Reduce feature dimensionality
     if red != "0":
         print "Starting dimensionality reduction via TruncatedSVD"
         logging.info("Starting dimensionality reduction via TruncatedSVD")
