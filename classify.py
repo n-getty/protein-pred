@@ -273,7 +273,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         features = tfer.transform(features)
 
     print "Final data shape:", features.shape
-    logging.info("Final data shape: %s" (features.shape,))
+    logging.info("Final data shape: %s" % (features.shape,))
 
     # Reduce feature dimensionality
     if red != "0":
