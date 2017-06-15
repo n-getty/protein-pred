@@ -10,12 +10,3 @@ data.protein = '>' + data.protein + '\n' + data.sequence
 for x in range(len(data.protein)):
     with open("data/ref.100.seqs/seq" + str(x) + ".fasta", mode='wb') as file:
             print>>file, data.protein[x]
-
-
-'''
-memory usage metric
-larger dataset
-fasta input
-start with res networks on this data
-add metafeatures
-'''

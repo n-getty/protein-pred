@@ -6,5 +6,4 @@ from sklearn.preprocessing import normalize
 import pandas as pd
 from memory_profiler import memory_usage
 
-if 1:
-    print "0"
+print "Test tup %s" % ((1,2,3),)
