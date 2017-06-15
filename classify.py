@@ -215,8 +215,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
     clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True),XGBClassifier(n_estimators=int(est), objective="multi:softprob", max_depth=6, learning_rate=0.1)
-             ,lgb.LGBMRegressor(objective='classification',
-                        num_leaves=63,
+             ,lgb.LGBMClassifier(num_leaves=63,
                         learning_rate=0.1,
                         n_estimators=int(est))]
     model_names = ["Random Forest" ,"XGBoost", "LightGBM"
