@@ -294,7 +294,7 @@ def read_whole(file,f,k):
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
     print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    save_sparse_csr("data/feature_matrix." + f + str(k) + ".csr", features, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix." + str(k) + ".csr", features, labels, vocab)
 
 
 def main(lg_file=False, k=3, chunksize=100000):
