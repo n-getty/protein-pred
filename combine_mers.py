@@ -1,6 +1,6 @@
 from scipy.sparse import csr_matrix, hstack
 import numpy as np
-
+import sys
 
 def convert_labels(labels):
     """ 
@@ -36,31 +36,40 @@ def load_sparse_csr(filename):
                          shape=loader['shape']), loader['labels'], loader['vocab']
 
 
-path = "data/lg/"
-features, labels, vocab = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-print features.shape
-vocab = dict(vocab.tolist())
+def main(size="sm"):
+    path = "data/" + size
+    features, labels, vocab = load_sparse_csr(path + "/feature_matrix.3.csr.npz")
+    print features.shape
+    vocab = dict(vocab.tolist())
 
-labels = convert_labels(labels)
+    labels = convert_labels(labels)
 
-features2, _, vocab2 = load_sparse_csr(path + "feature_matrix.5.csr.npz")
-print features2.shape
-vocab2 = dict(vocab2.tolist())
-features2 = features2[:,:-5]
-features = hstack([features, features2],format='csr')
+    features2, _, vocab2 = load_sparse_csr(path + "/feature_matrix.5.csr.npz")
+    print features2.shape
+    vocab2 = dict(vocab2.tolist())
+    features2 = features2[:,:-5]
+    features = hstack([features, features2],format='csr')
 
-for key, value in vocab2.iteritems():
-    vocab2[key] = value + features.shape[1]
+    for key, value in vocab2.iteritems():
+        vocab2[key] = value + features.shape[1]
 
-features3, _, vocab3 = load_sparse_csr(path + "feature_matrix.10.csr.npz")
-print features3.shape
-vocab3 = dict(vocab3.tolist())
-features3 = features3[:,:-5]
-features = hstack([features, features3],format='csr', dtype="Float32")
+    features3, _, vocab3 = load_sparse_csr(path + "/feature_matrix.10.csr.npz")
+    print features3.shape
+    vocab3 = dict(vocab3.tolist())
+    features3 = features3[:,:-5]
+    features = hstack([features, features3],format='csr', dtype="Float32")
 
-for key, value in vocab3.iteritems():
-    vocab3[key] = value + features.shape[1] + features2.shape[1]
+    for key, value in vocab3.iteritems():
+        vocab3[key] = value + features.shape[1] + features2.shape[1]
 
-vocab = dict(vocab.items() + vocab2.items() + vocab3.items())
+    vocab = dict(vocab.items() + vocab2.items() + vocab3.items())
 
-save_sparse_csr("data/lg/feature_matrix.3.5.10.csr", features, labels, vocab)
+    save_sparse_csr("data/" + size + "/feature_matrix.3.5.10.csr", features, labels, vocab)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        args = sys.argv[1:]
+        main(args[0])
+    else:
+        main()
