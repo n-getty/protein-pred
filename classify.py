@@ -25,6 +25,7 @@ from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
 from memory_profiler import memory_usage
 import operator
 import xgboost as xgb
+import lightgbm as lgb
 
 
 def cross_validation_accuracy(clf, X, labels, skf):
@@ -89,7 +90,8 @@ def test_train_split(clf, split, m):
         train_preds = clf.predict(X_train)
         train_score = accuracy_score(y_train, train_preds)'''
 
-    elif m == "Random Forest":
+    #elif m == "Random Forest":
+    else:
         clf.fit(X_train, y_train)
         t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
         train_score = clf.oob_score_
@@ -142,7 +144,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
-        if mn == "Random Forest":
+        if mn == "Random Forest" or mn == "LightGBM":
             feat_score = clf.feature_importances_
             top_10_features = np.argsort(feat_score)[::-1][:10]
         elif mn == "XGBoost":
@@ -212,9 +214,12 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     folds = 5
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
-    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True) , XGBClassifier(n_estimators=int(est), objective="multi:softprob", max_depth=6, learning_rate=0.1)
-             ]
-    model_names = ["Random Forest" ,"XGBoost"
+    clfs = [RandomForestClassifier(n_jobs=-1, n_estimators=int(est), oob_score=True),XGBClassifier(n_estimators=int(est), objective="multi:softprob", max_depth=6, learning_rate=0.1)
+             ,lgb.LGBMRegressor(objective='classification',
+                        num_leaves=63,
+                        learning_rate=0.1,
+                        n_estimators=int(est))]
+    model_names = ["Random Forest" ,"XGBoost", "LightGBM"
              ]
 
     if int(file2) * int(file3) == 1:
@@ -231,7 +236,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
             # normalize(features2, copy=False)
             features = hstack([features, features2], format='csr')
     labels = convert_labels(labels)
-    
+
     #features = features[:, :-5]
     log_info = "Dimensionality reduction with 3,5 and 10mers"
     #log_info = "Testing tfidf transformation"
@@ -240,11 +245,13 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
 
     if thresh > 0:
         print "Values less than threshhold,", np.sum(features.data <= thresh)
+        logging.info("Values less than threshhold,", np.sum(features.data <= thresh))
         features.data *= features.data > thresh
 
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
     print "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune)
+    logging.info("Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
     features = features[:, nonz]
 
 
@@ -253,6 +260,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     #tfer.transform(features[:, :-5], copy=False)
     if tfidf != "0":
         print "Converting features to tfidf"
+        logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
         tfer.fit(features)
         features = tfer.transform(features)
@@ -264,6 +272,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
 
     if red != "0":
         print "Starting dimensionality reduction via TruncatedSVD"
+        logging.info("Starting dimensionality reduction via TruncatedSVD")
         start = time()
         svd = TruncatedSVD(n_components=int(red), n_iter=5, random_state=42)
         svd.fit(features)
