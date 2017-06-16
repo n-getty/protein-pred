@@ -304,7 +304,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
     print features.dtype
-    features = features.astype('float8')
+    features = features.astype('float16')
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
