@@ -141,7 +141,7 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
-        if mn == "Random Forest" or mn == "LightGBM":
+        if mn == "Random Forest" or mn == "LightGBM" or mn == "XGBoost":
             feat_score = clf.feature_importances_
             top_10_features = np.argsort(feat_score)[::-1][:10]
         elif mn == "XGBoost":
