@@ -252,7 +252,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
                           max_depth=6,
                           learning_rate=0.1),
 
-            LGBMClassifier(n_jobs=-1,
+            LGBMClassifier(nthread=-1,
                            num_leaves=63,
                            learning_rate=0.1,
                            n_estimators=int(est))
