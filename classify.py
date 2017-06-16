@@ -145,6 +145,8 @@ def classify_all(labels, features, clfs, folds, model_names):
             feat_score = clf.feature_importances_
             top_10_features = np.argsort(feat_score)[::-1][:10]
         elif mn == "XGBoost":
+            print clf
+            print clf.booster()
             fscore = clf.booster().get_fscore()
             fscore = sorted(fscore.items(), key=operator.itemgetter(1), reverse=True)
             top_features = [int(k[1:]) for k, _ in fscore]
