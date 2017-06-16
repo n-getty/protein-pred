@@ -211,7 +211,7 @@ def convert_labels(labels):
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
-                         shape=loader['shape']), loader['labels']
+                         shape=loader['shape'], dtype="int32"), loader['labels']
 
 
 def load_data(size, file2, file3):
@@ -223,19 +223,19 @@ def load_data(size, file2, file3):
         features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-
         if file2 != '0':
             print "Adding 5mer count features"
             features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
             features2 = features2[:, :-5]
             features = hstack([features, features2], format='csr')
+            exit(0)
 
     labels = convert_labels(labels)
 
     return features, labels
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32', thresh='0'):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32', thresh='0'):
     thresh = int(thresh)
     folds = 5
 
@@ -246,7 +246,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
                                    n_estimators=int(est),
                                    oob_score=False),
 
-            XGBClassifier(n_jobs=-1,
+            XGBClassifier(#n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=6,
@@ -287,7 +287,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
         tfer.fit(features)
-        tfer.transform(features, copy=False)
+        features = tfer.transform(features)
 
     print "Final data shape:", features.shape
     logging.info("Final data shape: %s" % (features.shape,))
@@ -305,8 +305,8 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         print "Time elapsed for dimensionality reduction is %f" %  elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
-    print features.dtype
     features = features.astype('float16')
+
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
