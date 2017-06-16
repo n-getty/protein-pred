@@ -128,13 +128,17 @@ def classify_all(labels, features, clfs, folds, model_names):
         #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
 
         args = (clf, tts_split, mn)
-        mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
-        tts_score, tts_train_score, clf, t5 = retval
+        tts_score, tts_train_score, clf, t5 = test_train_split(*args)
 
+        '''mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
+        tts_score, tts_train_score, clf, t5 = retval
+        
         avg_mem = np.mean(mem_usage)
         max_mem = max(mem_usage)
         print('Average memory usage: %s' % avg_mem)
-        print('Maximum memory usage: %s' % max_mem)
+        print('Maximum memory usage: %s' % max_mem)'''
+        avg_mem = -1
+        max_mem = -1
         #np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
 
         #tts_score, tts_train_score, clf, t5 = test_train_split(clf, tts_split, mn)
