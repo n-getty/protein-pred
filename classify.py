@@ -249,8 +249,8 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
                                    n_estimators=int(est),
                                    oob_score=False),
 
-            XGBClassifier(#n_jobs=-1,
-                          nthread=-1,
+            XGBClassifier(n_jobs=-1,
+                          #nthread=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=6,
@@ -292,7 +292,6 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         tfer = TfidfTransformer()
         tfer.fit(features)
         features = tfer.transform(features)
-        features = features.astype('float16')
 
     print "Final data shape:", features.shape
     logging.info("Final data shape: %s" % (features.shape,))
@@ -310,7 +309,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         print "Time elapsed for dimensionality reduction is %f" %  elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
-
+    features = features.astype('float32')
 
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
