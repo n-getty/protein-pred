@@ -279,8 +279,14 @@ def featurize_nuc_counts(data):
     return csr_matrix(np.array(M))
 
 
+def featurize_aa_counts(data):
+    nuc_counts = [Counter(x) for x in data]
+    M = [[c['F'], c['S'], c['Y'], c['C'], c['L'], c['I'], c['M'], c['V'], c['P'], c['T'], c['A'], c['H'], c['Q'], c['N'], c['K'], c['D'], c['E'], c['W'], c['R'], c['S'], c['G']] for c in nuc_counts]
+    return csr_matrix(np.array(M))
+
+
 def read_whole(file,f,k):
-    data = pd.read_csv(file, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0)
+    data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
     features, vocab = featurize_data(data, k)
@@ -288,8 +294,9 @@ def read_whole(file,f,k):
     #features = features[:, nonz]
 
     nuc_features = featurize_nuc_counts(data.dna)
+    aa_features = featurize_aa_counts(data.aa)
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
-    features = hstack([features, nuc_features, seq_lens], format='csr')
+    features = hstack([features, nuc_features, aa_features, seq_lens], format='csr')
 
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
@@ -306,14 +313,14 @@ def main(lg_file=False, k=3, chunksize=100000):
 
     if lg_file == "True":
         file = "data/rep.1000ec.pgf.seqs.filter"
-        f = "lg."
+        f = "lg"
         if chunksize > 0:
             read_chunks(file, f, k, chunksize)
         else:
             read_whole(file, f, k)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
-        f = "sm."
+        f = "sm"
         read_whole(file, f, k)
 
     print "Time elapsed to build %d mers is %f" % (k, time() - start)

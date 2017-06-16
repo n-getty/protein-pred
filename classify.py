@@ -250,7 +250,6 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
                                    oob_score=False),
 
             XGBClassifier(n_jobs=-1,
-                          #nthread=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=6,
@@ -271,8 +270,9 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
 
     # Zero-out counts below the given threshold
     if thresh > 0:
-        print "Values less than threshhold,", np.sum(features.data <= thresh)
-        logging.info("Values less than threshhold,", np.sum(features.data <= thresh))
+        v = np.sum(features.data <= thresh)
+        print "Values less than threshhold,", v
+        logging.info("Values less than threshhold,", v)
         features.data *= features.data > thresh
 
     # Remove feature columns that have sample below threshhold
