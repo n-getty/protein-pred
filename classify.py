@@ -240,21 +240,23 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
-    clfs = [#RandomForestClassifier(n_jobs=-1,
-             #                      n_estimators=int(est),
-              #                     oob_score=False),
+    clfs = [RandomForestClassifier(n_jobs=-1,
+                                   n_estimators=int(est),
+                                   oob_score=False),
 
-            XGBClassifier(n_estimators=int(est),
+            XGBClassifier(n_jobs=-1,
+                          n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=6,
                           learning_rate=0.1),
 
-            LGBMClassifier(num_leaves=63,
+            LGBMClassifier(n_jobs=-1,
+                           num_leaves=63,
                            learning_rate=0.1,
                            n_estimators=int(est))
             ]
 
-    model_names = [#"Random Forest",
+    model_names = ["Random Forest",
                    "XGBoost",
                    "LightGBM"
              ]
@@ -283,7 +285,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
         tfer.fit(features)
-        features = tfer.transform(features)
+        tfer.transform(features, copy=False)
 
     print "Final data shape:", features.shape
     logging.info("Final data shape: %s" % (features.shape,))
@@ -301,6 +303,8 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='32
         print "Time elapsed for dimensionality reduction is %f" %  elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
+    print features.dtype
+    features = features.astype('float8')
     results = classify_all(labels, features, clfs, folds, model_names)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
