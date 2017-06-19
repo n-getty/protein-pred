@@ -265,10 +265,9 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
-    clfs = ['''RandomForestClassifier(n_jobs=-1,
-                                   n_estimators=int(est),
-                                   oob_score=False),'''
-
+    clfs = [#RandomForestClassifier(n_jobs=-1,
+                 #                  n_estimators=int(est),
+                                   #oob_score=False),
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
