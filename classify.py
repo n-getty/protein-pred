@@ -50,7 +50,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
             clf.fit(X_train, y_train)
         else:
             clf.fit(X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], early_stopping_rounds=2,
-                    verbose=0, eval_metric='logloss')
+                    verbose=0, eval_metric='mlogloss')
         t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
         train_pred = clf.predict(X_train)
         train_score = accuracy_score(y_train, train_pred)
