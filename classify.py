@@ -265,11 +265,11 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
-    clfs = [RandomForestClassifier(n_jobs=-1,
+    clfs = ['''RandomForestClassifier(n_jobs=-1,
                                    n_estimators=int(est),
-                                   oob_score=False),
+                                   oob_score=False),'''
 
-            XGBClassifier(n_jobs=-1,
+           XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=4,
@@ -281,7 +281,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
                            n_estimators=int(est))
             ]
 
-    model_names = ["Random Forest",
+    model_names = [#"Random Forest",
                    "XGBoost",
                    "LightGBM"
              ]
@@ -310,8 +310,11 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        tfer.fit(features)
-        features = tfer.transform(features)
+        tfer.fit(features[:,31],labels)
+        features_tf = tfer.transform(features[:,31])
+        #tfer.fit(features[:,31])
+        #features[:,31] = tfer.transform(features[:,31])
+        features = hstack([features_tf, features[:,32:]], format='csr')
         features = features.astype('float32')
 
     print "Final data shape:", features.shape
