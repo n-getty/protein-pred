@@ -258,16 +258,16 @@ def load_data(size, file2, file3):
     return features, labels
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='200', thresh='0'):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='200', thresh='0'):
     thresh = int(thresh)
     folds = 5
 
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
-    clfs = [#RandomForestClassifier(n_jobs=-1,
-                 #                  n_estimators=int(est),
-                                   #oob_score=False),
+    clfs = [RandomForestClassifier(n_jobs=-1,
+                                   n_estimators=int(est),
+                                   oob_score=False),
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
@@ -280,7 +280,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
                            n_estimators=int(est))
             ]
 
-    model_names = [#"Random Forest",
+    model_names = ["Random Forest",
                    "XGBoost",
                    "LightGBM"
              ]
@@ -309,8 +309,8 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='20
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        tfer.fit(features[:,31],labels)
-        features_tf = tfer.transform(features[:,31])
+        tfer.fit(features[:,:32],labels)
+        features_tf = tfer.transform(features[:,:32])
         #tfer.fit(features[:,31])
         #features[:,31] = tfer.transform(features[:,31])
         features = hstack([features_tf, features[:,32:]], format='csr')
