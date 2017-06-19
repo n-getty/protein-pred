@@ -28,7 +28,7 @@ import xgboost as xgb
 from lightgbm import LGBMClassifier
 
 
-def cross_validation_accuracy(clf, X, labels, skf):
+def cross_validation_accuracy(clf, X, labels, skf, m):
     """ 
     Compute the average testing accuracy over k folds of cross-validation. 
     Params:
@@ -42,17 +42,27 @@ def cross_validation_accuracy(clf, X, labels, skf):
     """
     scores = []
     train_scores = []
+    t5s = []
     for train_index, test_index in skf:
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
-        clf.fit(X_train, y_train)
-        scores.append(accuracy_score(y_test, clf.predict(X_test)))
-        train_scores.append(accuracy_score(y_train, clf.predict(X_train)))
+        if m == 'Random Forest':
+            clf.fit(X_train, y_train)
+        else:
+            clf.fit(X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], early_stopping_rounds=2,
+                    verbose=0, eval_metric='logloss')
+        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
+        train_pred = clf.predict(X_train)
+        train_score = accuracy_score(y_train, train_pred)
+        scores.append(score)
+        t5s.append(t5)
+        train_scores.append(train_score)
 
-    scores = [x for x in scores if str(x) != 'Nan']
+    '''scores = [x for x in scores if str(x) != 'Nan']
     train_scores = [x for x in train_scores if str(x) != 'Nan']
+    t5s = [x for x in t5s if str(x) != 'Nan']'''
 
-    return np.mean(scores), np.mean(train_scores)
+    return np.mean(scores), np.mean(train_scores), np.mean(t5s)
 
 
 def test_train_split(clf, split, m):
@@ -110,9 +120,9 @@ def classify_all(labels, features, clfs, folds, model_names):
     tts_split = train_test_split(
         features, labels, test_size=0.2, random_state=0, stratify=labels)
 
-    #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
+    skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Max Mem", "Avg Mem", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Max Mem", "Avg Mem", "Time"])
 
     for x in range(len(clfs)):
         start = time()
@@ -124,11 +134,15 @@ def classify_all(labels, features, clfs, folds, model_names):
         clf = clfs[x]
 
             #features = DMatrix(features)
-        #cv_score, cv_train_score = cross_validation_accuracy(clf, features, labels, skf)
-        cv_score = 0
-        cv_train_score = 0
-        #print "%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score)
-        #logging.info("%s %d fold cross validation mean accuracy: %f" % (mn, folds, cv_score))
+        cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
+        #cv_score = 0
+        #cv_train_score = 0
+        print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_score)
+        logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_score))
+        print "%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_score)
+        logging.info("%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_score))
+        print "%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score)
+        logging.info("%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score))
 
         args = (clf, tts_split, mn)
         tts_score, tts_train_score, clf, t5 = test_train_split(*args)
@@ -173,7 +187,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, cv_t5, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
         
     return results
 
