@@ -83,7 +83,11 @@ def test_train_split(clf, split, m):
     if m == 'Random Forest':
         clf.fit(X_train, y_train)
     else:
-        clf.fit(X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], early_stopping_rounds=2, verbose=0, eval_metric='mlogloss')
+        clf.fit(X_train, y_train,
+                eval_set=[(X_train, y_train), (X_test, y_test)],
+                early_stopping_rounds=2,
+                verbose=False,
+                eval_metric='mlogloss')
     t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
@@ -123,7 +127,7 @@ def classify_all(labels, features, clfs, folds, model_names):
     tts_split = train_test_split(
         features, labels, test_size=0.2, random_state=0, stratify=labels)
 
-    #skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
+    skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Max Mem", "Avg Mem", "Time"])
 
@@ -137,16 +141,16 @@ def classify_all(labels, features, clfs, folds, model_names):
         clf = clfs[x]
 
             #features = DMatrix(features)
-        #cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
-        cv_score = -1
+        cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
+        '''cv_score = -1
         cv_train_score = -1
-        cv_t5 = -1
-        '''print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
+        cv_t5 = -1'''
+        print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
         logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score))
         print "%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5)
         logging.info("%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5))
         print "%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score)
-        logging.info("%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score))'''
+        logging.info("%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score))
 
         args = (clf, tts_split, mn)
         tts_score, tts_train_score, clf, t5 = test_train_split(*args)
@@ -259,7 +263,7 @@ def load_data(size, file2, file3):
     return features, labels
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='200', thresh='0'):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32', thresh='0'):
     thresh = int(thresh)
     folds = 5
 
