@@ -137,10 +137,10 @@ def classify_all(labels, features, clfs, folds, model_names):
         cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
         #cv_score = 0
         #cv_train_score = 0
-        print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_score)
-        logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_score))
-        print "%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_score)
-        logging.info("%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_score))
+        print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
+        logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score))
+        print "%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5)
+        logging.info("%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5))
         print "%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score)
         logging.info("%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score))
 
