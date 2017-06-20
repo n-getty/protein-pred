@@ -127,7 +127,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
     if cv == 1:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Train Acc", "Max Mem", "Avg Mem", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Val Acc", "Max Mem", "Avg Mem", "Time"])
 
     for x in range(len(clfs)):
         start = time()
@@ -264,17 +264,18 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
 
     clfs = [RandomForestClassifier(n_jobs=-1,
                                    n_estimators=int(est),
-                                   oob_score=False),
+                                   oob_score=False,
+                                   max_depth = 4),
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
-                          max_depth=2,
+                          max_depth=4,
                           learning_rate=0.3,
                           colsample_bytree=0.5,
                           subsample=0.5),
 
             LGBMClassifier(nthread=-1,
-                           num_leaves=3,
+                           num_leaves=15,
                            learning_rate=0.3,
                            n_estimators=int(est),
                            colsample_bytree = 0.5,
