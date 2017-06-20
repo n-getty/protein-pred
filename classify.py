@@ -269,12 +269,16 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=2,
-                          learning_rate=0.3),
+                          learning_rate=0.3,
+                          colsample_bytree=0.5,
+                          subsample=0.5),
 
             LGBMClassifier(nthread=-1,
                            num_leaves=3,
                            learning_rate=0.3,
-                           n_estimators=int(est))
+                           n_estimators=int(est),
+                           colsample_bytree = 0.5,
+                           subsample=0.5)
             ]
 
     model_names = ["Random Forest",
