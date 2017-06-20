@@ -172,7 +172,7 @@ def classify_all(labels, features, clfs, folds, model_names):
         feat_score = clf.feature_importances_
         top_10_features = np.argsort(feat_score)[::-1][:10]
         if mn == "Random Forest":
-            features = features[np.argsort(feat_score)[::-1][:10000]]
+            features = features[:,np.argsort(feat_score)[::-1][:10000]]
 
         print "Top ten feature idxs", top_10_features
         logging.info("Top ten feature idxs: %s", str(top_10_features))
