@@ -203,10 +203,10 @@ def featurize_data(data, k=3):
     # labels = data.label
     start = time()
     #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
-    kmers = get_kmer_counts(data.dna, k)
+    kmers = get_kmer_counts(data, k)
 
     print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
-    nrows = len(data.label)
+    nrows = data.shape[0]
 
     vocab, _ = gen_vocab(k)
 
@@ -274,7 +274,7 @@ def read_chunks(file,f,k,chunksize):
 
 
 def featurize_nuc_counts(data):
-    nuc_counts = [Counter(x) for x in data]
+    nuc_counts = [Counter(x.lower()) for x in data]
     M = [[c['a'], c['c'], c['g'], c['t']] for c in nuc_counts]
     return csr_matrix(np.array(M))
 
@@ -286,17 +286,20 @@ def featurize_aa_counts(data):
 
 
 def read_whole(file,f,k):
-    data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
+    data = pd.read_csv(file, names=["label", "aa", "dna", "aa_len"], usecols=[0, 6, 7, 8], delimiter='\t', header=0)
     labels = data.label
 
-    features, vocab = featurize_data(data, k)
+    features, vocab = featurize_data(data.dna, k)
+    #aa_features, aa_vocab = featurize_data(data.aa, k)
+
     #nonz = features.getnnz(0) > 0
     #features = features[:, nonz]
 
     nuc_features = featurize_nuc_counts(data.dna)
-    aa_features = featurize_aa_counts(data.aa)
+    aa_counts = featurize_aa_counts(data.aa)
+    aa_lens = data.aa_len
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
-    features = hstack([features, nuc_features, aa_features, seq_lens], format='csr')
+    features = hstack([features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
 
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
