@@ -262,25 +262,28 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
-    clfs = [RandomForestClassifier(n_jobs=-1,
-                                   n_estimators=int(est),
-                                   oob_score=False,
-                                   max_depth=6),
+    clfs = [RandomForestClassifier(n_jobs=-1
+                                   ,n_estimators=int(est)
+                                   ,oob_score=False
+                                   #,max_depth=6
+                                   ),
 
-           XGBClassifier(n_jobs=-1,
-                          n_estimators=int(est),
-                          objective="multi:softprob",
-                          max_depth=6,
-                          learning_rate=0.1,
-                          colsample_bytree=0.5,
-                          subsample=0.5),
+           XGBClassifier(n_jobs=-1
+                          ,n_estimators=int(est)
+                          ,objective="multi:softprob"
+                          ,max_depth=6
+                          ,learning_rate=0.1
+                          ,colsample_bytree=0.5
+                          ,subsample=0.5
+                         ),
 
-            LGBMClassifier(nthread=-1,
-                           num_leaves=63,
-                           learning_rate=0.1,
-                           n_estimators=int(est),
-                           colsample_bytree = 0.5,
-                           subsample=0.5)
+            LGBMClassifier(nthread=-1
+                           ,num_leaves=63
+                           ,learning_rate=0.1
+                           ,n_estimators=int(est)
+                           ,colsample_bytree = 0.5
+                           ,subsample=0.5
+                           )
             ]
 
     model_names = ["Random Forest",
