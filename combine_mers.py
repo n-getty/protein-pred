@@ -1,6 +1,8 @@
 from scipy.sparse import csr_matrix, hstack
 import numpy as np
 import sys
+from sklearn.feature_extraction.text import TfidfTransformer
+
 
 def convert_labels(labels):
     """ 
@@ -42,12 +44,21 @@ def main(size="sm"):
     print features.shape
     vocab = dict(vocab.tolist())
 
+    tfer = TfidfTransformer()
+    tfer.fit(features[:,:32],labels)
+    features_tf = tfer.transform(features[:,:32])
+    features = hstack([features_tf, features[:,32:]], format='csr')
+
     labels = convert_labels(labels)
 
     features2, _, vocab2 = load_sparse_csr(path + "/feature_matrix.5.csr.npz")
     print features2.shape
     vocab2 = dict(vocab2.tolist())
     features2 = features2[:,:-5]
+
+    tfer.fit(features2)
+    features = tfer.transform(features2)
+
     features = hstack([features, features2],format='csr')
 
     for key, value in vocab2.iteritems():
@@ -57,6 +68,10 @@ def main(size="sm"):
     print features3.shape
     vocab3 = dict(vocab3.tolist())
     features3 = features3[:,:-5]
+
+    tfer.fit(features3)
+    features = tfer.transform(features3)
+
     features = hstack([features, features3],format='csr', dtype="Float32")
 
     for key, value in vocab3.iteritems():
