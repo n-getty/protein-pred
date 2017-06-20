@@ -57,7 +57,7 @@ def main(size="sm"):
     features2 = features2[:,:-5]
 
     tfer.fit(features2)
-    features = tfer.transform(features2)
+    features2 = tfer.transform(features2)
 
     features = hstack([features, features2],format='csr')
 
@@ -70,7 +70,7 @@ def main(size="sm"):
     features3 = features3[:,:-5]
 
     tfer.fit(features3)
-    features = tfer.transform(features3)
+    features3 = tfer.transform(features3)
 
     features = hstack([features, features3],format='csr', dtype="Float32")
 
