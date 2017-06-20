@@ -265,18 +265,20 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
     clfs = [RandomForestClassifier(n_jobs=-1,
                                    n_estimators=int(est),
                                    oob_score=False,
-                                   max_depth = 4),
+                                   max_depth=4,
+                                   bootstrap=True),
+
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
                           max_depth=4,
-                          learning_rate=0.3,
+                          learning_rate=0.1,
                           colsample_bytree=0.5,
                           subsample=0.5),
 
             LGBMClassifier(nthread=-1,
                            num_leaves=15,
-                           learning_rate=0.3,
+                           learning_rate=0.1,
                            n_estimators=int(est),
                            colsample_bytree = 0.5,
                            subsample=0.5)
