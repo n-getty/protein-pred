@@ -297,7 +297,7 @@ def read_whole(file,f,k):
 
     nuc_features = featurize_nuc_counts(data.dna)
     aa_counts = featurize_aa_counts(data.aa)
-    aa_lens = data.aa_len
+    aa_lens = data.aa_len.reshape((len(labels),1))
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
     features = hstack([features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
 
