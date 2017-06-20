@@ -265,8 +265,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
     clfs = [RandomForestClassifier(n_jobs=-1,
                                    n_estimators=int(est),
                                    oob_score=False,
-                                   max_depth=4,
-                                   bootstrap=True),
+                                   max_depth=4),
 
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
