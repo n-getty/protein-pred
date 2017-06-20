@@ -258,7 +258,7 @@ def load_data(size, file2, file3):
 def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32', thresh='0', cv=0):
     thresh = int(thresh)
     folds = 5
-
+    cv = int(cv)
     # SVC(probability=True),
     # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
