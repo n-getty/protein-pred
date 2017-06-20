@@ -310,11 +310,11 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        #tfer.fit(features[:,:32],labels)
-        #features_tf = tfer.transform(features[:,:32])
-        #features = hstack([features_tf, features[:,32:]], format='csr')
-        tfer.fit(features)
-        features = tfer.transform(features)
+        tfer.fit(features[:,:32],labels)
+        features_tf = tfer.transform(features[:,:32])
+        features = hstack([features_tf, features[:,32:]], format='csr')
+        #tfer.fit(features)
+        #features = tfer.transform(features)
         features = features.astype('float32')
 
     print "Final data shape:", features.shape
