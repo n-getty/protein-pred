@@ -286,7 +286,7 @@ def featurize_aa_counts(data):
 
 
 def read_whole(file,f,k):
-    data = pd.read_csv(file, names=["label", "aa", "dna", "aa_len"], usecols=[0, 6, 7, 8], delimiter='\t', header=0)
+    data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
     features, vocab = featurize_data(data.dna, k)
@@ -297,10 +297,10 @@ def read_whole(file,f,k):
 
     nuc_features = featurize_nuc_counts(data.dna)
     aa_counts = featurize_aa_counts(data.aa)
-    aa_lens = pd.to_numeric(data.aa_len).reshape((len(labels),1))
+    aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
     features = hstack([features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
-
+    print features.shape
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
     print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
