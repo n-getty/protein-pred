@@ -168,19 +168,11 @@ def classify_all(labels, features, clfs, folds, model_names):
 
         #if mn == "Random Forest":
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
-        if mn == "Random Forest" or mn == "LightGBM" or mn == "XGBoost":
-            feat_score = clf.feature_importances_
-            top_10_features = np.argsort(feat_score)[::-1][:10]
-        elif mn == "XGBoost":
-            print clf
-            print clf.booster()
-            fscore = clf.booster().get_fscore()
-            fscore = sorted(fscore.items(), key=operator.itemgetter(1), reverse=True)
-            top_features = [int(k[1:]) for k, _ in fscore]
-            top_10_features = top_features[:10]
-        else:
-            feat_score = clf.coef_
-            top_10_features = np.argsort(feat_score)[::-1][:10]
+
+        feat_score = clf.feature_importances_
+        top_10_features = np.argsort(feat_score)[::-1][:10]
+        if mn == "Random Forest":
+            features = features[np.argsort(feat_score)[::-1][:10000]]
 
         print "Top ten feature idxs", top_10_features
         logging.info("Top ten feature idxs: %s", str(top_10_features))
@@ -274,12 +266,12 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est),
                           objective="multi:softprob",
-                          max_depth=4,
-                          learning_rate=0.3),
+                          max_depth=6,
+                          learning_rate=0.1),
 
             LGBMClassifier(nthread=-1,
-                           num_leaves=15,
-                           learning_rate=0.3,
+                           num_leaves=63,
+                           learning_rate=0.1,
                            n_estimators=int(est))
             ]
 
