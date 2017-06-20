@@ -179,9 +179,9 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
         print "Top ten feature idxs", top_10_features
         logging.info("Top ten feature idxs: %s", str(top_10_features))
 
-        print "Training generalization accuracy:", tts_train_score
+        print "Training accuracy:", tts_train_score
         print "Validation accuracy:", tts_score
-        logging.info("Training generalization accuracy: %f", tts_train_score)
+        logging.info("Training accuracy: %f", tts_train_score)
         logging.info("test/train split accuracy: %f", tts_score)
         end = time()
         elapsed = end-start
@@ -271,15 +271,15 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
            XGBClassifier(n_jobs=-1
                           ,n_estimators=int(est)
                           ,objective="multi:softprob"
-                          ,max_depth=6
-                          ,learning_rate=0.3
+                          ,max_depth=4
+                          ,learning_rate=0.1
                           ,colsample_bytree=0.5
                           ,subsample=0.5
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,num_leaves=63
-                           ,learning_rate=0.3
+                           ,num_leaves=15
+                           ,learning_rate=0.1
                            ,n_estimators=int(est)
                            ,colsample_bytree = 0.5
                            ,subsample=0.5
