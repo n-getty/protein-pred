@@ -29,7 +29,7 @@ def window(seq, k=3):
         yield result
 
 
-def reverse_complement(kmer):
+def reverse_complement(kmer, comp):
     """
     Generate a kmers complement
     Params:
@@ -37,7 +37,6 @@ def reverse_complement(kmer):
     Returns:
         A single kmer complement
     """
-    comp = {'a': 't', 'c': 'g', 't': 'a', 'g': 'c'}
     rc = ()
     for x in range(len(kmer)):
         rc = rc + (comp[kmer[len(kmer)-x-1]],)
@@ -53,12 +52,13 @@ def gen_comp_dict(all_kmers):
         Dictionary mapping kmer to their complement and vice-versa
     """
     comps = {}
+    comp = {'a': 't', 'c': 'g', 't': 'a', 'g': 'c'}
     for kmer in all_kmers:
-        comps[kmer] = reverse_complement(kmer)
+        comps[kmer] = reverse_complement(kmer, comp)
     return comps
 
 
-def gen_vocab(k=3):
+def gen_vocab(k=3, mode='dna'):
     """
     Generate index kmer pairs for all possible kmers, binning complements together
     Params:
@@ -66,18 +66,27 @@ def gen_vocab(k=3):
     Returns:
         Dictionary mapping kmers and their complements to an index (column) in feature matrix
     """
-    all_kmers = list(product('acgt', repeat=k))
+    if mode == 'dna':
+        all_kmers = list(product('acgt', repeat=k))
+        comps = gen_comp_dict(all_kmers)
+    else:
+        all_kmers = list(product('FSYCLIMVPTAHQNKDEWRG'.lower(), repeat=k))
+
     vocab = {}
     unique = 0
-    comps = gen_comp_dict(all_kmers)
+
     for mer in all_kmers:
-        rc = comps[mer]
-        if rc in vocab:
-            vocab[mer] = vocab[rc]
+        if mode == 'dna':
+            rc = comps[mer]
+            if rc in vocab:
+                vocab[mer] = vocab[rc]
+            else:
+                vocab[mer] = unique
+                unique += 1
         else:
             vocab[mer] = unique
             unique += 1
-    return vocab, comps
+    return vocab
 
 
 def convert_labels(labels):
@@ -94,59 +103,6 @@ def convert_labels(labels):
         new_labels[x] = label_idxs.setdefault(labels[x], len(label_idxs))
     return new_labels
 
-
-def normalize_tfidf(vocab, frequencies):
-    """ 
-    Convert labels to indexes
-    Params:
-        vocab.........mapping of kmers to their feature vector index
-        frequencies...kmer counts (complements combined)
-    Returns:
-        complete feature matrix
-    """
-    N = len(frequencies)
-    df = Counter()
-
-    for freq in frequencies:
-        df.update(freq.keys())
-
-    features = []
-    for freq in frequencies:
-        tokens = freq.keys()
-        feature_vector = np.zeros((len(vocab)/2))
-        max_k = freq.most_common(1)[0][1]
-        for token in tokens:
-            tfidf = freq[token] / (max_k * math.log10(float(N) / df[token]))
-            feature_vector[vocab[token]] = tfidf
-        features.append(feature_vector)
-
-    return np.array(features)
-
-
-def combine_complements(kmer_counters, comps):
-    """ 
-    Convert labels to indexes
-    Params:
-        kmer_counters...kmer counts for all sequences
-        comps...........dict mapping kmers to their complements
-    Returns:
-        kmer counters with complements combined
-    """
-    new_kmer_counters = []
-    for kmers in kmer_counters:
-        new_counts = Counter()
-        for kmer, v in kmers.items():
-            comp = comps[kmer]
-            if comp in new_counts:
-                new_counts[comp] += v
-            else:
-                new_counts[kmer] = v
-        new_kmer_counters.append(new_counts)
-
-    return new_kmer_counters
-
-
-#def gen_meta_features(data):
 
 def work(seqnum_seq_k):
     """ 
@@ -184,7 +140,6 @@ def get_kmer_counts(data, k):
         sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(data)))
 
     res = np.array(res)
-    #print res.dtype
     indices = np.array(res[:,0],dtype=int)
     data = np.array(res[:,1])
     counts = data[indices]
@@ -192,7 +147,7 @@ def get_kmer_counts(data, k):
     return counts
 
 
-def featurize_data(data, k=3):
+def featurize_data(data, k=3, mode='dna'):
     """ 
     Featurize sequences and index labels
     Params:
@@ -208,9 +163,13 @@ def featurize_data(data, k=3):
     print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
     nrows = data.shape[0]
 
-    vocab, _ = gen_vocab(k)
+    if mode == 'dna':
+        vocab = gen_vocab(k)
+        ncols = len(vocab) / 2 if k % 2 == 1 else (len(vocab) + 2 ** k) / 2
+    else:
+        vocab = gen_vocab(k, 'aa')
+        ncols = len(vocab)
 
-    ncols = len(vocab) / 2 if k % 2 == 1 else (len(vocab) + 2 ** k) / 2
     start = time()
     print "Generated vocab for complements in %d seconds" % (time() - start)
     # comb_kmers = combine_complements(kmers, comps)
@@ -220,8 +179,6 @@ def featurize_data(data, k=3):
     print "Counting nonzero data"
     for kmer in kmers:
         nonzero_data += len(kmer)
-
-
 
     indptr = np.zeros(nrows+1, dtype="int32")
     col = np.empty(nonzero_data, dtype="int32")
@@ -281,7 +238,7 @@ def featurize_nuc_counts(data):
 
 def featurize_aa_counts(data):
     nuc_counts = [Counter(x) for x in data]
-    M = [[c['F'], c['S'], c['Y'], c['C'], c['L'], c['I'], c['M'], c['V'], c['P'], c['T'], c['A'], c['H'], c['Q'], c['N'], c['K'], c['D'], c['E'], c['W'], c['R'], c['S'], c['G']] for c in nuc_counts]
+    M = [[c['F'], c['S'], c['Y'], c['C'], c['L'], c['I'], c['M'], c['V'], c['P'], c['T'], c['A'], c['H'], c['Q'], c['N'], c['K'], c['D'], c['E'], c['W'], c['R'], c['G']] for c in nuc_counts]
     return csr_matrix(np.array(M))
 
 
@@ -290,6 +247,8 @@ def read_whole(file,f,k):
     labels = data.label
 
     features, vocab = featurize_data(data.dna, k)
+    aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
+
     #aa_features, aa_vocab = featurize_data(data.aa, k)
 
     #nonz = features.getnnz(0) > 0
@@ -299,7 +258,8 @@ def read_whole(file,f,k):
     aa_counts = featurize_aa_counts(data.aa)
     aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
-    features = hstack([features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
+
+    features = hstack([features, aa_features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
     print features.shape
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
