@@ -11,17 +11,14 @@ from time import time
 file = "data/coreseed.train.tsv"
 data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
 
-start = time()
 
-for x in range(len(data.aa)):
-    if 'U' in data.aa[x]:
-        print x
-        data.aa[x] = data.aa[x].replace("U", "")
-
-print (time() - start)
 
 start = time()
 
 data.aa = data.aa.replace('U', '')
+
+for x in range(len(data.aa)):
+    if 'U' in data.aa[x]:
+        print x
 
 print (time() - start)

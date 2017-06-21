@@ -244,7 +244,7 @@ def featurize_aa_counts(data):
 
 def read_whole(file,f,k):
     if f == 'core':
-        data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 5], delimiter='\t', header=0)
+        data = pd.read_csv(file, names=["label","dna","aa"], usecols=[0, 5, 6], delimiter='\t', header=0)
         for x in range(len(data.aa)):
             if 'U' in data.aa[x]:
                 data.aa[x] = data.aa[x].replace("U", "")

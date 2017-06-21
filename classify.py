@@ -172,7 +172,9 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
 
         feat_score = clf.feature_importances_
-        top_10_features = np.argsort(feat_score)[::-1][:10]
+        sorted_feats = np.argsort(feat_score)[::-1][:10]
+        np.savetxt('results/sorted_features', sorted_feats)
+        top_10_features = sorted_feats
         #if mn == "Random Forest":
         #    features = features[:,np.argsort(feat_score)[::-1][:10000]]
 
