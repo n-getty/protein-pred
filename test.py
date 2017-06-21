@@ -9,16 +9,10 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from time import time
 #file = "data/rep.1000ec.pgf.seqs.filter"
 file = "data/coreseed.train.tsv"
-data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
+data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[1, 6, 7], delimiter='\t', header=0)
 
 
 
-start = time()
-
-data.aa = data.aa.replace('U', '')
-
-for x in range(len(data.aa)):
-    if 'Z' in data.aa[x]:
-        print x
-
-print (time() - start)
+c = Counter(data.label)
+print c.most_common()[:10]
+print c.most_common()[-10:]
