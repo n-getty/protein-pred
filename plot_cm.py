@@ -1,6 +1,7 @@
 import itertools
 import numpy as np
 import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
@@ -52,7 +53,7 @@ def pcm(y_true, y_pred, mn):
     np.set_printoptions(precision=2)
 
     # Plot normalized confusion matrix
-    plt.figure(figsize=(50,50))
+    plt.figure(figsize=(25,25))
 
     #plt.figure(figsize=(50, 50))
     plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
