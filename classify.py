@@ -272,20 +272,20 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
            XGBClassifier(n_jobs=-1
                           ,n_estimators=int(est)
                           ,objective="multi:softprob"
-                          ,max_depth=6
+                          ,max_depth=4
                           ,learning_rate=0.1
                           ,colsample_bytree=1
                           ,subsample=1
-                          ,min_child_weight=6
+                          ,min_child_weight=8
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,num_leaves=63
+                           ,num_leaves=15
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
                            ,colsample_bytree =1
                            ,subsample=1
-                           ,min_child_weight=6
+                           ,min_child_weight=8
                            )
             ]
 
