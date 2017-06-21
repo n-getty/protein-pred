@@ -46,13 +46,8 @@ def pcm(y_test, y_pred, mn):
     cnf_matrix = confusion_matrix(y_test, y_pred)
     np.set_printoptions(precision=2)
 
-    # Plot non-normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=y_test,
-                          title='Confusion matrix, without normalization')
-
     # Plot normalized confusion matrix
-    plt.figure()
+    plt.figure(figsize=(50, 50))
     plot_confusion_matrix(cnf_matrix, classes=y_test, normalize=True,
                           title=mn + ' Normalized confusion matrix')
 
