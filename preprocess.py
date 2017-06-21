@@ -243,11 +243,14 @@ def featurize_aa_counts(data):
 
 
 def read_whole(file,f,k):
-    data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
+    if f == 'core':
+        data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 5], delimiter='\t', header=0)
+    else:
+        data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
-    for x in data.aa:
-        x= x.replace("U","")
+    for x in range(len(data.aa)):
+        data.aa[x] = data.aa[x].replace("U","")
 
     features, vocab = featurize_data(data.dna, k)
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
@@ -279,22 +282,19 @@ def main(fn='sm', k=3, chunksize=100000):
 
     if fn == "lg":
         file = "data/rep.1000ec.pgf.seqs.filter"
-        f = "lg"
         if chunksize > 0:
-            read_chunks(file, f, k, chunksize)
+            read_chunks(file, fn, k, chunksize)
         else:
-            read_whole(file, f, k)
+            read_whole(file, fn, k)
     elif fn == "core":
         file = "data/coreseed.train.tsv"
-        f = "core"
         if chunksize > 0:
-            read_chunks(file, f, k, chunksize)
+            read_chunks(file, fn, k, chunksize)
         else:
-            read_whole(file, f, k)
+            read_whole(file, fn, k)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
-        f = "sm"
-        read_whole(file, f, k)
+        read_whole(file, fn, k)
 
     print "Time elapsed to build %d mers is %f" % (k, time() - start)
 
