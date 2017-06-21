@@ -26,7 +26,7 @@ from memory_profiler import memory_usage
 import operator
 import xgboost as xgb
 from lightgbm import LGBMClassifier
-
+import plot_cm as pcm
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
     """ 
@@ -90,6 +90,8 @@ def test_train_split(clf, split, m):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
+    pcm.pcm(y_test, clf.predict(y_test))
+    
     '''
     X_train = DMatrix(X_train, y_train)
     X_test = DMatrix(X_test, y_test)
