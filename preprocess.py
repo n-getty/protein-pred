@@ -254,8 +254,9 @@ def read_whole(file,f,k):
     labels = data.label
 
     features, vocab = featurize_data(data.dna, k)
+    print "generating aa 2mer features"
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
-
+    print "generating aa 3mer features"
     aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
 
     #aa_features, aa_vocab = featurize_data(data.aa, k)
