@@ -92,7 +92,7 @@ def test_train_split(clf, split, m, labels):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    #pcm.pcm(y_test, clf.predict(X_test), m)
+    pcm.pcm(y_test, clf.predict(X_test), m)
     #pcmp.pcm(y_test, probs, m)
 
     '''
