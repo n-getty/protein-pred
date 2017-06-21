@@ -177,9 +177,9 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
             #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
 
         feat_score = clf.feature_importances_
-        sorted_feats = np.argsort(feat_score)[::-1][:10]
+        sorted_feats = np.argsort(feat_score)[::-1]
         np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
-        top_10_features = sorted_feats
+        top_10_features = sorted_feats[:10]
         #if mn == "Random Forest":
         #    features = features[:,np.argsort(feat_score)[::-1][:10000]]
 
@@ -349,11 +349,9 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
     #features = features.astype('float32')
-    fimp = np.genfromtxt("results/LightGBM.sorted_features")
-    print fimp.shape
-    print len(fimp[0])
+    '''fimp = np.genfromtxt("results/LightGBM.sorted_features")
     idxs = fimp[0][:1000]
-    features = features[:,idxs]
+    features = features[:,idxs]'''
     results = classify_all(labels, features, clfs, folds, model_names, cv)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
