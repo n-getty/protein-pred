@@ -276,7 +276,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                                    #,max_depth=6
                                    ),
 
-           XGBClassifier(#n_jobs=-1,
+           XGBClassifier(n_jobs=-1,
                           n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=4
@@ -349,7 +349,9 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
     #features = features.astype('float32')
-    fimp = np.genfromtxt("results/LightGBM.sorted_features", dtype=[int,float])
+    fimp = np.genfromtxt("results/LightGBM.sorted_features")
+    print fimp.shape
+    print len(fimp[0])
     idxs = fimp[0][:1000]
     features = features[:,idxs]
     results = classify_all(labels, features, clfs, folds, model_names, cv)
