@@ -60,5 +60,4 @@ def pcm(y_true, y_pred, mn):
                           title=mn + ' confusion matrix')
     plt.autoscale()
     plt.savefig("results/plts" + mn)
-    exit(0)
     #plt.show()
