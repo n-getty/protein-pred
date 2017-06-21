@@ -245,12 +245,13 @@ def featurize_aa_counts(data):
 def read_whole(file,f,k):
     if f == 'core':
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 5], delimiter='\t', header=0)
+        for x in range(len(data.aa)):
+            if 'U' in data.aa[x]:
+                data.aa[x] = data.aa[x].replace("U", "")
+        print "Removed all U aas"
     else:
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
-
-    for x in range(len(data.aa)):
-        data.aa[x] = data.aa[x].replace("U","")
 
     features, vocab = featurize_data(data.dna, k)
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
