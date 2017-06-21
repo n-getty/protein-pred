@@ -56,4 +56,5 @@ def pcm(y_test, y_pred, mn):
     plot_confusion_matrix(cnf_matrix, classes=y_test, normalize=True,
                           title=mn + ' Normalized confusion matrix')
 
-    plt.show()
+    plt.savefig("results/plts/" + mn)
+    #plt.show()

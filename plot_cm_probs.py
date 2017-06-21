@@ -54,5 +54,5 @@ def pcm(y_test, y_probs, mn):
     plot_confusion_matrix(cnf_matrix, classes=y_test, normalize=True,
                           title=mn + ' Probability confusion matrix')
 
-    plt.savefig("results/plts/" + mn)
+    plt.savefig("results/plts/" + mn + '.prob')
     # plt.show()
