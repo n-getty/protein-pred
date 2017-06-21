@@ -90,7 +90,7 @@ def test_train_split(clf, split, m):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    pcm.pcm(y_test, clf.predict(y_test))
+    pcm.pcm(y_test, clf.predict(X_test))
 
     '''
     X_train = DMatrix(X_train, y_train)
