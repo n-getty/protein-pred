@@ -349,9 +349,9 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
         logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
 
     #features = features.astype('float32')
-    '''fimp = np.genfromtxt("results/LightGBM.sorted_features")
+    fimp = np.genfromtxt("results/LightGBM.sorted_features")
     idxs = fimp[0][:1000]
-    features = features[:,idxs]'''
+    features = features[:,idxs]
     results = classify_all(labels, features, clfs, folds, model_names, cv)
     #results.sort("Split Val Acc", inplace=True, ascending=False)
     results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
