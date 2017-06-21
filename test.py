@@ -18,7 +18,7 @@ start = time()
 data.aa = data.aa.replace('U', '')
 
 for x in range(len(data.aa)):
-    if 'U' in data.aa[x]:
+    if 'Z' in data.aa[x]:
         print x
 
 print (time() - start)
