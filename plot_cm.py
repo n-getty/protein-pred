@@ -2,7 +2,6 @@ import itertools
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from pandas_ml import ConfusionMatrix
 from sklearn.metrics import confusion_matrix
 
 
