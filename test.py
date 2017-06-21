@@ -7,6 +7,10 @@ import pandas as pd
 from memory_profiler import memory_usage
 from sklearn.feature_extraction.text import TfidfTransformer
 
-x = [1,2,3,4,5]
+#file = "data/rep.1000ec.pgf.seqs.filter"
+file = "data/coreseed.train.tsv"
+data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
 
-print x[3:]
+for x in range(len(data.aa)):
+    if 'O' in data.aa[x]:
+        print x
