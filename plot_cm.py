@@ -1,9 +1,8 @@
 import itertools
 import numpy as np
 import matplotlib
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
-
+from pandas_ml import ConfusionMatrix
 from sklearn.metrics import confusion_matrix
 
 
@@ -28,7 +27,7 @@ def plot_confusion_matrix(cm, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    #print(cm)
 
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
@@ -36,20 +35,30 @@ def plot_confusion_matrix(cm, classes,
                  horizontalalignment="center",
                  color="white" if cm[i, j] > thresh else "black")
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
 
-def pcm(y_test, y_pred, mn):
+def pcm(y_true, y_pred, mn):
+    '''cm = ConfusionMatrix(y_true, y_pred)
+    cm.plot(normalized=True)
+    plt.tight_layout()
+    plt.savefig("testcmfig")
+    #cm.print_stats()
+    exit(0)'''
+    class_names=range(100)
     # Compute confusion matrix
-    cnf_matrix = confusion_matrix(y_test, y_pred)
+    cnf_matrix = confusion_matrix(y_true, y_pred)
     np.set_printoptions(precision=2)
 
     # Plot normalized confusion matrix
-    plt.figure(figsize=(50, 50))
-    plot_confusion_matrix(cnf_matrix, classes=y_test, normalize=True,
-                          title=mn + ' Normalized confusion matrix')
+    plt.figure(figsize=(50,50))
 
-    plt.savefig("results/plts/" + mn)
+    #plt.figure(figsize=(50, 50))
+    plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+                          title=mn + ' confusion matrix')
+    plt.autoscale()
+    plt.savefig("testcmfig")
+    exit(0)
     #plt.show()

@@ -1,15 +1,11 @@
 import itertools
 import numpy as np
-import matplotlib
-
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from collections import Counter
 from sklearn.metrics import confusion_matrix
 
 
 def plot_confusion_matrix(cm, classes,
-                          normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
     """
@@ -24,6 +20,7 @@ def plot_confusion_matrix(cm, classes,
     plt.yticks(tick_marks, classes)
 
     #print(cm)
+    cm = cm.astype('float')
 
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
@@ -36,23 +33,26 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-def pcm(y_test, y_probs, mn):
+def pcm(y_true, y_probs, mn):
+    n_classes = int(np.max(y_true) + 1)
     # Compute confusion matrix
-    #cnf_matrix = confusion_matrix(y_test, y_pred)
-    cnf_matrix = np.zeros((y_probs.shape[1],y_probs.shape[1]), dtype='float16')
-    class_counts = Counter(y_test)
-    class_counts = class_counts[range(np.max(y_test) + 1)]
+    cnf_matrix = np.zeros((n_classes, n_classes))
+    class_counts = Counter(y_true)
+    class_counts = [class_counts[x] for x in range(n_classes)]
 
-    for x in range(len(y_test)):
-        cnf_matrix[y_test[x]] += y_probs[x]
+    for x in range(len(y_true)):
+        cnf_matrix[int(y_true[x])] += y_probs[x]
+
     cnf_matrix /= class_counts
 
     np.set_printoptions(precision=2)
 
     # Plot normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=y_test, normalize=True,
+    plt.figure(figsize=(50,50))
+    plot_confusion_matrix(cnf_matrix, classes=range(n_classes),
                           title=mn + ' Probability confusion matrix')
 
-    plt.savefig("results/plts/" + mn + '.prob')
+    plt.autoscale()
+    plt.savefig("testcmfig")
+    exit(0)
     # plt.show()

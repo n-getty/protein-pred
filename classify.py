@@ -27,7 +27,7 @@ import operator
 import xgboost as xgb
 from lightgbm import LGBMClassifier
 import plot_cm as pcm
-
+import plot_cm_probs as pcmp
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
     """ 
@@ -87,11 +87,13 @@ def test_train_split(clf, split, m, labels):
                 eval_set=[(X_train, y_train), (X_test, y_test)],
                 early_stopping_rounds=2,
                 verbose=False,)
-    t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
+    probs = clf.predict_proba(X_test)
+    t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    pcm.pcm(y_test, clf.predict(X_test), m)
+    #pcm.pcm(y_test, clf.predict(X_test), m)
+    #pcmp.pcm(y_test, probs, m)
 
     '''
     X_train = DMatrix(X_train, y_train)
@@ -261,7 +263,7 @@ def load_data(size, file2, file3):
     return features, labels
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32', thresh='0', cv='0'):
+def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16', thresh='0', cv='0'):
     thresh = int(thresh)
     folds = 5
     cv = int(cv)
@@ -274,8 +276,8 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='1', prune='0', est='32
                                    #,max_depth=6
                                    ),
 
-           XGBClassifier(n_jobs=-1
-                          ,n_estimators=int(est)
+           XGBClassifier(#n_jobs=-1,
+                          n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=4
                           ,learning_rate=0.1
