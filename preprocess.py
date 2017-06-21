@@ -256,6 +256,8 @@ def read_whole(file,f,k):
     features, vocab = featurize_data(data.dna, k)
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
 
+    aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
+
     #aa_features, aa_vocab = featurize_data(data.aa, k)
 
     #nonz = features.getnnz(0) > 0
@@ -266,7 +268,7 @@ def read_whole(file,f,k):
     aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
 
-    features = hstack([features, aa_features, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
+    features = hstack([features, aa_features, aa_features3, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
     print features.shape
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
