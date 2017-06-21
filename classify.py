@@ -47,7 +47,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     for train_index, test_index in skf:
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
-        if m == 'Random Forest':
+        if m == 'RandomForest':
             clf.fit(X_train, y_train)
         else:
             clf.fit(X_train, y_train,
@@ -80,7 +80,7 @@ def test_train_split(clf, split, m, labels):
     """
 
     X_train, X_test, y_train, y_test = split
-    if m == 'Random Forest':
+    if m == 'RandomForest':
         clf.fit(X_train, y_train)
     else:
         clf.fit(X_train, y_train,
