@@ -282,7 +282,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                           ,max_depth=4
                           ,learning_rate=0.1
                           ,colsample_bytree=1
-                          ,subsample=.8
+                          ,subsample=0.5
                           ,min_child_weight=6
                          ),
 
@@ -291,7 +291,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
                            ,colsample_bytree=1
-                           ,subsample=.8
+                           ,subsample=0.5
                            ,min_child_weight=6
                            )
             ]
