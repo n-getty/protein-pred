@@ -55,7 +55,7 @@ def pcm(y_true, y_pred, mn):
     plt.figure(figsize=(50,50))
 
     #plt.figure(figsize=(50, 50))
-    plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True,
+    plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
                           title=mn + ' confusion matrix')
     plt.autoscale()
     plt.savefig("testcmfig")
