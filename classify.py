@@ -67,7 +67,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     return np.mean(scores), np.mean(train_scores), np.mean(t5s)
 
 
-def test_train_split(clf, split, m):
+def test_train_split(clf, split, m, labels):
     """
     Compute the accuracy of a train/test split
     Params:
@@ -90,7 +90,7 @@ def test_train_split(clf, split, m):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    pcm.pcm(y_test, clf.predict(X_test))
+    pcm.pcm(y_test, clf.predict(X_test), m)
 
     '''
     X_train = DMatrix(X_train, y_train)
@@ -154,7 +154,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
             cv_train_score = -1
             cv_t5 = -1
 
-        args = (clf, tts_split, mn)
+        args = (clf, tts_split, mn, labels)
         tts_score, tts_train_score, clf, t5 = test_train_split(*args)
 
         '''mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
