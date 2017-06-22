@@ -235,8 +235,8 @@ def load_data(size, file2, file3):
         #features = hstack((features[:,:37], features[:,8458:]), format='csr')
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-        print "DNA 3mers, 1mers and seq length"
-        #features = features[:,31:]
+        print "AA 1mers"
+        features = features[:,32:53]
         #features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
