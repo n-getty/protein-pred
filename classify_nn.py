@@ -103,7 +103,7 @@ def classify(features, labels, use_batches, file, m):
         model = build_lstm_model(nb_classes, input_shape)
     else:
         print 'Building RES model...'
-        model = resnet.ResnetBuilder.build_resnet_18((1, features.shape[1], 1), nb_classes)
+        model = resnet.ResnetBuilder.build_resnet_101((1, features.shape[1], 1), nb_classes)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
