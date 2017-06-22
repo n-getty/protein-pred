@@ -58,7 +58,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     return np.mean(scores), np.mean(train_scores), np.mean(t5s)
 
 
-def test_train_split(clf, split, m, labels):
+def test_train_split(clf, split, m, class_names):
     """
     Compute the accuracy of a train/test split
     Params:
@@ -69,7 +69,7 @@ def test_train_split(clf, split, m, labels):
         matrix.
     """
 
-    X_train, X_test, y_train, y_test, train_names, test_names = split
+    X_train, X_test, y_train, y_test = split
     if m == 'RandomForest':
         clf.fit(X_train, y_train)
     else:
@@ -82,11 +82,12 @@ def test_train_split(clf, split, m, labels):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    stats_df = pcm.class_statistics(y_test, clf.predict(X_test), test_names)
+    stats_df = pcm.class_statistics(y_test, clf.predict(X_test), class_names)
     stats_df.to_csv('results/' + m + '.class_stats', index=0)
 
-    pcm.pcm(y_test, clf.predict(X_test), m)
-    pcm.pcm(y_test, probs, m)
+    test_pred = clf.predict(X_test)
+    pcm.pcm(y_test, test_pred, m)
+    #pcm.pcm(y_test, test_pred, m)
 
     print "Top 5 accuracy:", t5
     logging.info("Top 5 accuracy: %f", t5)
@@ -105,8 +106,10 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
         model_names..Readable names of each classifier
     """
     labels = convert_labels(class_names)
+    class_names = unique_class_names(class_names)
+
     tts_split = train_test_split(
-        (features, labels, class_names),test_size=0.2, random_state=0, stratify=labels)
+        features, labels, test_size=0.2, random_state=0, stratify=labels)
     if cv:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
@@ -121,7 +124,6 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
 
         clf = clfs[x]
 
-            #features = DMatrix(features)
         if cv:
             cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
             print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
@@ -135,7 +137,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
             cv_train_score = -1
             cv_t5 = -1
 
-        args = (clf, tts_split, mn, labels)
+        args = (clf, tts_split, mn, class_names)
         if mem:
             mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
             tts_score, tts_train_score, clf, t5 = retval
@@ -170,6 +172,16 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
         
     return results
 
+
+def unique_class_names(names):
+    cns = set()
+    unique = []
+    for c in names:
+        if c not in cns:
+            unique.append(c)
+            cns.add(c)
+
+    return unique
 
 def top_5_accuracy(probs, y_true):
     """ 

@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import pandas as pd
 
 
 def plot_confusion_matrix(cm, classes,
@@ -29,7 +30,8 @@ def plot_confusion_matrix(cm, classes,
 
     #print(cm)
 
-    thresh = cm.max() / 2.
+    #thresh = cm.max() / 2.
+    thresh = 0
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(j, i, cm[i, j],
                  horizontalalignment="center",
@@ -38,6 +40,36 @@ def plot_confusion_matrix(cm, classes,
     #plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+
+
+def class_statistics(y_true, y_pred, class_names):
+
+    cnf_matrix = confusion_matrix(y_true, y_pred)
+    sens = []
+    spec = []
+    most_conf_for = []
+    most_conf_by = []
+
+    for x in range(int(max(y_true))+1):
+        row = cnf_matrix[x]
+        col = cnf_matrix[:, x]
+        tp = row[x]
+        fp = sum(col)-tp
+        fn = sum(row)-tp
+        tn = len(y_true)-tp-fp
+        sens.append(tp/tp+fn)
+        spec.append(tn/tn+fp)
+        sorted_row_idxs = np.argsort(row)
+        sorted_col_idxs = np.argsort(col)
+        mcf = sorted_row_idxs[-2] if sorted_row_idxs[-1] == x else sorted_row_idxs[-1]
+        mcb = sorted_col_idxs[-2] if sorted_col_idxs[-1] == x else sorted_col_idxs[-1]
+        most_conf_for.append(class_names[mcf])
+        most_conf_by.append(class_names[mcb])
+
+    stats_df = pd.DataFrame({'PGF': class_names, 'Sensitivity': sens, 'Specicifity': spec,
+                             'Most FN': most_conf_for, 'Most FP': most_conf_by})
+    stats_df.sort_values(by='Sensitivity', ascending=1, inplace=1,)
+    return stats_df
 
 
 def pcm(y_true, y_pred, mn):
@@ -59,5 +91,5 @@ def pcm(y_true, y_pred, mn):
     plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=False,
                           title=mn + ' confusion matrix')
     plt.autoscale()
-    plt.savefig("results/plts" + mn)
-    #plt.show()
+    #plt.savefig("results/plts" + mn)
+    plt.savefig("testcmfig")
