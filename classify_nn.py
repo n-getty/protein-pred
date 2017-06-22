@@ -55,7 +55,7 @@ def build_lstm_model(nb_classes, input_shape):
     pool_size = 4
 
     # LSTM
-    lstm_output_size = 256
+    lstm_output_size = 128
     model = Sequential()
     # model.add(Dropout(0.25, input_shape=(features.shape[1:])))
     model.add(Conv1D(filters,
@@ -82,7 +82,7 @@ def classify(features, labels, use_batches, file, m):
         nb_classes = 100
 
     # Training
-    batch_size = 10000
+    batch_size = 1000
     epochs = 600
 
     X_train, X_test, y_train, y_test = train_test_split(
