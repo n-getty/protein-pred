@@ -172,7 +172,7 @@ def main(data="sm", use_batches='0', m="lstm"):
     #normalize(features, copy=False)
     features = features.reshape(features.shape[0],features.shape[1], 1)
 
-    classify(features, labels, use_batches, file, m)
+    classify(features, labels, use_batches, data, m)
 
 
 if __name__ == '__main__':
