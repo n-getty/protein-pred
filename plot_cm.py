@@ -1,3 +1,5 @@
+#Adapted from http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py
+
 import itertools
 import numpy as np
 import matplotlib
