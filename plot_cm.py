@@ -68,7 +68,7 @@ def class_statistics(y_true, y_pred, class_names):
 
     stats_df = pd.DataFrame({'PGF': class_names, 'Sensitivity': sens, 'Specicifity': spec,
                              'Most FN': most_conf_for, 'Most FP': most_conf_by})
-    stats_df.sort_values(by='Sensitivity', ascending=1, inplace=1,)
+    stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True,)
     return stats_df
 
 
