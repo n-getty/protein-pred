@@ -1,33 +1,23 @@
 #/home/ngetty/dev/anaconda2/bin/python
 import warnings
-import os
 import pandas as pd
 import numpy as np
 from time import time
 import logging
-import math
-from itertools import islice, product
-from collections import Counter
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.naive_bayes import MultinomialNB, GaussianNB
-from sklearn.metrics import confusion_matrix
-from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import normalize
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-from xgboost import XGBClassifier, DMatrix
-from scipy.sparse import csr_matrix, hstack, issparse
+from xgboost import XGBClassifier
+from scipy.sparse import csr_matrix, hstack
 import sys
-from sklearn.decomposition import TruncatedSVD, MiniBatchSparsePCA
+from sklearn.decomposition import TruncatedSVD
 from memory_profiler import memory_usage
-import operator
-import xgboost as xgb
 from lightgbm import LGBMClassifier
 import plot_cm as pcm
-import plot_cm_probs as pcmp
+import argparse
+
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
     """ 
@@ -79,7 +69,7 @@ def test_train_split(clf, split, m, labels):
         matrix.
     """
 
-    X_train, X_test, y_train, y_test = split
+    X_train, X_test, y_train, y_test, train_names, test_names = split
     if m == 'RandomForest':
         clf.fit(X_train, y_train)
     else:
@@ -92,23 +82,11 @@ def test_train_split(clf, split, m, labels):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
+    stats_df = pcm.class_statistics(y_test, clf.predict(X_test), test_names)
+    stats_df.to_csv('results/' + m + '.class_stats', index=0)
+
     pcm.pcm(y_test, clf.predict(X_test), m)
-    #pcmp.pcm(y_test, probs, m)
-
-    '''
-    X_train = DMatrix(X_train, y_train)
-    X_test = DMatrix(X_test, y_test)
-
-    param = {'n_jobs': 8, 'n_estimators': 32, 'objective': "multi:softmax", "num_class": 100, "silent":1, "max_depth": 6, "eta": 0.3}
-    clf = xgb.train(param, X_train, 10)
-    preds = clf.predict(X_test)
-    score = accuracy_score(y_test,preds)
-    t5=0
-    train_preds = clf.predict(X_train)
-    train_score = accuracy_score(y_train, train_preds)'''
-
-    #if m == "Random Forest":
-        #train_score = clf.oob_score_
+    pcm.pcm(y_test, probs, m)
 
     print "Top 5 accuracy:", t5
     logging.info("Top 5 accuracy: %f", t5)
@@ -116,7 +94,7 @@ def test_train_split(clf, split, m, labels):
     return score, train_score, clf, t5
 
 
-def classify_all(labels, features, clfs, folds, model_names, cv):
+def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
     """ 
     Compute the average testing accuracy over k folds of cross-validation. 
     Params:
@@ -126,10 +104,10 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
         folds........Number of folds for cross validation
         model_names..Readable names of each classifier
     """
-
+    labels = convert_labels(class_names)
     tts_split = train_test_split(
-        features, labels, test_size=0.2, random_state=0, stratify=labels)
-    if cv == 1:
+        (features, labels, class_names),test_size=0.2, random_state=0, stratify=labels)
+    if cv:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Val Acc", "Max Mem", "Avg Mem", "Time"])
@@ -144,7 +122,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
         clf = clfs[x]
 
             #features = DMatrix(features)
-        if cv == 1:
+        if cv:
             cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
             print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
             logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score))
@@ -158,30 +136,24 @@ def classify_all(labels, features, clfs, folds, model_names, cv):
             cv_t5 = -1
 
         args = (clf, tts_split, mn, labels)
-        tts_score, tts_train_score, clf, t5 = test_train_split(*args)
+        if mem:
+            mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
+            tts_score, tts_train_score, clf, t5 = retval
 
-        '''mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
-        tts_score, tts_train_score, clf, t5 = retval
-        
-        avg_mem = np.mean(mem_usage)
-        max_mem = max(mem_usage)
-        print('Average memory usage: %s' % avg_mem)
-        print('Maximum memory usage: %s' % max_mem)'''
-        avg_mem = -1
-        max_mem = -1
-        #np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
-
-        #tts_score, tts_train_score, clf, t5 = test_train_split(clf, tts_split, mn)
-
-        #if mn == "Random Forest":
-            #print "test/train split accuracy:", top_5_accuracy(clf.predict_proba(),)
+            avg_mem = np.mean(mem_usage)
+            max_mem = max(mem_usage)
+            print('Average memory usage: %s' % avg_mem)
+            print('Maximum memory usage: %s' % max_mem)
+            # np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
+        else:
+            tts_score, tts_train_score, clf, t5 = test_train_split(*args)
+            avg_mem = -1
+            max_mem = -1
 
         feat_score = clf.feature_importances_
         sorted_feats = np.argsort(feat_score)[::-1]
         np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
         top_10_features = sorted_feats[:10]
-        #if mn == "Random Forest":
-        #    features = features[:,np.argsort(feat_score)[::-1][:10000]]
 
         print "Top ten feature idxs", top_10_features
         logging.info("Top ten feature idxs: %s", str(top_10_features))
@@ -243,10 +215,9 @@ def load_sparse_csr(filename):
 
 
 def load_data(size, file2, file3):
-
     path = "data/" + size + '/'
 
-    if int(file2) * int(file3) == 1:
+    if file2 and file3:
         print "Using 3, 5 and 10mer count features"
         features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
     else:
@@ -258,21 +229,38 @@ def load_data(size, file2, file3):
             features2 = features2[:, :-5]
             features = hstack([features, features2], format='csr')
 
-    labels = convert_labels(labels)
-
     return features, labels
 
 
-def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16', thresh='0', cv='0'):
-    thresh = int(thresh)
+def get_parser():
+    parser = argparse.ArgumentParser(description='Classify protein function with ensemble methods')
+    parser.add_argument("-d", "--data", default='sm', type=str, help="data to use")
+    parser.add_argument("--five", default=False, help="add 5mer features")
+    parser.add_argument("--ten", default=False, help="add 10mer features")
+    parser.add_argument("--redu", default=0, type=int, help="feature reduction with Truncated SVD")
+    parser.add_argument("--tfidf", default=False, help="convert counts to tfidf")
+    parser.add_argument("--prune", default=0, type=int, help="remove features with apperance below prune")
+    parser.add_argument("--est", default=16, type=int, help="number of estimators (trees)")
+    parser.add_argument("--thresh", default=0, type=int, help="zero counts below threshold")
+    parser.add_argument("--cv", default=False, help="calculate cross validation results")
+    parser.add_argument("--mem", default=False, help="store memory usage statistics")
+    parser.add_argument("--truncate", default=0, type=int, help="Use only top k ")
+
+    return parser
+
+
+def main():
+    parser = get_parser()
+    args = parser.parse_args()
+    est = args.est
+    thresh = args.thresh
+    prune = args.prune
+
     folds = 5
-    cv = int(cv)
-    # SVC(probability=True),
-    # LogisticRegression(solver="newton-cg", multi_class="multinomial", n_jobs=-1),
 
     clfs = [RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
-                                   ,oob_score=False
+                                   #,oob_score=True
                                    #,max_depth=6
                                    ),
 
@@ -282,7 +270,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                           ,max_depth=4
                           ,learning_rate=0.1
                           ,colsample_bytree=1
-                          ,subsample=0.5
+                          ,subsample=0.8
                           ,min_child_weight=6
                          ),
 
@@ -291,7 +279,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
                            ,colsample_bytree=1
-                           ,subsample=0.5
+                           ,subsample=0.8
                            ,min_child_weight=6
                            )
             ]
@@ -301,7 +289,7 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
                    "LightGBM"
              ]
 
-    features, labels = load_data(size, file2, file3)
+    features, class_names = load_data(args.data, args.five, args.ten)
 
     # Zero-out counts below the given threshold
     if thresh > 0:
@@ -321,41 +309,41 @@ def main(size='sm', file2='0', file3='0', red='0', tfidf='0', prune='0', est='16
 
     features = features[:, nonz]
 
-    if tfidf != "0":
+    if args.tfidf:
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        tfer.fit(features[:,:32],labels)
+        tfer.fit(features[:,:32],class_names)
         features_tf = tfer.transform(features[:,:32])
         features = hstack([features_tf, features[:,32:]], format='csr')
         #tfer.fit(features)
         #features = tfer.transform(features)
         features = features.astype('float32')
 
-
-
     # Reduce feature dimensionality
-    if red != "0":
+    if args.red > 0:
         print "Starting dimensionality reduction via TruncatedSVD"
         logging.info("Starting dimensionality reduction via TruncatedSVD")
         start = time()
-        svd = TruncatedSVD(n_components=int(red), n_iter=5, random_state=42)
+        svd = TruncatedSVD(n_components=int(args.red), n_iter=5, random_state=42)
         svd.fit(features)
         features = svd.transform(features)
         end = time()
         elapsed = end - start
-        print "Time elapsed for dimensionality reduction is %f" %  elapsed
-        logging.info("Time elapsed for dimensionality reduction is %f" %  elapsed)
+        print "Time elapsed for dimensionality reduction is %f" % elapsed
+        logging.info("Time elapsed for dimensionality reduction is %f" % elapsed)
 
-    #features = features.astype('float32')
-    fimp = np.genfromtxt("results/LightGBM.sorted_features")
-    idxs = fimp[0][:500]
-    features = features[:,idxs]
+    if args.truncate > 0:
+        fimp = np.genfromtxt("results/LightGBM.sorted_features")
+        idxs = fimp[0][:args.truncate]
+        features = features[:,idxs]
+
     print "Final data shape:", features.shape
+
+
     logging.info("Final data shape: %s" % (features.shape,))
-    results = classify_all(labels, features, clfs, folds, model_names, cv)
-    #results.sort("Split Val Acc", inplace=True, ascending=False)
-    results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
+    results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem)
+    #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
     print results
 
 
