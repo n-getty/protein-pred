@@ -223,7 +223,7 @@ def load_data(size, file2, file3):
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         features = features[:,31:]
-        if file2 != '0':
+        if file2:
             print "Adding 5mer count features"
             features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
             features2 = features2[:, :-5]
@@ -321,11 +321,11 @@ def main():
         features = features.astype('float32')
 
     # Reduce feature dimensionality
-    if args.red > 0:
+    if args.redu > 0:
         print "Starting dimensionality reduction via TruncatedSVD"
         logging.info("Starting dimensionality reduction via TruncatedSVD")
         start = time()
-        svd = TruncatedSVD(n_components=int(args.red), n_iter=5, random_state=42)
+        svd = TruncatedSVD(n_components=int(args.redu), n_iter=5, random_state=42)
         svd.fit(features)
         features = svd.transform(features)
         end = time()
