@@ -79,10 +79,12 @@ def test_train_split(clf, split, m, class_names):
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    stats_df = pcm.class_statistics(y_test, clf.predict(X_test), class_names)
-    stats_df.to_csv('results/stats/' + m, index=0)
-
     test_pred = clf.predict(X_test)
+
+    stats_df = pcm.class_statistics(y_test, test_pred, class_names)
+    stats_df.to_csv('results/stats/' + m + '.csv', index=0)
+    stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
+
     #pcm.pcm(y_test, test_pred, m)
 
     print "Top 5 accuracy:", t5
