@@ -114,7 +114,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Val Acc", "Max Mem", "Avg Mem", "Time"])
 
-    for x in range(len(clfs)):
+    for x in range(len(model_names)):
         start = time()
         mn = model_names[x]
 
@@ -281,7 +281,7 @@ def main():
                           ,max_depth=4
                           ,learning_rate=0.1
                           ,colsample_bytree=1
-                          ,subsample=0.8
+                          ,subsample=1
                           ,min_child_weight=6
                          ),
 
@@ -290,14 +290,14 @@ def main():
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
                            ,colsample_bytree=1
-                           ,subsample=0.8
+                           ,subsample=1
                            ,min_child_weight=6
                            )
             ]
 
-    model_names = ["RandomForest",
-                   "XGBoost",
-                   "LightGBM"
+    model_names = ["RandomForest"
+                   ,"XGBoost"
+                   ,"LightGBM"
              ]
 
     features, class_names = load_data(args.data, args.five, args.ten)
@@ -355,7 +355,7 @@ def main():
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem)
     #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
-    print results
+    print results.to_string()
 
 
 if __name__ == '__main__':
