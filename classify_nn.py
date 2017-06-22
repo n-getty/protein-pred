@@ -178,7 +178,7 @@ def main(data="sm", use_batches='0', m="lstm"):
 if __name__ == '__main__':
     lock = threading.Lock()
     if len(sys.argv) > 1:
-        os.chdir("/home/ngetty/examples/protein-pred")
+        os.chdir("/home/ngetty/proj/protein-pred")
         args = sys.argv[1:]
         main(args[0], args[1], args[2])
     else:
