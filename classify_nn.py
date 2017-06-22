@@ -82,8 +82,8 @@ def classify(features, labels, use_batches, file, m):
         nb_classes = 100
 
     # Training
-    batch_size = 100
-    epochs = 30
+    batch_size = 10000
+    epochs = 200
 
     X_train, X_test, y_train, y_test = train_test_split(
         features, labels, test_size=0.2, random_state=0, stratify=labels)
@@ -167,6 +167,7 @@ def main(data="sm", use_batches='0', m="lstm"):
     features, labels = load_data(data, False, False)
 
     labels = convert_labels(labels)
+    print features.shape
 
     features = features.toarray()
     #normalize(features, copy=False)
