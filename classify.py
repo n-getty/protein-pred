@@ -86,7 +86,7 @@ def test_train_split(clf, split, m, class_names):
     stats_df.to_csv('results/' + m + '.class_stats', index=0)
 
     test_pred = clf.predict(X_test)
-    pcm.pcm(y_test, test_pred, m)
+    pcm.class_statistics(y_test, test_pred, m)
     #pcm.pcm(y_test, test_pred, m)
 
     print "Top 5 accuracy:", t5
