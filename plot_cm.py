@@ -57,8 +57,8 @@ def class_statistics(y_true, y_pred, class_names):
         fp = sum(col)-tp
         fn = sum(row)-tp
         tn = len(y_true)-tp-fp
-        sens.append(tp/tp+fn)
-        spec.append(tn/tn+fp)
+        sens.append(float(tp)/(tp+fn))
+        spec.append(float(tn)/(tn+fp))
         sorted_row_idxs = np.argsort(row)
         sorted_col_idxs = np.argsort(col)
         mcf = sorted_row_idxs[-2] if sorted_row_idxs[-1] == x else sorted_row_idxs[-1]
@@ -68,7 +68,8 @@ def class_statistics(y_true, y_pred, class_names):
 
     stats_df = pd.DataFrame({'PGF': class_names, 'Sensitivity': sens, 'Specicifity': spec,
                              'Most FN': most_conf_for, 'Most FP': most_conf_by})
-    stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True,)
+    stats_df.sort_values(by='Sensitivity', axis=1, ascending=True, inplace=True,)
+
     return stats_df
 
 
