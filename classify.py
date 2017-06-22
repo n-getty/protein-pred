@@ -234,7 +234,7 @@ def load_data(size, file2, file3):
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Classify protein function with ensemble methods')
-    parser.add_argument("-d", "--data", default='sm', type=str, help="data to use")
+    parser.add_argument("--data", default='sm', type=str, help="data to use")
     parser.add_argument("--five", default=False, help="add 5mer features")
     parser.add_argument("--ten", default=False, help="add 10mer features")
     parser.add_argument("--redu", default=0, type=int, help="feature reduction with Truncated SVD")
