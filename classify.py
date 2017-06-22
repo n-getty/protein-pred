@@ -82,7 +82,8 @@ def test_train_split(clf, split, m, class_names):
     test_pred = clf.predict(X_test)
 
     stats_df = pcm.class_statistics(y_test, test_pred, class_names)
-    stats_df.to_csv('results/stats/' + m + '.csv', index=0, engine='python')
+    stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
+                             'Most FN', 'Most FP'])
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
