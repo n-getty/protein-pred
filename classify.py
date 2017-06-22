@@ -234,9 +234,9 @@ def load_data(size, file2, file3):
         features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-        print "DNA 3mers"
+        print "DNA 3mers, 1mers and seq length"
         #features = features[:,31:]
-        features = features[:,:32]
+        features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
             features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
