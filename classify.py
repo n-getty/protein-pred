@@ -27,6 +27,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
         X........A matrix of features.
         labels...The true labels for each instance in X
         split........The fold indices
+        m............The model name
     Returns:
         The average testing accuracy of the classifier
         over each fold of cross-validation.
@@ -50,10 +51,6 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
         scores.append(score)
         t5s.append(t5)
         train_scores.append(train_score)
-
-    '''scores = [x for x in scores if str(x) != 'Nan']
-    train_scores = [x for x in train_scores if str(x) != 'Nan']
-    t5s = [x for x in t5s if str(x) != 'Nan']'''
 
     return np.mean(scores), np.mean(train_scores), np.mean(t5s)
 
@@ -103,6 +100,8 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
         clfs.........The classifiers to fit and test
         folds........Number of folds for cross validation
         model_names..Readable names of each classifier
+        cv...........Whether to use cross validation
+        mem..........Whether to store memory usage
     """
     labels = convert_labels(class_names)
     class_names = unique_class_names(class_names)
@@ -173,6 +172,13 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
 
 
 def unique_class_names(names):
+    """ 
+    Generate ordered unique class names
+    Params:
+        names....Label for every data point
+    Returns:
+        Name for each class in the set
+    """
     cns = set()
     unique = []
     for c in names:
@@ -236,7 +242,8 @@ def load_data(size, file2, file3):
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         print "AA 1mers 2mers"
-        features = hstack((features[:,32:432], features[:,-22:]), format='csr')
+        # features = features[:,32:]
+        # features = hstack((features[:,32:432], features[:,-22:]), format='csr')
         #features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
