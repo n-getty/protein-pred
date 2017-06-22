@@ -244,8 +244,9 @@ def load_data(size, file2, file3):
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         print "AA 1mers 2mers 3mers"
-        features = features[:,32:]
+        # features = features[:,32:]
         # features = hstack((features[:,32:432], features[:,-22:]), format='csr')
+        features = hstack((features[:,:432], features[:,-22:]))
         #features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
