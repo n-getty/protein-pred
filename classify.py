@@ -182,6 +182,7 @@ def unique_class_names(names):
 
     return unique
 
+
 def top_5_accuracy(probs, y_true):
     """ 
     Calculates top 5 and top 1 accuracy in 1 go
@@ -248,15 +249,15 @@ def load_data(size, file2, file3):
 def get_parser():
     parser = argparse.ArgumentParser(description='Classify protein function with ensemble methods')
     parser.add_argument("--data", default='sm', type=str, help="data to use")
-    parser.add_argument("--five", default=False, help="add 5mer features")
-    parser.add_argument("--ten", default=False, help="add 10mer features")
+    parser.add_argument("--five", default=False, action='store_true', help="add 5mer features")
+    parser.add_argument("--ten", default=False, action='store_true', help="add 10mer features")
     parser.add_argument("--redu", default=0, type=int, help="feature reduction with Truncated SVD")
     parser.add_argument("--tfidf", default=False, help="convert counts to tfidf")
     parser.add_argument("--prune", default=0, type=int, help="remove features with apperance below prune")
     parser.add_argument("--est", default=16, type=int, help="number of estimators (trees)")
     parser.add_argument("--thresh", default=0, type=int, help="zero counts below threshold")
-    parser.add_argument("--cv", default=False, help="calculate cross validation results")
-    parser.add_argument("--mem", default=False, help="store memory usage statistics")
+    parser.add_argument("--cv", default=False, action='store_true', help="calculate cross validation results")
+    parser.add_argument("--mem", default=False, action='store_true', help="store memory usage statistics")
     parser.add_argument("--truncate", default=0, type=int, help="Use only top k ")
 
     return parser
