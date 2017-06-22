@@ -174,7 +174,7 @@ def main(data="sm", use_batches='0', m="lstm"):
     if m == 'lstm':
         features = features.reshape(features.shape[0],features.shape[1], 1)
     else:
-        features = features.reshape(features.shape[0], features.shape[1], features.shape[2], 1)
+        features = features.reshape(features.shape[0], features.shape[1], 1, 1)
 
     classify(features, labels, use_batches, data, m)
 
