@@ -275,7 +275,7 @@ def main():
                                    #,max_depth=6
                                    ),
 
-           XGBClassifier(#n_jobs=-1,
+           XGBClassifier(n_jobs=-1,
                           n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=4
@@ -296,8 +296,8 @@ def main():
             ]
 
     model_names = ["RandomForest"
-                   #,"XGBoost"
-                   #,"LightGBM"
+                   ,"XGBoost"
+                   ,"LightGBM"
              ]
 
     features, class_names = load_data(args.data, args.five, args.ten)
