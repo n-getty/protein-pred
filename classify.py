@@ -350,10 +350,6 @@ def main():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-    if len(sys.argv) > 1:
+        #if len(sys.argv) > 1:
         #os.chdir("/home/ngetty/examples/protein-pred")
-        args = sys.argv[1:]
-        main(*args)
-
-    else:
-        main()
+    main()
