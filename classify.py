@@ -82,7 +82,7 @@ def test_train_split(clf, split, m, class_names):
     test_pred = clf.predict(X_test)
 
     stats_df = pcm.class_statistics(y_test, test_pred, class_names)
-    stats_df.to_csv('results/stats/' + m + '.csv', index=0)
+    stats_df.to_csv('results/stats/' + m + '.csv', index=0, engine='python')
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
@@ -246,7 +246,7 @@ def load_data(size, file2, file3):
         print "AA 1mers 2mers 3mers"
         # features = features[:,32:]
         # features = hstack((features[:,32:432], features[:,-22:]), format='csr')
-        features = hstack((features[:,:432], features[:,-22:]))
+        features = hstack((features[:,:432], features[:,-22:]), format='csr')
         #features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
