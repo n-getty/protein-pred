@@ -232,7 +232,7 @@ def load_data(size, file2, file3):
     if file2 and file3:
         print "Using 1, 3, 5 and 10mers"
         features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
-        features = hstack((features[:,:37], features[:,8458:]))
+        features = hstack((features[:,:37], features[:,8458:]), format='csr')
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         print "DNA 3mers, 1mers and seq length"
