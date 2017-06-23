@@ -296,8 +296,8 @@ def main():
                           ,objective="multi:softprob"
                           ,max_depth=2
                           ,learning_rate=1
-                          ,colsample_bytree=0.25
-                          ,subsample=0.25
+                          ,colsample_bytree=0.8
+                          ,subsample=0.8
                           ,min_child_weight=6
                          ),
 
@@ -305,8 +305,8 @@ def main():
                            ,num_leaves=3
                            ,learning_rate=1
                            ,n_estimators=int(est)
-                           ,colsample_bytree=0.25
-                           ,subsample=0.25
+                           ,colsample_bytree=0.8
+                           ,subsample=0.8
                            ,min_child_weight=6
                            )
             ]
