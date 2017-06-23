@@ -287,7 +287,7 @@ def main():
     clfs = [RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
                                    #,oob_score=True
-                                   ,max_depth=2
+                                   ,max_depth=8
                                    ),
 
            XGBClassifier(n_jobs=-1,
