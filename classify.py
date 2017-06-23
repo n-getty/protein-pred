@@ -293,19 +293,19 @@ def main():
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est)
                           ,objective="multi:softprob"
-                          ,max_depth=4
-                          ,learning_rate=0.1
-                          ,colsample_bytree=1
-                          ,subsample=1
+                          ,max_depth=2
+                          ,learning_rate=1
+                          ,colsample_bytree=0.25
+                          ,subsample=0.25
                           ,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,num_leaves=15
-                           ,learning_rate=0.1
+                           ,num_leaves=3
+                           ,learning_rate=1
                            ,n_estimators=int(est)
-                           ,colsample_bytree=1
-                           ,subsample=1
+                           ,colsample_bytree=0.25
+                           ,subsample=0.25
                            ,min_child_weight=6
                            )
             ]
