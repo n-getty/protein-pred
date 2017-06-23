@@ -245,7 +245,7 @@ def load_data(size, file2, file3):
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         print "AA 1mers 2mers 3mers"
-        # features = features[:,32:]
+        features = features[:,32:]
         #features = hstack((features[:,32:432], features[:,-22:]), format='csr')
         # features = hstack((features[:,:432], features[:,-22:]), format='csr')
         #features = features[:,-22:]
@@ -295,7 +295,7 @@ def main():
                           n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=6
-                          ,learning_rate=0.1
+                          ,learning_rate=0.5
                           #,colsample_bytree=0.8
                           #,subsample=0.8
                           ,min_child_weight=6
@@ -303,7 +303,7 @@ def main():
 
             LGBMClassifier(nthread=-1
                            ,num_leaves=63
-                           ,learning_rate=0.1
+                           ,learning_rate=0.5
                            ,n_estimators=int(est)
                            #,colsample_bytree=0.8
                            #,subsample=0.8
