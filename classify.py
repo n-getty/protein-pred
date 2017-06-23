@@ -298,7 +298,7 @@ def main():
                           ,learning_rate=0.5
                           #,colsample_bytree=0.8
                           #,subsample=0.8
-                          ,min_child_weight=6
+                          #,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=-1
@@ -307,7 +307,7 @@ def main():
                            ,n_estimators=int(est)
                            #,colsample_bytree=0.8
                            #,subsample=0.8
-                           ,min_child_weight=6
+                           #,min_child_weight=6
                            )
             ]
 
