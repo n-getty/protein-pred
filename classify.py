@@ -295,17 +295,17 @@ def main():
                           n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=6
-                          ,learning_rate=0.5
-                          ,colsample_bytree=0.8
+                          ,learning_rate=0.8
+                          #,colsample_bytree=0.8
                           #,subsample=0.8
                           ,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=-1
                            ,num_leaves=63
-                           ,learning_rate=0.5
+                           ,learning_rate=0.8
                            ,n_estimators=int(est)
-                           ,colsample_bytree=0.8
+                           #,colsample_bytree=0.8
                            #,subsample=0.8
                            ,min_child_weight=6
                            )
