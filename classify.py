@@ -288,25 +288,25 @@ def main():
     clfs = [RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
                                    #,oob_score=True
-                                   ,max_depth=8
+                                   ,max_depth=12
                                    ),
 
            XGBClassifier(n_jobs=-1,
                           n_estimators=int(est)
                           ,objective="multi:softprob"
-                          ,max_depth=2
+                          ,max_depth=6
                           ,learning_rate=1
-                          ,colsample_bytree=0.8
-                          ,subsample=0.8
+                          #,colsample_bytree=0.8
+                          #,subsample=0.8
                           ,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,num_leaves=3
+                           ,num_leaves=63
                            ,learning_rate=1
                            ,n_estimators=int(est)
-                           ,colsample_bytree=0.8
-                           ,subsample=0.8
+                           #,colsample_bytree=0.8
+                           #,subsample=0.8
                            ,min_child_weight=6
                            )
             ]
