@@ -6,7 +6,8 @@ df = pd.DataFrame
 file = "data/ref.100ec.pgf.seqs.filter"
 
 #data = pd.read_csv(file, names=["protein", "sequence"], usecols=[0, 7], delimiter = '\t')
-data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0, dtype=[str,str])
+data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
+data.protein = data.protein.astype(str)
 X_train, X_test, y_train, y_test = train_test_split(data.sequence, data.protein, test_size=0.2, random_state=0, stratify=data.protein)
 
 df = pd.DataFrame({'X_train': X_train, 'X_test': X_test, 'y_train': y_train, 'y_test': y_test})
