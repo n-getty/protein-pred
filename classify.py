@@ -302,18 +302,18 @@ def main():
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,num_leaves=15
+                           ,num_leaves=63
                            ,learning_rate=0.5
                            ,n_estimators=int(est)
                            ,colsample_bytree=0.5
-                           ,subsample=0.5
+                           ,subsample=1
                            ,min_child_weight=6
                            )
             ]
 
-    model_names = ["RandomForest"
-                   ,"XGBoost"
-                   ,"LightGBM"
+    model_names = [#"RandomForest",
+                   #"XGBoost",
+                   "LightGBM"
              ]
 
     features, class_names = load_data(args.data, args.five, args.ten)
