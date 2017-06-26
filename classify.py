@@ -305,7 +305,8 @@ def main():
                            ,num_leaves=63
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
-                           #,colsample_bytree=0.5
+                           ,max_bin=127
+                           ,colsample_bytree=0.8
                            #,subsample=0.8
                            ,min_child_weight=6
                            )
@@ -346,6 +347,8 @@ def main():
         #tfer.fit(features)
         #features = tfer.transform(features)
         features = features.astype('float32')
+    else:
+        features = features.astype('int16')
 
     # Reduce feature dimensionality
     if args.redu > 0:
