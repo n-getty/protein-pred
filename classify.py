@@ -285,7 +285,7 @@ def main():
 
     folds = 5
 
-    clfs = [RandomForestClassifier(n_jobs=-1
+    clfs = ['''RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
                                    #,oob_score=True
                                    #,max_depth=12
@@ -299,7 +299,7 @@ def main():
                           ,colsample_bytree=0.5
                           ,subsample=0.5
                           ,min_child_weight=6
-                         ),
+                         ),'''/
 
             LGBMClassifier(nthread=-1
                            ,num_leaves=63
