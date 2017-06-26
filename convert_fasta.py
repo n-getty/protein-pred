@@ -3,7 +3,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 df = pd.DataFrame
-file = "data/ref.100ec.pgf.seqs.filter"
+#file = "data/ref.100ec.pgf.seqs.filter"
+file = "data/coreseed.train.tsv"
 
 #data = pd.read_csv(file, names=["protein", "sequence"], usecols=[0, 7], delimiter = '\t')
 data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
