@@ -306,10 +306,10 @@ def main():
                            ,num_leaves=80
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
-                           ,max_bin=127
+                           ,max_bin=63
                            ,colsample_bytree=0.8
                            #,subsample=0.8
-                           ,min_child_weight=6
+                           #,min_child_weight=6
                            )
             ]
     clfs = [clfs[2]]
