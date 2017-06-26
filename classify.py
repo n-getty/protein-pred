@@ -303,7 +303,7 @@ def main():
 
             LGBMClassifier(nthread=-1
                            ,num_leaves=63
-                           ,learning_rate=0.3
+                           ,learning_rate=0.1
                            ,n_estimators=int(est)
                            #,colsample_bytree=0.5
                            #,subsample=0.8
