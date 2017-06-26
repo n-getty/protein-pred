@@ -1,13 +1,21 @@
 
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
 
 df = pd.DataFrame
 file = "data/ref.100ec.pgf.seqs.filter"
 
-data = pd.read_csv(file, names=["protein", "sequence"], usecols=[0, 7], delimiter = '\t')
-data.protein = '>' + data.protein + '\n' + data.sequence
+#data = pd.read_csv(file, names=["protein", "sequence"], usecols=[0, 7], delimiter = '\t')
+data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
+X_train, X_test, y_train, y_test = train_test_split(data.sequence, data.protein, test_size=0.2, random_state=0, stratify=data.protein)
 
-with open("data/ref.100ec.pgf.seqs.fasta", mode='wb') as file:
-        for x in data.protein:
+train_seqs = '>' + y_train + '\n' + X_train
+test_seqs = '>' + y_test + '\n' + X_test
+
+with open("data/coreseed.train.fasta", mode='wb') as file:
+        for x in train_seqs:
             print>>file, x
+
+with open("data/coreseed.test.fasta", mode='wb') as file:
+    for x in test_seqs:
+        print>> file, x
