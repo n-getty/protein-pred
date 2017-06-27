@@ -306,7 +306,7 @@ def main():
                            ,num_leaves=10
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
-                           ,max_bin=31
+                           ,max_bin=15
                            ,colsample_bytree=0.8
                            #,subsample=0.8
                            #,min_child_weight=6
