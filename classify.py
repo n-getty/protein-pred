@@ -347,9 +347,8 @@ def main():
         features = hstack([features_tf, features[:,32:]], format='csr')
         #tfer.fit(features)
         #features = tfer.transform(features)
-        features = features.astype('float32')
-    else:
-        features = features.astype('int16')
+
+    features = features.astype('float32')
 
     # Reduce feature dimensionality
     if args.redu > 0:
