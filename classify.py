@@ -302,11 +302,11 @@ def main():
                          ),
 
             LGBMClassifier(nthread=-1
-                           ,max_depth=4
-                           ,num_leaves=10
-                           ,learning_rate=0.3
+                           ,max_depth=6
+                           ,num_leaves=31
+                           ,learning_rate=0.1
                            ,n_estimators=int(est)
-                           ,max_bin=15
+                           ,max_bin=31
                            ,colsample_bytree=0.8
                            #,subsample=0.8
                            #,min_child_weight=6
