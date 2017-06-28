@@ -94,7 +94,7 @@ def test_train_split(clf, split, m, class_names):
     return score, train_score, clf, t5
 
 
-def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
+def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_feat):
     """ 
     Compute the average testing accuracy over k folds of cross-validation. 
     Params:
@@ -152,11 +152,12 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem):
             tts_score, tts_train_score, clf, t5 = test_train_split(*args)
             avg_mem = -1
             max_mem = -1
-
-        feat_score = clf.feature_importances_
-        sorted_feats = np.argsort(feat_score)[::-1]
-        np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
-        top_10_features = sorted_feats[:10]
+        
+        if save_feat:
+            feat_score = clf.feature_importances_
+            sorted_feats = np.argsort(feat_score)[::-1]
+            np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
+            top_10_features = sorted_feats[:10]
 
         print "Top ten feature idxs", top_10_features
         logging.info("Top ten feature idxs: %s", str(top_10_features))
@@ -272,6 +273,7 @@ def get_parser():
     parser.add_argument("--cv", default=False, action='store_true', help="calculate cross validation results")
     parser.add_argument("--mem", default=False, action='store_true', help="store memory usage statistics")
     parser.add_argument("--truncate", default=0, type=int, help="Use only top k ")
+    parser.add_argument("--save_feat", default=False, action='store_true', help="Save features and importances")
 
     return parser
 
@@ -320,6 +322,11 @@ def main():
 
     features, class_names = load_data(args.data, args.five, args.ten)
 
+    if args.truncate > 0:
+        fimp = np.genfromtxt("results/LightGBM.sorted_features")
+        idxs = fimp[0][:args.truncate]
+        features = features[:,idxs]
+
     # Zero-out counts below the given threshold
     if thresh > 0:
         v = np.sum(features.data <= thresh)
@@ -363,16 +370,11 @@ def main():
         print "Time elapsed for dimensionality reduction is %f" % elapsed
         logging.info("Time elapsed for dimensionality reduction is %f" % elapsed)
 
-    if args.truncate > 0:
-        fimp = np.genfromtxt("results/LightGBM.sorted_features")
-        idxs = fimp[0][:args.truncate]
-        features = features[:,idxs]
-
     print "Final data shape:", features.shape
 
 
     logging.info("Final data shape: %s" % (features.shape,))
-    results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem)
+    results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
     print results.to_string()
 
