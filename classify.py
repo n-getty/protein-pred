@@ -158,9 +158,8 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
             sorted_feats = np.argsort(feat_score)[::-1]
             np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
             top_10_features = sorted_feats[:10]
-
-        print "Top ten feature idxs", top_10_features
-        logging.info("Top ten feature idxs: %s", str(top_10_features))
+            print "Top ten feature idxs", top_10_features
+            logging.info("Top ten feature idxs: %s", str(top_10_features))
 
         print "Training accuracy:", tts_train_score
         print "Validation accuracy:", tts_score
