@@ -152,7 +152,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
             tts_score, tts_train_score, clf, t5 = test_train_split(*args)
             avg_mem = -1
             max_mem = -1
-        
+
         if save_feat:
             feat_score = clf.feature_importances_
             sorted_feats = np.argsort(feat_score)[::-1]
@@ -314,8 +314,8 @@ def main():
                            #,min_child_weight=6
                            )
             ]
-    clfs = [clfs[2]]
-    model_names = [#"RandomForest",
+    clfs = [clfs[0], clfs[2]]
+    model_names = ["RandomForest",
                    #"XGBoost",
                    "LightGBM"
              ]
