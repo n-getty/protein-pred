@@ -49,7 +49,7 @@ def convert_labels(labels):
 
 
 def build_attention_model(input_dim, nb_classes):
-    inputs = Input(shape=input_dim[0])
+    inputs = Input(shape=input_dim)
 
     # ATTENTION PART STARTS HERE
     attention_probs = Dense(input_dim[0], activation='softmax', name='attention_vec')(inputs)
@@ -108,7 +108,7 @@ def classify(features, labels, use_batches, file, m):
     Y_train = np_utils.to_categorical(y_train, nb_classes)
     Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-    rows =  1
+    rows = 1
 
     input_shape = (features.shape[1], rows)
 
