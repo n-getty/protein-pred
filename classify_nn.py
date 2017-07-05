@@ -48,7 +48,7 @@ def convert_labels(labels):
     return new_labels
 
 
-def build_attention_model(input_dim):
+def build_attention_model(input_dim, nb_classes):
     inputs = Input(shape=(input_dim,))
 
     # ATTENTION PART STARTS HERE
@@ -57,7 +57,7 @@ def build_attention_model(input_dim):
     # ATTENTION PART FINISHES HERE
 
     attention_mul = Dense(64)(attention_mul)
-    output = Dense(1, activation='sigmoid')(attention_mul)
+    output = Dense(units=nb_classes, activation='sigmoid')(attention_mul)
     model = Model(input=[inputs], output=output)
 
     return model
@@ -118,7 +118,7 @@ def classify(features, labels, use_batches, file, m):
         print 'Building LSTM model...'
         model = build_lstm_model(nb_classes, input_shape)
     elif m == "attn":
-        model = build_attention_model(input_shape)
+        model = build_attention_model(input_shape, nb_classes)
     else:
         print 'Building RES model...'
         model = resnet.ResnetBuilder.build_resnet_101((1, features.shape[1], 1), nb_classes)
