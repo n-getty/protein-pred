@@ -49,7 +49,7 @@ def convert_labels(labels):
 
 
 def build_attention_model(input_dim, nb_classes):
-    inputs = Input(shape=(input_dim,))
+    inputs = Input(shape=input_dim)
 
     # ATTENTION PART STARTS HERE
     attention_probs = Dense(input_dim, activation='softmax', name='attention_vec')(inputs)
