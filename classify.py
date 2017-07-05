@@ -276,7 +276,7 @@ def get_parser():
     parser.add_argument("--rf", default=False, action='store_true', help="build random forest model")
     parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
     parser.add_argument("--lgbm", default=False, action='store_true', help="build lightgbm model")
-
+    parser.add_argument("--gpu", default=False, action='store_true', help="use gpu for lgbm")
     return parser
 
 
@@ -288,6 +288,12 @@ def main():
     prune = args.prune
 
     folds = 5
+
+    if args.gpu:
+        print "Using gpu enabled light gbm"
+        device = 'gpu'
+    else:
+        device = 'cpu'
 
     all_clfs = [RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
@@ -312,6 +318,7 @@ def main():
                            ,n_estimators=int(est)
                            ,max_bin=31
                            ,colsample_bytree=0.8
+                           ,device=device
                            #,subsample=0.8
                            #,min_child_weight=6
                            )
