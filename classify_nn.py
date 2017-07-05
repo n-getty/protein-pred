@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
+from keras.layers import Dense, Dropout, Activation, Input, merge
 from keras.layers import LSTM
 from keras.layers import Conv1D, MaxPooling1D
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
@@ -11,6 +11,7 @@ from keras.utils import np_utils
 import sys, os
 import resnet
 import threading
+from keras.models import Model
 
 
 def nn_batch_generator(X_data, y_data, batch_size, csr_2d, m):
@@ -48,6 +49,20 @@ def convert_labels(labels):
     return new_labels
 
 
+def build_attention_model(input_dim):
+    inputs = Input(shape=(input_dim,))
+
+    # ATTENTION PART STARTS HERE
+    attention_probs = Dense(input_dim, activation='softmax', name='attention_vec')(inputs)
+    attention_mul = merge([inputs, attention_probs], output_shape=32, name='attention_mul', mode='mul')
+    # ATTENTION PART FINISHES HERE
+
+    attention_mul = Dense(64)(attention_mul)
+    output = Dense(1, activation='sigmoid')(attention_mul)
+    model = Model(input=[inputs], output=output)
+    return model
+
+
 def build_lstm_model(nb_classes, input_shape):
     # Convolution
     kernel_size = 7
@@ -57,12 +72,13 @@ def build_lstm_model(nb_classes, input_shape):
     # LSTM
     lstm_output_size = 128
     model = Sequential()
-    # model.add(Dropout(0.25, input_shape=(features.shape[1:])))
+    model.add(Dropout(0.25, input_shape=(input_shape)))
     model.add(Conv1D(filters,
                      kernel_size,
                      padding='same',
                      activation='relu',
-                     strides=2, input_shape=(input_shape)))
+                     strides=2#, input_shape=(input_shape)
+                                 ))
     model.add(MaxPooling1D(pool_size=pool_size))
     model.add(LSTM(lstm_output_size))
     model.add(Dense(units=nb_classes, kernel_initializer="he_normal"))
@@ -101,6 +117,8 @@ def classify(features, labels, use_batches, file, m):
     if m == "lstm":
         print 'Building LSTM model...'
         model = build_lstm_model(nb_classes, input_shape)
+    elif m == "attn":
+        model = build_attention_model(input_shape)
     else:
         print 'Building RES model...'
         model = resnet.ResnetBuilder.build_resnet_101((1, features.shape[1], 1), nb_classes)
@@ -148,8 +166,10 @@ def load_data(size, file2, file3):
     else:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
         print "AA 1mers 2mers 3mers"
-        features = hstack((features[:,:432], features[:,-22:]), format='csr')
-        # features = hstack((features[:,32:432], features[:,-22:]), format='csr')
+        #features = features[:,32:]
+        #features = hstack((features[:,32:432], features[:,-22:]), format='csr')
+        #features = hstack((features[:,:432], features[:,-22:]), format='csr')
+        #features = features[:,-22:]
         #features = features[:,:37]
         if file2:
             print "Adding 5mer count features"
@@ -171,7 +191,7 @@ def main(data="sm", use_batches='0', m="lstm"):
 
     features = features.toarray()
     #normalize(features, copy=False)
-    if m == 'lstm':
+    if m == 'lstm' or m == 'attn':
         features = features.reshape(features.shape[0],features.shape[1], 1)
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
