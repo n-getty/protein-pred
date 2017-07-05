@@ -1,4 +1,4 @@
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Input, merge
 from keras.layers import LSTM
 from keras.layers import Conv1D, MaxPooling1D
@@ -11,7 +11,6 @@ from keras.utils import np_utils
 import sys, os
 import resnet
 import threading
-from keras.models import Model
 
 
 def nn_batch_generator(X_data, y_data, batch_size, csr_2d, m):
@@ -60,6 +59,7 @@ def build_attention_model(input_dim):
     attention_mul = Dense(64)(attention_mul)
     output = Dense(1, activation='sigmoid')(attention_mul)
     model = Model(input=[inputs], output=output)
+
     return model
 
 
