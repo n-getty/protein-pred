@@ -1,6 +1,7 @@
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import os
 
 df = pd.DataFrame
 #file = "data/ref.100ec.pgf.seqs.filter"
@@ -24,10 +25,23 @@ test_df.test_seqs = test_seqs
 train_df.to_csv("data/coreseed.train_df.csv", index=0)
 test_df.to_csv("data/coreseed.test_df.csv", index=0)
 
-with open("data/coreseed.train.fasta", mode='wb') as file:
-        for x in train_seqs:
-            print>>file, x
+test_dir = "data/coreseed.test/"
+train_dir = "data/coreseed.train/"
 
-with open("data/coreseed.test.fasta", mode='wb') as file:
-    for x in test_seqs:
-        print>> file, x
+if not os.path.exists(test_dir):
+    os.makedirs(test_dir)
+    
+if not os.path.exists(train_dir):
+    os.makedirs(train_dir)
+
+for x in range(len(train_seqs)):
+    idx = train_df.y_train[x]
+    seq = train_seqs[x]
+    with open(train_dir + idx + ".fasta", mode='wb') as file:
+            print>>file, seq
+
+for x in range(len(test_seqs)):
+    idx = test_df.y_test[x]
+    seq = test_seqs[x]
+    with open(test_dir + idx + ".fasta", mode='wb') as file:
+            print>>file, seq
