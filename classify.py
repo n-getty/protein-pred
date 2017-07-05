@@ -273,6 +273,9 @@ def get_parser():
     parser.add_argument("--mem", default=False, action='store_true', help="store memory usage statistics")
     parser.add_argument("--truncate", default=0, type=int, help="Use only top k ")
     parser.add_argument("--save_feat", default=False, action='store_true', help="Save features and importances")
+    parser.add_argument("--rf", default=False, action='store_true', help="build random forest model")
+    parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
+    parser.add_argument("--lgbm", default=False, action='store_true', help="build lightgbm model")
 
     return parser
 
@@ -286,7 +289,7 @@ def main():
 
     folds = 5
 
-    clfs = [RandomForestClassifier(n_jobs=-1
+    all_clfs = [RandomForestClassifier(n_jobs=-1
                                    ,n_estimators=int(est)
                                    #,oob_score=True
                                    #,max_depth=12
@@ -313,11 +316,17 @@ def main():
                            #,min_child_weight=6
                            )
             ]
-    clfs = [clfs[0], clfs[2]]
-    model_names = ["RandomForest",
-                   #"XGBoost",
-                   "LightGBM"
-             ]
+    model_names = []
+    clfs = []
+    if args.rf:
+        model_names.append("RandomForest")
+        clfs.append(all_clfs[0])
+    if args.xgb:
+        model_names.append("XGBoost")
+        clfs.append(all_clfs[1])
+    if args.lgbm:
+        model_names.append("LightGBM")
+        clfs.append(all_clfs[2])
 
     features, class_names = load_data(args.data, args.five, args.ten)
 
