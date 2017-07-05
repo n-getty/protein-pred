@@ -191,8 +191,10 @@ def main(data="sm", use_batches='0', m="lstm"):
 
     features = features.toarray()
     #normalize(features, copy=False)
-    if m == 'lstm' or m == 'attn':
+    if m == 'lstm':
         features = features.reshape(features.shape[0],features.shape[1], 1)
+    elif m == 'attn':
+        pass
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
 
