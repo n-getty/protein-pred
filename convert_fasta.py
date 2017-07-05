@@ -40,7 +40,7 @@ for index, row in train_df.iterrows():
     with open(train_dir + idx + ".fasta", mode='ab') as file:
             print>>file, seq
 
-for index, row in train_df.iterrows():
+for index, row in test_df.iterrows():
     idx = row.y_test
     seq = row.test_fasta
     with open(test_dir + idx + ".fasta", mode='ab') as file:
