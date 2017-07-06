@@ -271,7 +271,7 @@ def get_parser():
     parser.add_argument("--thresh", default=0, type=int, help="zero counts below threshold")
     parser.add_argument("--cv", default=False, action='store_true', help="calculate cross validation results")
     parser.add_argument("--mem", default=False, action='store_true', help="store memory usage statistics")
-    parser.add_argument("--truncate", default=0, type=int, help="Use only top k ")
+    parser.add_argument("--trunc", default=0, type=int, help="Use only top k ")
     parser.add_argument("--save_feat", default=False, action='store_true', help="Save features and importances")
     parser.add_argument("--rf", default=False, action='store_true', help="build random forest model")
     parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
@@ -337,9 +337,9 @@ def main():
 
     features, class_names = load_data(args.data, args.five, args.ten)
 
-    if args.truncate > 0:
+    if args.trunc > 0:
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
-        idxs = fimp[0][:args.truncate]
+        idxs = fimp[0][:args.trunc]
         features = features[:,idxs]
 
     # Zero-out counts below the given threshold
