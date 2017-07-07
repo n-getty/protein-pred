@@ -364,11 +364,11 @@ def main():
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        tfer.fit(features[:,:32],class_names)
+        '''tfer.fit(features[:,:32],class_names)
         features_tf = tfer.transform(features[:,:32])
-        features = hstack([features_tf, features[:,32:]], format='csr')
-        #tfer.fit(features)
-        #features = tfer.transform(features)
+        features = hstack([features_tf, features[:,32:]], format='csr')'''
+        tfer.fit(features)
+        features = tfer.transform(features)
 
     features = features.astype('float32')
 
