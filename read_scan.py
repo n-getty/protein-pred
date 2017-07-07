@@ -17,7 +17,8 @@ with open(file, mode='rb') as scan:
                     next = False
                     y_true.append(vals[2])
             if line[2] == 't':
-                preds.append(top)
+                if top != []:
+                    preds.append(top)
                 top = []
                 next = True
 
