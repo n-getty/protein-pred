@@ -265,7 +265,7 @@ def get_parser():
     parser.add_argument("--five", default=False, action='store_true', help="add 5mer features")
     parser.add_argument("--ten", default=False, action='store_true', help="add 10mer features")
     parser.add_argument("--redu", default=0, type=int, help="feature reduction with Truncated SVD")
-    parser.add_argument("--tfidf", default=False, help="convert counts to tfidf")
+    parser.add_argument("--tfidf", default=False, action='store_true', help="convert counts to tfidf")
     parser.add_argument("--prune", default=0, type=int, help="remove features with apperance below prune")
     parser.add_argument("--est", default=16, type=int, help="number of estimators (trees)")
     parser.add_argument("--thresh", default=0, type=int, help="zero counts below threshold")
