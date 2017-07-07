@@ -11,7 +11,7 @@ with open(file, mode='rb') as scan:
     for line in scan:
         if len(line) > 10:
             if line[0] != '#':
-                vals = line.split('\t')
+                vals = line.split()
                 top.append(vals[0])
                 if next:
                     next = False
