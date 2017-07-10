@@ -1,5 +1,5 @@
-import numpy as np
-from sklearn.metrics import accuracy_score
+
+from collections import Counter
 
 file = "data/coreseed.test/scans/all.scan"
 
@@ -7,6 +7,7 @@ preds = []
 y_true = []
 top = []
 next = False
+
 with open(file, mode='rb') as scan:
     for line in scan:
         if len(line) > 10:
@@ -21,13 +22,28 @@ with open(file, mode='rb') as scan:
                     preds.append(top)
                 top = []
                 next = True
+preds.append(top)
 
 first_pred = [x[0] for x in preds]
-acc = accuracy_score(y_true, first_pred)
-c=0
+
+t5=0
+t1=0
+missed = []
+mistaken = []
 for x in range(len(y_true)):
+    if y_true[x] == preds[x][0]:
+        t1+=1
+    else:
+        mistaken.append(preds[x][0])
+        missed.append(y_true[x])
     if y_true[x] in preds[x]:
-        c+=1
-print "Top 5 accuarcy:", float(c)/len(y_true)
-print "Accuracy:", acc
-np.savetxt("data/hmm_preds.csv", np.column_stack((preds,y_true)))
+        t5+=1
+
+missed = Counter(missed)
+mistaken = Counter(mistaken)
+
+print "Top 5 accuarcy:", float(t5)/len(y_true)
+print "Accuracy:", float(t1)/len(y_true)
+print "Missed counts", missed
+print "Classes with mistakes:", len(missed)
+print "Mistaken counts", mistaken

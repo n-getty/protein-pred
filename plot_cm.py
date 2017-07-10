@@ -71,7 +71,7 @@ def class_statistics(y_true, y_pred, class_names):
     stats_df = pd.DataFrame({'PGF': class_names, 'Sensitivity': sens, 'Specicifity': spec,
                              'Most FN': most_conf_for, 'Most FP': most_conf_by})
 
-    return stats_df
+    return stats_df, cnf_matrix
 
 
 def pcm(y_true, y_pred, mn):
