@@ -1,7 +1,8 @@
 from collections import Counter
 import pandas as pd
 import sys
-from multiprocessing import Pool, Manager
+from multiprocessing import Pool
+import os
 
 data_path = 'data'
 nb_path = 'letter_distributions'
@@ -56,19 +57,23 @@ def work(wd):
 
     return letters
 
-z = [0] * b_len
-letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
-                        'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
-                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
+letters_pickle = "data/letters.p"
+if not os.path.isfile(letters_pickle):
+    z = [0] * b_len
+    letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
+                            'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
+                            'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
 
-pool = Pool(processes=160)
-words = zip(words.label, words.aa)
+    pool = Pool(processes=160)
+    words = zip(words.label, words.aa)
 
-for i, l in enumerate(pool.imap_unordered(work, words)):
-    sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
-    letters+=l
+    for i, l in enumerate(pool.imap_unordered(work, words)):
+        sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
+        letters+=l
 
-print letters
+    letters.to_pickle(letters_pickle)
+else:
+    letters = pd.read_pickle(letters_pickle)
 
 colors = [[0, '#ffffcc'],
           [0.1, '#ffeda0'],
@@ -164,6 +169,9 @@ save_plot = True
 column_list = list('abcdefghijklmnopqrstuvwxyz')
 x_length = b_len
 
+
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 fig, axes = plt.subplots(20, 1, figsize=(12, 90))
