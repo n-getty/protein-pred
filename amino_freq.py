@@ -25,6 +25,7 @@ p_step = b_len  # to facilitate readability; cross product
 
 # dataframe for results; z is just a temporary list to facilitate dataframe initialization
 
+
 def work(wd):
     freq = freqs[wd[0]]
     wd = wd[1]
@@ -65,7 +66,7 @@ words = zip(words.label, words.aa)
 
 for i, l in enumerate(pool.imap_unordered(work, words)):
     sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
-    letters.add(l, fill_value=0)
+    letters+=l
 
 print letters
 

@@ -8,3 +8,10 @@ from memory_profiler import memory_usage
 from sklearn.feature_extraction.text import TfidfTransformer
 from time import time
 #file = "data/rep.1000ec.pgf.seqs.filter"
+
+
+a = pd.DataFrame({'A': [0,0], 'B': [0,0]})
+b = pd.DataFrame({'A': [1,0], 'B': [0,1]})
+
+c = a+b
+print c
