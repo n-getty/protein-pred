@@ -67,7 +67,7 @@ letters_norm = letters.copy()  # note that values are kept as integers for now; 
 letters_equal_area = letters.copy()
 letters_overall = {}
 
-letters_stats = pd.DataFrame({'max_freq': [0] * 26}, index=list(alphabet))
+letters_stats = pd.DataFrame({'max_freq': [0] * 22}, index=list(alphabet))
 letters_stats['max_bin'] = 0
 letters_stats['total_freq'] = 0
 letters_stats['pct_freq'] = 0.0
@@ -148,7 +148,7 @@ x_length = b_len
 
 import matplotlib.pyplot as plt
 
-fig, axes = plt.subplots(26, 1, figsize=(12, 90))
+fig, axes = plt.subplots(22, 1, figsize=(12, 90))
 #plt.title("Title", size=18, color='k')
 
 for pos in range(len(column_list)):
