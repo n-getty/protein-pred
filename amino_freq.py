@@ -6,25 +6,9 @@ import os
 
 data_path = 'data'
 nb_path = 'letter_distributions'
-
-save_filename = 'aa_dist' #used for .pickle and .png, leave as '' to use a default filename
-
+save_filename = 'aa_dist'
 file = "data/coreseed.train.tsv"
-words = pd.read_csv(file, names=["label","aa"], usecols=[1,6], delimiter='\t', header=0)
-
-for x in range(len(words.aa)):
-    if 'U' in words.aa[x]:
-        words.aa[x] = words.aa[x].replace("U", "")
-    if 'X' in words.aa[x]:
-        words.aa[x] = words.aa[x].replace("X", "")
-
-freqs = Counter(words.label)
-b_len = 15  # number of bins, decided by user
-
-print 'Calculating letters dataframe.'
-p_step = b_len  # to facilitate readability; cross product
-
-# dataframe for results; z is just a temporary list to facilitate dataframe initialization
+letters_pickle = "data/letters.p"
 
 
 def work(wd):
@@ -57,8 +41,23 @@ def work(wd):
 
     return letters
 
-letters_pickle = "data/letters.p"
 if not os.path.isfile(letters_pickle):
+    words = pd.read_csv(file, names=["label", "aa"], usecols=[1, 6], delimiter='\t', header=0)
+
+    for x in range(len(words.aa)):
+        if 'U' in words.aa[x]:
+            words.aa[x] = words.aa[x].replace("U", "")
+        if 'X' in words.aa[x]:
+            words.aa[x] = words.aa[x].replace("X", "")
+
+    freqs = Counter(words.label)
+    b_len = 15  # number of bins, decided by user
+
+    print 'Calculating letters dataframe.'
+    p_step = b_len  # to facilitate readability; cross product
+
+    # dataframe for results; z is just a temporary list to facilitate dataframe initialization
+
     z = [0] * b_len
     letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
                             'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
@@ -166,7 +165,7 @@ for ltr in alphabet:
 
 save_plot = True
 
-column_list = list('abcdefghijklmnopqrstuvwxyz')
+column_list = list(alphabet)
 x_length = b_len
 
 
