@@ -8,9 +8,9 @@ import os
 
 data_path = 'data'
 nb_path = 'letter_distributions'
-save_filename = 'aa_dist_30'
+save_filename = 'aa_dist_10'
 file = "data/coreseed.train.tsv"
-letters_pickle = "data/letters_30.p"
+letters_pickle = "data/letters_10.p"
 
 
 def work(wd):
@@ -43,7 +43,7 @@ def work(wd):
 
     return letters
 
-b_len = 30  # number of bins, decided by user
+b_len = 10  # number of bins, decided by user
 
 if not os.path.isfile(letters_pickle):
     words = pd.read_csv(file, names=["label", "aa"], usecols=[1, 6], delimiter='\t', header=0)
