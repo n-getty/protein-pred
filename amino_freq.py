@@ -1,7 +1,7 @@
 from collections import Counter
 import pandas as pd
 import sys
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 
 data_path = 'data'
 nb_path = 'letter_distributions'
@@ -24,11 +24,6 @@ print 'Calculating letters dataframe.'
 p_step = b_len  # to facilitate readability; cross product
 
 # dataframe for results; z is just a temporary list to facilitate dataframe initialization
-z = [0] * b_len
-letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
-                        'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
-                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
-
 
 def work(wd):
     freq = freqs[wd[0]]
@@ -40,6 +35,11 @@ def work(wd):
     p_curnum = 0  # current letter
     curmult = 0  # current position of algorithm from 0 to bp_mult
     temp = 0
+
+    z = [0] * b_len
+    letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
+                            'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
+                            'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
 
     if p_len > 1:
         while curmult < bp_mult:
@@ -53,11 +53,21 @@ def work(wd):
             if (p_curnum + 1) * p_step == curmult:
                 p_curnum += 1
 
+    return letters
+
+z = [0] * b_len
+letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
+                        'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
+                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
 
 pool = Pool(processes=160)
 words = zip(words.label, words.aa)
-for i, _ in enumerate(pool.imap_unordered(work, words)):
+
+for i, l in enumerate(pool.imap_unordered(work, words)):
     sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
+    letters.add(l, fill=0)
+
+print letters
 
 colors = [[0, '#ffffcc'],
           [0.1, '#ffeda0'],
