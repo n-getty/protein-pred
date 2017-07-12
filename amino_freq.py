@@ -65,7 +65,7 @@ words = zip(words.label, words.aa)
 
 for i, l in enumerate(pool.imap_unordered(work, words)):
     sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
-    letters.add(l, fill=0)
+    letters.add(l, fill_value=0)
 
 print letters
 
