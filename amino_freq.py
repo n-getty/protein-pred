@@ -41,6 +41,8 @@ def work(wd):
 
     return letters
 
+b_len = 15  # number of bins, decided by user
+
 if not os.path.isfile(letters_pickle):
     words = pd.read_csv(file, names=["label", "aa"], usecols=[1, 6], delimiter='\t', header=0)
 
@@ -51,7 +53,6 @@ if not os.path.isfile(letters_pickle):
             words.aa[x] = words.aa[x].replace("X", "")
 
     freqs = Counter(words.label)
-    b_len = 15  # number of bins, decided by user
 
     print 'Calculating letters dataframe.'
     p_step = b_len  # to facilitate readability; cross product
