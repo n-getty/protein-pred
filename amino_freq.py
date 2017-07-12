@@ -49,7 +49,7 @@ def work(wd):
 
 pool = Pool(processes=160)
 words = zip(words.label, words.aa)
-for i in pool.imap_unordered(work, words):
+for i, _ in enumerate(pool.imap_unordered(work, words)):
     sys.stderr.write('\rdone {0:%}'.format(float(i+1) / len(words)))
 
 colors = [[0, '#ffffcc'],
