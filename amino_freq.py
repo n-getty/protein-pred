@@ -1,3 +1,5 @@
+#adapted from https://github.com/Prooffreader/word_list_tools
+
 from collections import Counter
 import pandas as pd
 import sys
