@@ -20,7 +20,7 @@ p_step = b_len  # to facilitate readability; cross product
 z = [0] * b_len
 letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
                         'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
-                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z, 'X': z, 'U': z})
+                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z, 'X': z})
 
 
 def work(wd):
