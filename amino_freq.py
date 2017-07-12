@@ -10,6 +10,13 @@ save_filename = 'aa_dist' #used for .pickle and .png, leave as '' to use a defau
 
 file = "data/coreseed.train.tsv"
 words = pd.read_csv(file, names=["label","aa"], usecols=[1,6], delimiter='\t', header=0)
+
+for x in range(len(words.aa)):
+    if 'U' in words.aa[x]:
+        words.aa[x] = words.aa[x].replace("U", "")
+    if 'X' in words.aa[x]:
+        words.aa[x] = words.aa[x].replace("X", "")
+
 freqs = Counter(words.label)
 b_len = 15  # number of bins, decided by user
 
@@ -20,7 +27,7 @@ p_step = b_len  # to facilitate readability; cross product
 z = [0] * b_len
 letters = pd.DataFrame({'F': z, 'S': z, 'Y': z, 'C': z, 'L': z, 'I': z, 'M': z,
                         'V': z, 'P': z, 'T': z, 'A': z, 'H': z, 'Q': z, 'N': z,
-                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z, 'X': z})
+                        'K': z, 'D': z, 'E': z, 'W': z, 'R': z, 'G': z})
 
 
 def work(wd):
@@ -61,7 +68,7 @@ colors = [[0, '#ffffcc'],
           [5, '#e31a1c'],
           [9, '#b10026']]
 
-alphabet = 'FSYCLIMVPTAHQNKDEWRGXU'
+alphabet = 'FSYCLIMVPTAHQNKDEWRG'
 
 letters_norm = letters.copy()  # note that values are kept as integers for now; the graphs are narrow enough that it should not matter
 letters_equal_area = letters.copy()
