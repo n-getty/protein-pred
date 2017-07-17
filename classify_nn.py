@@ -185,7 +185,7 @@ def main(data="sm", use_batches='0', m="lstm", trunc=0, batch_size=1000):
     use_batches = int(use_batches)
     use_batches = use_batches > 0
     trunc = int(trunc)
-
+    batch_size = int(batch_size)
     features, labels = load_data(data, False, False)
     print features.shape
 
