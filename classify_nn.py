@@ -20,7 +20,7 @@ def nn_batch_generator(X_data, y_data, batch_size, csr_2d, m):
     index = np.arange(np.shape(y_data)[0])
     while 1:
         index_batch = index[batch_size*counter:batch_size*(counter+1)]
-        if not csr_2d:
+        if csr_2d:
             X_batch = X_data[index_batch,:].toarray()
         y_batch = y_data[index_batch]
         if m == "lstm":
