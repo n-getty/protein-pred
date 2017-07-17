@@ -89,7 +89,7 @@ def build_lstm_model(nb_classes, input_shape):
     return model
 
 
-def classify(features, labels, use_batches, file, m):
+def classify(features, labels, use_batches, file, m, batch_size):
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/" + file + '.lstm.log.csv')
@@ -100,7 +100,6 @@ def classify(features, labels, use_batches, file, m):
         nb_classes = 100
 
     # Training
-    batch_size = 100
     epochs = 200
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -182,7 +181,7 @@ def load_data(size, file2, file3):
     return features, labels
 
 
-def main(data="sm", use_batches='0', m="lstm", trunc=0):
+def main(data="sm", use_batches='0', m="lstm", trunc=0, batch_size=1000):
     use_batches = int(use_batches)
     use_batches = use_batches > 0
     trunc = int(trunc)
@@ -207,7 +206,7 @@ def main(data="sm", use_batches='0', m="lstm", trunc=0):
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
 
-    classify(features, labels, use_batches, data, m)
+    classify(features, labels, use_batches, data, m, batch_size)
 
 
 if __name__ == '__main__':
