@@ -306,10 +306,10 @@ def main():
                           n_estimators=int(est)
                           ,objective="multi:softprob"
                           ,max_depth=4
-                          ,learning_rate=0.5
-                          ,colsample_bytree=0.5
+                          ,learning_rate=0.1
+                          ,colsample_bytree=0.8
                           ,subsample=0.5
-                          ,min_child_weight=6
+                          #,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=-1
