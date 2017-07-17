@@ -214,6 +214,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/proj/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1], args[2], args[3])
+        main(args[0], args[1], args[2], args[3], args[4])
     else:
         main()
