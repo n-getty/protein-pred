@@ -168,7 +168,7 @@ def load_data(size, file2, file3):
         print "AA 1mers 2mers 3mers"
         #features = features[:,32:]
         #features = hstack((features[:,32:432], features[:,-22:]), format='csr')
-        features = hstack((features[:,:432], features[:,-22:]), format='csr')
+        #features = hstack((features[:,:432], features[:,-22:]), format='csr')
         #features = features[:,-22:]
         #features = features[:,:37]
         if file2:
@@ -180,11 +180,19 @@ def load_data(size, file2, file3):
     return features, labels
 
 
-def main(data="sm", use_batches='0', m="lstm"):
+def main(data="sm", use_batches='0', m="lstm", trunc=0):
     use_batches = int(use_batches)
     use_batches = use_batches > 0
 
+
+
+
     features, labels = load_data(data, False, False)
+
+    if trunc > 0:
+        fimp = np.genfromtxt("results/LightGBM.sorted_features")
+        idxs = fimp[0][:args.trunc]
+        features = features[:,idxs]
 
     labels = convert_labels(labels)
     print features.shape
@@ -206,6 +214,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir("/home/ngetty/proj/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1], args[2])
+        main(args[0], args[1], args[2], args[3])
     else:
         main()
