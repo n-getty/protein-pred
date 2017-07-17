@@ -308,7 +308,7 @@ def main():
                           ,max_depth=4
                           ,learning_rate=0.1
                           ,colsample_bytree=0.8
-                          ,subsample=0.5
+                          #,subsample=0.5
                           #,min_child_weight=6
                          ),
 
