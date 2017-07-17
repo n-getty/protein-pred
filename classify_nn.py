@@ -79,7 +79,7 @@ def build_lstm_model(nb_classes, input_shape):
                      kernel_size,
                      padding='same',
                      activation='relu',
-                     strides=2#, input_shape=(input_shape)
+                     strides=2, input_shape=(input_shape)
                                  ))
     model.add(MaxPooling1D(pool_size=pool_size))
     model.add(LSTM(lstm_output_size))
