@@ -72,7 +72,7 @@ def build_lstm_model(nb_classes, input_shape):
     pool_size = 4
 
     # LSTM
-    lstm_output_size = 128
+    lstm_output_size = 32
     model = Sequential()
     model.add(Dropout(0.25, input_shape=(input_shape)))
     model.add(Conv1D(filters,
