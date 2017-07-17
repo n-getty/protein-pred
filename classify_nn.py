@@ -183,9 +183,7 @@ def load_data(size, file2, file3):
 def main(data="sm", use_batches='0', m="lstm", trunc=0):
     use_batches = int(use_batches)
     use_batches = use_batches > 0
-
-
-
+    trunc = int(trunc)
 
     features, labels = load_data(data, False, False)
     print features.shape
