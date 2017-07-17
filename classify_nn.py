@@ -192,7 +192,7 @@ def main(data="sm", use_batches='0', m="lstm", trunc=0):
 
     if trunc > 0:
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
-        idxs = fimp[0][:args.trunc]
+        idxs = fimp[0][:trunc]
         features = features[:,idxs]
 
     labels = convert_labels(labels)
