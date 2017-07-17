@@ -317,7 +317,7 @@ def main():
                            ,num_leaves=31
                            ,learning_rate=0.1
                            ,n_estimators=int(est)
-                           ,max_bin=15
+                           #,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
                            #,subsample=0.8
