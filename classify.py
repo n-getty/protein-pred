@@ -392,7 +392,7 @@ def main():
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
-    print "Times:", results.Time[0], results.Time[1], results.Time[2]
+    #print "Times:", results.Time[0], results.Time[1], results.Time[2]
     print results.to_string()
 
 
