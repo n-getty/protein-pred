@@ -188,6 +188,7 @@ def main(data="sm", use_batches='0', m="lstm", trunc=0):
 
 
     features, labels = load_data(data, False, False)
+    print features.shape
 
     if trunc > 0:
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
