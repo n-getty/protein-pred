@@ -100,7 +100,7 @@ def classify(features, labels, use_batches, file, m):
         nb_classes = 100
 
     # Training
-    batch_size = 1000
+    batch_size = 100
     epochs = 200
 
     X_train, X_test, y_train, y_test = train_test_split(
