@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 import os
 
 df = pd.DataFrame
-#file = "data/ref.100ec.pgf.seqs.filter"
-file = "data/coreseed.train.tsv"
+file = "data/ref.100ec.pgf.seqs.filter"
+#file = "data/coreseed.train.tsv"
 
 #data = pd.read_csv(file, names=["protein", "sequence"], usecols=[0, 7], delimiter = '\t')
 data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
@@ -22,11 +22,17 @@ test_seqs = '>' + test_df.y_test + '\n' + test_df.X_test
 train_df['train_fasta'] = pd.Series(train_seqs)
 test_df['test_fasta'] = pd.Series(test_seqs)
 
-train_df.to_csv("data/coreseed.train_df.csv", index=0)
+'''train_df.to_csv("data/coreseed.train_df.csv", index=0)
 test_df.to_csv("data/coreseed.test_df.csv", index=0)
 
 test_dir = "data/coreseed.test/"
-train_dir = "data/coreseed.train/"
+train_dir = "data/coreseed.train/"'''
+
+train_df.to_csv("data/sm.train_df.csv", index=0)
+test_df.to_csv("data/sm.test_df.csv", index=0)
+
+test_dir = "data/sm.test/"
+train_dir = "data/sm.train/"
 
 if not os.path.exists(test_dir):
     os.makedirs(test_dir)
