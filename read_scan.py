@@ -1,7 +1,7 @@
 import sys
 from collections import Counter
 
-def main(data):
+def main(data="sm"):
     file = "data/" + data + ".test/scans/all.scan"
 
     preds = []
