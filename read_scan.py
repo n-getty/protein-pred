@@ -1,7 +1,7 @@
 import sys
 from collections import Counter
 
-def main(data="sm"):
+def main(data="coreseed"):
     file = "data/" + data + ".test/scans/all.scan"
 
     preds = []
@@ -52,4 +52,7 @@ def main(data="sm"):
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    main(args[0])
+    if len(args) > 0:
+        main(args[0])
+    else:
+        main()

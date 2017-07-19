@@ -122,7 +122,7 @@ def classify(features, labels, use_batches, file, m, batch_size):
         model = build_attention_model(input_shape, nb_classes)
     else:
         print 'Building RES model...'
-        model = resnet.ResnetBuilder.build_resnet_18((1, features.shape[1], 1), nb_classes)
+        model = resnet.ResnetBuilder.build_resnet_101((1, features.shape[1], 1), nb_classes)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
