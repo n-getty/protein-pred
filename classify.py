@@ -236,26 +236,36 @@ def load_sparse_csr(filename):
                          shape=loader['shape'], dtype="float32"), loader['labels']
 
 
-def load_data(size, file2, file3):
+def load_data(size, dna1, dna3, dna5, dna10, aa1, aa2, aa3, aa4):
     path = "data/" + size + '/'
 
-    if file2 and file3:
-        print "Using 1, 3, 5 and 10mers"
-        features, labels = load_sparse_csr(path + "feature_matrix.3.5.10.csr.npz")
-        #features = hstack((features[:,:37], features[:,8458:]), format='csr')
-    else:
+    files = []
+    if dna1:
+        features, labels = load_sparse_csr(path + "feature_matrix.1.csr.npz")
+        files.append(features)
+    if dna3:
         features, labels = load_sparse_csr(path + "feature_matrix.3.csr.npz")
-        print "AA 1mers 2mers 3mers"
-        #features = features[:,32:]
-        #features = hstack((features[:,32:432], features[:,-22:]), format='csr')
-        #features = hstack((features[:,:432], features[:,-22:]), format='csr')
-        #features = features[:,-22:]
-        #features = features[:,:37]
-        if file2:
-            print "Adding 5mer count features"
-            features2, _ = load_sparse_csr(path + "feature_matrix.5.csr.npz")
-            features2 = features2[:, :-5]
-            features = hstack([features, features2], format='csr')
+        files.append(features)
+    if dna5:
+        features, labels = load_sparse_csr(path + "feature_matrix.5.csr.npz")
+        files.append(features)
+    if dna10:
+        features, labels = load_sparse_csr(path + "feature_matrix.10.csr.npz")
+        files.append(features)
+    if aa1:
+        features, labels = load_sparse_csr(path + "feature_matrix.aa1.csr.npz")
+        files.append(features)
+    if aa2:
+        features, labels = load_sparse_csr(path + "feature_matrix.aa2.csr.npz")
+        files.append(features)
+    if aa3:
+        features, labels = load_sparse_csr(path + "feature_matrix.aa3.csr.npz")
+        files.append(features)
+    if aa4:
+        features, labels = load_sparse_csr(path + "feature_matrix.aa4.csr.npz")
+        files.append(features)
+
+    features = hstack(files, format='csr')
 
     return features, labels
 
@@ -263,8 +273,14 @@ def load_data(size, file2, file3):
 def get_parser():
     parser = argparse.ArgumentParser(description='Classify protein function with ensemble methods')
     parser.add_argument("--data", default='sm', type=str, help="data to use")
-    parser.add_argument("--five", default=False, action='store_true', help="add 5mer features")
-    parser.add_argument("--ten", default=False, action='store_true', help="add 10mer features")
+    parser.add_argument("--dna1", default=False, action='store_true', help="add 1mer features")
+    parser.add_argument("--dna3", default=False, action='store_true', help="add 3mer features")
+    parser.add_argument("--dna5", default=False, action='store_true', help="add 5mer features")
+    parser.add_argument("--dna10", default=False, action='store_true', help="add 10mer features")
+    parser.add_argument("--aa1", default=False, action='store_true', help="add 1mer aa features")
+    parser.add_argument("--aa2", default=False, action='store_true', help="add 2mer aa features")
+    parser.add_argument("--aa3", default=False, action='store_true', help="add 3mer aa features")
+    parser.add_argument("--aa4", default=False, action='store_true', help="add 4mer aa features")
     parser.add_argument("--redu", default=0, type=int, help="feature reduction with Truncated SVD")
     parser.add_argument("--tfidf", default=False, action='store_true', help="convert counts to tfidf")
     parser.add_argument("--prune", default=0, type=int, help="remove features with apperance below prune")
@@ -336,7 +352,7 @@ def main():
         model_names.append("LightGBM")
         clfs.append(all_clfs[2])
 
-    features, class_names = load_data(args.data, args.five, args.ten)
+    features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
 
     if args.trunc > 0:
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
