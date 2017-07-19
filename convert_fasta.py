@@ -11,7 +11,7 @@ def main(set="sm"):
         file = "data/ref.1000ec.pgf.seqs.filter"
     elif set == "coreseed":
         file = "data/coreseed.train.tsv"
-    
+
     if set == "coreseed":
         data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
     else:

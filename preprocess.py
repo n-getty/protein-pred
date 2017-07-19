@@ -255,11 +255,15 @@ def read_whole(file,f,k):
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
-    features, vocab = featurize_data(data.dna, k)
+    features3, vocab = featurize_data(data.dna, 3)
+    features5, vocab = featurize_data(data.dna, 5)
+    features10, vocab = featurize_data(data.dna, 10)
     print "generating aa 2mer features"
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
     print "generating aa 3mer features"
     aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
+
+    aa_features4, aa_vocab3 = featurize_data(data.aa, 4, 'aa')
 
     #aa_features, aa_vocab = featurize_data(data.aa, k)
 
@@ -271,12 +275,23 @@ def read_whole(file,f,k):
     aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
     seq_lens = csr_matrix(np.array([len(seq) for seq in data.dna]).reshape((len(labels),1)))
 
-    features = hstack([features, aa_features, aa_features3, nuc_features, aa_counts, seq_lens, aa_lens], format='csr')
-    print features.shape
+    #features = hstack([features, seq_lens], format='csr')
+
+    aa_counts = hstack([aa_counts, aa_lens], format='csr')
+    save_sparse_csr("data/" + f + "/feature_matrix.aa1.csr", aa_counts, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa2.csr", aa_features, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, labels, vocab)
+
+    #print features.shape
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
     #print "There are %d unique kmers" % len(features[0])
-    print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
-    save_sparse_csr("data/" + f + "/feature_matrix." + str(k) + ".csr", features, labels, vocab)
+    nuc_features = hstack([nuc_features,seq_lens], format='csr')
+    #print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
+    save_sparse_csr("data/" + f + "/feature_matrix.1.csr", nuc_features, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.3.csr", features3, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.5.csr", features5, labels, vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.10.csr", features10, labels, vocab)
 
 
 def main(fn='sm', k=3, chunksize=100000):

@@ -1,6 +1,7 @@
 import sys
 from collections import Counter
 
+
 def main(data="coreseed"):
     file = "data/" + data + ".test/scans/all.scan"
 
@@ -43,6 +44,7 @@ def main(data="coreseed"):
     missed = Counter(missed)
     mistaken = Counter(mistaken)
 
+    print "Number of predictions", len(preds)
     print "Top 5 accuarcy:", float(t5)/len(y_true)
     print "Accuracy:", float(t1)/len(y_true)
     print "Missed counts", missed

@@ -10,8 +10,8 @@ from time import time
 #file = "data/rep.1000ec.pgf.seqs.filter"
 
 
-a = pd.DataFrame({'A': [0,0], 'B': [0,0]})
-b = pd.DataFrame({'A': [1,0], 'B': [0,1]})
+file = "data/coreseed.train.tsv"
 
-c = a+b
-print c
+data = pd.read_csv(file, names=["protein", "sequence"], usecols=[1, 5], delimiter='\t', header=0)
+
+print len(data)
