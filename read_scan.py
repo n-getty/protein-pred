@@ -2,8 +2,8 @@ import sys
 from collections import Counter
 
 
-def main(data="coreseed"):
-    file = "data/" + data + ".test/scans/all.scan"
+def main(data="coreseed", split="train"):
+    file = "data/" + data + "." + split + "/scans/all.scan"
 
     preds = []
     y_true = []
@@ -55,6 +55,6 @@ def main(data="coreseed"):
 if __name__ == '__main__':
     args = sys.argv[1:]
     if len(args) > 0:
-        main(args[0])
+        main(args[0], args[1])
     else:
         main()
