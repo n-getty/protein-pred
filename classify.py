@@ -341,7 +341,7 @@ def main():
                            #,subsample=0.8
                            #,min_child_weight=6
                            ),
-            LogisticRegression()
+            LogisticRegression(multi_class='multinomial', n_jobs=-1)
             ]
     model_names = []
     clfs = []
