@@ -354,7 +354,7 @@ def main():
     if args.lgbm:
         model_names.append("LightGBM")
         clfs.append(all_clfs[2])
-    if args.lgbm:
+    if args.regr:
         model_names.append("Regression")
         clfs.append(all_clfs[3])
 
