@@ -12,7 +12,6 @@ from sklearn.metrics import accuracy_score
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xgboost import XGBClassifier
 from scipy.sparse import csr_matrix, hstack
-import sys
 from sklearn.decomposition import TruncatedSVD
 from memory_profiler import memory_usage
 from lightgbm import LGBMClassifier
@@ -266,6 +265,10 @@ def load_data(size, dna1, dna3, dna5, dna10, aa1, aa2, aa3, aa4):
         features, labels = load_sparse_csr(path + "feature_matrix.aa4.csr.npz")
         files.append(features)
 
+    if not files:
+        print "No dataset provided"
+        exit(0)
+
     features = hstack(files, format='csr')
 
     return features, labels
@@ -387,9 +390,6 @@ def main():
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        '''tfer.fit(features[:,:32],class_names)
-        features_tf = tfer.transform(features[:,:32])
-        features = hstack([features_tf, features[:,32:]], format='csr')'''
         tfer.fit(features)
         features = tfer.transform(features)
 
@@ -412,8 +412,6 @@ def main():
 
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
-    #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
-    #print "Times:", results.Time[0], results.Time[1], results.Time[2]
     for t in results.Time:
         print t,
 
@@ -423,6 +421,4 @@ def main():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
-        #if len(sys.argv) > 1:
-        #os.chdir("/home/ngetty/examples/protein-pred")
     main()
