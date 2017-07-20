@@ -315,13 +315,13 @@ def main():
         device = 'cpu'
 
     all_clfs = [RandomForestClassifier(n_jobs=-1
-                                   ,n_estimators=int(est)
+                                   ,n_estimators=est
                                    #,oob_score=True
                                    #,max_depth=12
                                    ),
 
            XGBClassifier(n_jobs=-1,
-                          n_estimators=int(est)
+                          n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
                           ,learning_rate=0.1
@@ -334,14 +334,14 @@ def main():
                            ,max_depth=6
                            ,num_leaves=31
                            ,learning_rate=0.1
-                           ,n_estimators=int(est)
+                           ,n_estimators=est
                            ,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
                            #,subsample=0.8
                            #,min_child_weight=6
                            ),
-            LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs')
+            LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs', max_iter=est)
             ]
     model_names = []
     clfs = []
