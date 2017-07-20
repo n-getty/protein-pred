@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from time import time
 import logging
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -341,7 +341,7 @@ def main():
                            #,subsample=0.8
                            #,min_child_weight=6
                            ),
-            LinearRegression()
+            LogisticRegression()
             ]
     model_names = []
     clfs = []
