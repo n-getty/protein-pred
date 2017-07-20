@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from time import time
 import logging
+from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -67,7 +68,7 @@ def test_train_split(clf, split, m, class_names):
     """
 
     X_train, X_test, y_train, y_test = split
-    if m == 'RandomForest':
+    if m == 'RandomForest' or m =='Regression':
         clf.fit(X_train, y_train)
     else:
         clf.fit(X_train, y_train,
@@ -294,6 +295,7 @@ def get_parser():
     parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
     parser.add_argument("--lgbm", default=False, action='store_true', help="build lightgbm model")
     parser.add_argument("--gpu", default=False, action='store_true', help="use gpu for lgbm")
+    parser.add_argument("--regr", default=False, action='store_true', help="build regression model")
     return parser
 
 
@@ -338,7 +340,8 @@ def main():
                            ,device=device
                            #,subsample=0.8
                            #,min_child_weight=6
-                           )
+                           ),
+            LinearRegression()
             ]
     model_names = []
     clfs = []
@@ -351,6 +354,9 @@ def main():
     if args.lgbm:
         model_names.append("LightGBM")
         clfs.append(all_clfs[2])
+    if args.lgbm:
+        model_names.append("Regression")
+        clfs.append(all_clfs[3])
 
     features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
 
