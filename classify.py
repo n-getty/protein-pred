@@ -172,7 +172,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
         results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, cv_t5, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
-        
+
     return results
 
 
@@ -410,11 +410,13 @@ def main():
 
     print "Final data shape:", features.shape
 
-
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     #results.to_csv("results/" + size + '.' + file2 + '.' + file3 + '.' + red + '.' + tfidf + '.' + prune + '.' + est, sep="\t")
     #print "Times:", results.Time[0], results.Time[1], results.Time[2]
+    for t in results.Time:
+        print t,
+
     print results.to_string()
 
 
