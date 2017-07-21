@@ -414,7 +414,7 @@ def main():
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     for t in results.Time:
         print t,
-
+    print
     print results.to_string()
 
 
