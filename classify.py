@@ -299,6 +299,7 @@ def get_parser():
     parser.add_argument("--lgbm", default=False, action='store_true', help="build lightgbm model")
     parser.add_argument("--gpu", default=False, action='store_true', help="use gpu for lgbm")
     parser.add_argument("--regr", default=False, action='store_true', help="build regression model")
+    parser.add_argument("--thread",  default=-1, type=int, help="specify number of threads to to run with")
     return parser
 
 
@@ -317,13 +318,13 @@ def main():
     else:
         device = 'cpu'
 
-    all_clfs = [RandomForestClassifier(n_jobs=-1
+    all_clfs = [RandomForestClassifier(n_jobs=args.thread
                                    ,n_estimators=est
                                    #,oob_score=True
                                    #,max_depth=12
                                    ),
 
-           XGBClassifier(n_jobs=-1,
+           XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
@@ -333,7 +334,7 @@ def main():
                           #,min_child_weight=6
                          ),
 
-            LGBMClassifier(nthread=-1
+            LGBMClassifier(nthread=args.thread
                            ,max_depth=6
                            ,num_leaves=31
                            ,learning_rate=0.1
