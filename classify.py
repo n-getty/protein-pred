@@ -364,11 +364,6 @@ def main():
 
     features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
 
-    if args.trunc > 0:
-        fimp = np.genfromtxt("results/LightGBM.sorted_features")
-        idxs = fimp[0][:args.trunc]
-        features = features[:,idxs]
-
     # Zero-out counts below the given threshold
     if thresh > 0:
         v = np.sum(features.data <= thresh)
@@ -387,6 +382,11 @@ def main():
 
     features = features[:, nonz]
 
+    if args.trunc > 0:
+        fimp = np.genfromtxt("results/LightGBM.sorted_features")
+        idxs = fimp[0][:args.trunc]
+        features = features[:,idxs]
+        
     if args.tfidf:
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
