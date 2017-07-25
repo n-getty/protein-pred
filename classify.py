@@ -17,6 +17,7 @@ from memory_profiler import memory_usage
 from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
+from collections import Counter
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
@@ -45,7 +46,8 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
                     eval_set=[(X_train, y_train), (X_test, y_test)],
                     early_stopping_rounds=2,
                     verbose=False,)
-        t5, score = top_5_accuracy(clf.predict_proba(X_test), y_test)
+        probs = clf.predict_proba(X_test)
+        t5, score = top_5_accuracy(probs, y_test)
         train_pred = clf.predict(X_train)
         train_score = accuracy_score(y_train, train_pred)
         scores.append(score)
@@ -53,6 +55,27 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
         train_scores.append(train_score)
 
     return np.mean(scores), np.mean(train_scores), np.mean(t5s)
+
+
+def save_incorrect_csv(probs, y_test, test_idx):
+    if len(y_test) > 100000:
+        file = "data/coreseed.train.tsv"
+        labels = pd.read_csv(file, names=["peg", "function"], usecols=[0, 2], delimiter='\t', header=0)
+    else:
+        file = "data/ref.100ec.pgf.seqs.filter"
+        labels = pd.read_csv(file, names=["peg", "function"], usecols=[2,5], delimiter='\t')
+
+    uni_funcs = unique_class_names(labels.function)
+    preds = np.argsort(probs, axis=1)[:,0]
+    scores = probs[range(len(preds)),preds]
+    pegs = labels.peg[test_idx]
+    true_funcs = labels.function[test_idx]
+    pred_funcs = uni_funcs[preds]
+    tups = zip(y_test, preds)
+    all_counts = Counter(tups)
+    counts = [all_counts[tup] for tup in tups]
+    inc_df = pd.DataFrame({'peg': pegs, 'score': scores, 'true_function': true_funcs, 'pred_function': pred_funcs, 'counts': counts})
+    inc_df.to_csv("incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0)
 
 
 def test_train_split(clf, split, m, class_names):
@@ -66,7 +89,7 @@ def test_train_split(clf, split, m, class_names):
         matrix.
     """
 
-    X_train, X_test, y_train, y_test = split
+    X_train, X_test, y_train, y_test, train_idx, test_idx = split
     if m == 'RandomForest' or m =='Regression':
         clf.fit(X_train, y_train)
     else:
@@ -84,10 +107,12 @@ def test_train_split(clf, split, m, class_names):
     stats_df, cnfm = pcm.class_statistics(y_test, test_pred, class_names)
     stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
                              'Most FN', 'Most FP'])
-    np.savetxt('results/stats/cnfm' + m + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + '.csv', cnfm, delimiter=',')
+    np.savetxt('results/stats/cnfm' + m + strftime("%Y-%m-%d %H:%M", gmtime()) + '.csv', cnfm, delimiter=',')
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
+    if m == "LightGBM":
+        save_incorrect_csv(probs, y_test, test_idx)
 
     print "Top 5 accuracy:", t5
     logging.info("Top 5 accuracy: %f", t5)
@@ -111,7 +136,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
     class_names = unique_class_names(class_names)
 
     tts_split = train_test_split(
-        features, labels, test_size=0.2, random_state=0, stratify=labels)
+        features, labels, range(len(labels)), test_size=0.2, random_state=0, stratify=labels)
     if cv:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
