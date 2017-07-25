@@ -70,6 +70,8 @@ def save_incorrect_csv(probs, y_test, test_idx):
     inc_idxs = np.where(preds != y_test)
     scores = probs[range(len(preds)),preds][inc_idxs]
     pegs = np.array(labels.peg[test_idx])[inc_idxs]
+    if len(y_test) > 100000:
+        pegs = ["http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&feature=" + x for x in pegs]
     true_funcs = np.array(labels.function[test_idx])[inc_idxs]
     pred_funcs = uni_funcs[preds][inc_idxs]
     tups = zip(y_test, preds)
@@ -98,6 +100,7 @@ def test_train_split(clf, split, m, class_names):
                 eval_set=[(X_train, y_train), (X_test, y_test)],
                 early_stopping_rounds=2,
                 verbose=False,)
+
     probs = clf.predict_proba(X_test)
     t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
