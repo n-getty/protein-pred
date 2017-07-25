@@ -65,7 +65,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
         file = "data/ref.100ec.pgf.seqs.filter"
         labels = pd.read_csv(file, names=["peg", "function"], usecols=[2,5], delimiter='\t')
 
-    uni_funcs = unique_class_names(labels.function)
+    uni_funcs = np.array(unique_class_names(labels.function))
     preds = np.argsort(probs, axis=1)[:,0]
     scores = probs[range(len(preds)),preds]
     pegs = labels.peg[test_idx]
