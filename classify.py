@@ -2,7 +2,7 @@
 import warnings
 import pandas as pd
 import numpy as np
-from time import time
+from time import time, gmtime, strftime
 import logging
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -84,7 +84,7 @@ def test_train_split(clf, split, m, class_names):
     stats_df, cnfm = pcm.class_statistics(y_test, test_pred, class_names)
     stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
                              'Most FN', 'Most FP'])
-    np.savetxt('results/stats/cnfm' + m + '.csv', cnfm, delimiter=',')
+    np.savetxt('results/stats/cnfm' + m + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + '.csv', cnfm, delimiter=',')
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
@@ -386,7 +386,7 @@ def main():
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
         idxs = fimp[0][:args.trunc]
         features = features[:,idxs]
-        
+
     if args.tfidf:
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")

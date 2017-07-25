@@ -1,3 +1,4 @@
+#from https://github.com/liuzhuang13/DenseNet
 from keras.models import Model
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.convolutional import Convolution2D
