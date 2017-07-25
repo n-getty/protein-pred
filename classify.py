@@ -75,7 +75,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
     all_counts = Counter(tups)
     counts = [all_counts[tup] for tup in tups]
     inc_df = pd.DataFrame({'peg': pegs, 'score': scores, 'true_function': true_funcs, 'pred_function': pred_funcs, 'counts': counts})
-    inc_df.to_csv("incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0)
+    inc_df.to_csv("confs/incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0)
 
 
 def test_train_split(clf, split, m, class_names):
