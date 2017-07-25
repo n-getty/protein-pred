@@ -66,7 +66,8 @@ def save_incorrect_csv(probs, y_test, test_idx):
         labels = pd.read_csv(file, names=["peg", "function"], usecols=[2,5], delimiter='\t')
 
     uni_funcs = np.array(unique_class_names(labels.function))
-    preds = np.argsort(probs, axis=1)[:,0]
+    preds = np.argsort(probs, axis=1)[:,-1]
+    inc_idxs = np.where(preds != y_test)
     scores = probs[range(len(preds)),preds]
     pegs = labels.peg[test_idx]
     true_funcs = labels.function[test_idx]
@@ -75,6 +76,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
     all_counts = Counter(tups)
     counts = [all_counts[tup] for tup in tups]
     inc_df = pd.DataFrame({'peg': pegs, 'score': scores, 'true_function': true_funcs, 'pred_function': pred_funcs, 'counts': counts})
+    inc_df = inc_df.loc(inc_idxs)
     inc_df.to_csv("confs/incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0, columns=['peg', 'score', 'true_function', 'pred_function', 'counts'])
 
 
