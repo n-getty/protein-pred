@@ -1,9 +1,9 @@
 #from https://github.com/liuzhuang13/DenseNet
 from keras.models import Model
 from keras.layers.core import Dense, Dropout, Activation
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import AveragePooling2D
-from keras.layers.pooling import GlobalAveragePooling2D
+from keras.layers.convolutional import Convolution1D
+from keras.layers.pooling import AveragePooling1D
+from keras.layers.pooling import GlobalAveragePooling1D
 from keras.layers import Input, merge
 from keras.layers.normalization import BatchNormalization
 from keras.regularizers import l2
@@ -11,14 +11,14 @@ import keras.backend as K
 
 
 def conv_factory(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
-    """Apply BatchNorm, Relu 3x3Conv2D, optional dropout
+    """Apply BatchNorm, Relu 3x3Conv1D, optional dropout
 
     :param x: Input keras network
     :param nb_filter: int -- number of filters
     :param dropout_rate: int -- dropout rate
     :param weight_decay: int -- weight decay factor
 
-    :returns: keras network with b_norm, relu and convolution2d added
+    :returns: keras network with b_norm, relu and convolution1D added
     :rtype: keras network
     """
 
@@ -27,7 +27,7 @@ def conv_factory(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
                            gamma_regularizer=l2(weight_decay),
                            beta_regularizer=l2(weight_decay))(x)
     x = Activation('relu')(x)
-    x = Convolution2D(nb_filter, 3, 1,
+    x = Convolution1D(nb_filter, 3, 1,
                       init="he_uniform",
                       border_mode="same",
                       bias=False,
@@ -39,7 +39,7 @@ def conv_factory(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
 
 
 def transition(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
-    """Apply BatchNorm, Relu 1x1Conv2D, optional dropout and Maxpooling2D
+    """Apply BatchNorm, Relu 1x1Conv1D, optional dropout and Maxpooling1D
 
     :param x: keras model
     :param nb_filter: int -- number of filters
@@ -56,14 +56,14 @@ def transition(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
                            gamma_regularizer=l2(weight_decay),
                            beta_regularizer=l2(weight_decay))(x)
     x = Activation('relu')(x)
-    x = Convolution2D(nb_filter, 1, 1,
+    x = Convolution1D(nb_filter, 1, 1,
                       init="he_uniform",
                       border_mode="same",
                       bias=False,
                       W_regularizer=l2(weight_decay))(x)
     if dropout_rate:
         x = Dropout(dropout_rate)(x)
-    x = AveragePooling2D((2, 1), strides=(2, 1))(x)
+    x = AveragePooling1D((2, 1), strides=(2, 1))(x)
 
     return x
 
@@ -159,10 +159,10 @@ def DenseNet(nb_classes, img_dim, depth, nb_dense_block, growth_rate,
     nb_layers = int((depth - 4) / 3)
 
     # Initial convolution
-    x = Convolution2D(nb_filter, 3, 1,
+    x = Convolution1D(nb_filter, 3, 1,
                       init="he_uniform",
                       border_mode="same",
-                      name="initial_conv2D",
+                      name="initial_conv1D",
                       bias=False,
                       W_regularizer=l2(weight_decay))(model_input)
 
@@ -185,7 +185,7 @@ def DenseNet(nb_classes, img_dim, depth, nb_dense_block, growth_rate,
                            gamma_regularizer=l2(weight_decay),
                            beta_regularizer=l2(weight_decay))(x)
     x = Activation('relu')(x)
-    x = GlobalAveragePooling2D(dim_ordering="th")(x)
+    x = GlobalAveragePooling1D(dim_ordering="th")(x)
     x = Dense(nb_classes,
               activation='softmax',
               W_regularizer=l2(weight_decay),
