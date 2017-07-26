@@ -126,7 +126,7 @@ def classify(features, labels, use_batches, file, m, batch_size,
         model = build_lstm_model(nb_classes, input_shape)
     elif m == "attn":
         model = build_attention_model(input_shape, nb_classes)
-    elif m == "deep":
+    elif m == "dense":
         model = densenet.DenseNet(nb_classes,
                                   (1,features.shape[2],1),
                                   depth,
@@ -277,7 +277,7 @@ def main():
         features = features.reshape(features.shape[0],features.shape[1], 1)
     elif args.model == 'attn':
         pass
-    elif args.model == 'deep':
+    elif args.model == 'dense':
         #features = features.reshape(features.shape[0], features.shape[1], 1)
         features = features.reshape(features.shape[0], 1, features.shape[1] ,1)
         #features = features.reshape(1, features.shape[0], features.shape[1])
