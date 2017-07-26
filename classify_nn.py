@@ -283,7 +283,8 @@ def main():
         #features = features.reshape(1, features.shape[0], features.shape[1])
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
-
+        
+    features = features.astype('float32')
     classify(features, labels, args.gen, args.data, args.model, args.batch_size,
                                   args.depth,
                                   args.nb_dense_block,
