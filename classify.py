@@ -354,7 +354,7 @@ def main():
                                    #,max_depth=12
                                    ),
 
-           XGBClassifier(#n_jobs=args.thread,
+           XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
