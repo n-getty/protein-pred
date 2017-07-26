@@ -73,12 +73,13 @@ def save_incorrect_csv(probs, y_test, test_idx):
     if len(y_test) > 100000:
         pegs = ["http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&feature=" + x for x in pegs]
     true_funcs = np.array(labels.function[test_idx])[inc_idxs]
-    pred_funcs = uni_funcs[preds][inc_idxs]
+    #pred_funcs = uni_funcs[preds][inc_idxs]
+    pred_funcs = np.array([uni_funcs[p] for p in preds])[inc_idxs]
     tups = zip(y_test, preds)
     all_counts = Counter(tups)
     counts = np.array([all_counts[tup] for tup in tups])[inc_idxs]
     inc_df = pd.DataFrame({'peg': pegs, 'score': scores, 'true_function': true_funcs, 'pred_function': pred_funcs, 'counts': counts})
-    inc_df.to_csv("confs/incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0, columns=['peg', 'score', 'true_function', 'pred_function', 'counts'])
+    inc_df.to_csv("results/confs/incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()), index=0, columns=['peg', 'score', 'true_function', 'pred_function', 'counts'])
 
 
 def test_train_split(clf, split, m, class_names):
@@ -310,7 +311,7 @@ def get_parser():
     parser.add_argument("--dna3", default=False, action='store_true', help="add 3mer features")
     parser.add_argument("--dna5", default=False, action='store_true', help="add 5mer features")
     parser.add_argument("--dna10", default=False, action='store_true', help="add 10mer features")
-    parser.add_argument("--aa1", default=False, action='store_true', help="add 1mer aa features")
+    parser.add_argument("--aa1", default=True, action='store_true', help="add 1mer aa features")
     parser.add_argument("--aa2", default=False, action='store_true', help="add 2mer aa features")
     parser.add_argument("--aa3", default=False, action='store_true', help="add 3mer aa features")
     parser.add_argument("--aa4", default=False, action='store_true', help="add 4mer aa features")
@@ -325,7 +326,7 @@ def get_parser():
     parser.add_argument("--save_feat", default=False, action='store_true', help="Save features and importances")
     parser.add_argument("--rf", default=False, action='store_true', help="build random forest model")
     parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
-    parser.add_argument("--lgbm", default=False, action='store_true', help="build lightgbm model")
+    parser.add_argument("--lgbm", default=True, action='store_true', help="build lightgbm model")
     parser.add_argument("--gpu", default=False, action='store_true', help="use gpu for lgbm")
     parser.add_argument("--regr", default=False, action='store_true', help="build regression model")
     parser.add_argument("--thread",  default=-1, type=int, help="specify number of threads to to run with")
@@ -353,7 +354,7 @@ def main():
                                    #,max_depth=12
                                    ),
 
-           XGBClassifier(n_jobs=args.thread,
+           XGBClassifier(#n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
