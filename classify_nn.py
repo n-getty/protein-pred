@@ -14,6 +14,7 @@ import threading
 import argparse
 import densenet
 
+
 def nn_batch_generator(X_data, y_data, batch_size, csr_2d, m):
     samples_per_epoch = X_data.shape[0]
     number_of_batches = samples_per_epoch/batch_size
@@ -90,7 +91,7 @@ def build_lstm_model(nb_classes, input_shape):
     return model
 
 
-def classify(features, labels, use_batches, file, m, batch_size, img_dim,
+def classify(features, labels, use_batches, file, m, batch_size,
                                   depth,
                                   nb_dense_block,
                                   growth_rate,
@@ -127,7 +128,7 @@ def classify(features, labels, use_batches, file, m, batch_size, img_dim,
         model = build_attention_model(input_shape, nb_classes)
     elif m == "deep":
         model = densenet.DenseNet(nb_classes,
-                                  img_dim,
+                                  input_shape,
                                   depth,
                                   nb_dense_block,
                                   growth_rate,
@@ -279,7 +280,7 @@ def main():
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
 
-    classify(features, labels, args.gen, args.data, args.model, args.batch_size, args.img_dim,
+    classify(features, labels, args.gen, args.data, args.model, args.batch_size,
                                   args.depth,
                                   args.nb_dense_block,
                                   args.growth_rate,
