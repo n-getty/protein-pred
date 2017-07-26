@@ -27,7 +27,7 @@ def conv_factory(x, nb_filter, dropout_rate=None, weight_decay=1E-4):
                            gamma_regularizer=l2(weight_decay),
                            beta_regularizer=l2(weight_decay))(x)
     x = Activation('relu')(x)
-    x = Convolution2D(nb_filter, 3, 3,
+    x = Convolution2D(nb_filter, 3, 1,
                       init="he_uniform",
                       border_mode="same",
                       bias=False,
@@ -159,7 +159,7 @@ def DenseNet(nb_classes, img_dim, depth, nb_dense_block, growth_rate,
     nb_layers = int((depth - 4) / 3)
 
     # Initial convolution
-    x = Convolution2D(nb_filter, 3, 3,
+    x = Convolution2D(nb_filter, 3, 1,
                       init="he_uniform",
                       border_mode="same",
                       name="initial_conv2D",
