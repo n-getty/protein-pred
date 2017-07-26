@@ -272,7 +272,7 @@ def main():
     print features.shape
 
     features = features.toarray()
-    #normalize(features, copy=False)
+    normalize(features, copy=False)
     if args.model == 'lstm':
         features = features.reshape(features.shape[0],features.shape[1], 1)
     elif args.model == 'attn':
