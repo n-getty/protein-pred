@@ -279,7 +279,7 @@ def main():
         pass
     elif args.model == 'deep':
         #features = features.reshape(features.shape[0], features.shape[1], 1)
-        features = features.reshape(None,1,features.shape[0], features.shape[1])
+        features = features.reshape(1,1,features.shape[0], features.shape[1])
         #features = features.reshape(1, features.shape[0], features.shape[1])
     else:
         features = features.reshape(features.shape[0], features.shape[1], 1, 1)
