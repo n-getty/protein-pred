@@ -59,9 +59,11 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
 
 def save_incorrect_csv(probs, y_test, test_idx):
     if len(y_test) > 100000:
+        print "Loading coreseed functions"
         file = "data/coreseed.train.tsv"
         labels = pd.read_csv(file, names=["peg", "function"], usecols=[0, 2], delimiter='\t', header=0)
     else:
+        print "Loading sm functions"
         file = "data/ref.100ec.pgf.seqs.filter"
         labels = pd.read_csv(file, names=["peg", "function"], usecols=[2,5], delimiter='\t')
 
@@ -71,10 +73,12 @@ def save_incorrect_csv(probs, y_test, test_idx):
     scores = probs[range(len(preds)),preds][inc_idxs]
     pegs = np.array(labels.peg[test_idx])[inc_idxs]
     if len(y_test) > 100000:
+        print "Prepending url to pegs"
         pegs = ["http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&feature=" + x for x in pegs]
     true_funcs = np.array(labels.function[test_idx])[inc_idxs]
     #pred_funcs = uni_funcs[preds][inc_idxs]
-    pred_funcs = np.array([uni_funcs[p] for p in preds])[inc_idxs]
+    pred_funcs = np.array([uni_funcs[p] for p in preds])
+    pred_funcs = pred_funcs[inc_idxs]
     tups = zip(y_test, preds)
     all_counts = Counter(tups)
     counts = np.array([all_counts[tup] for tup in tups])[inc_idxs]
@@ -354,7 +358,7 @@ def main():
                                    #,max_depth=12
                                    ),
 
-           XGBClassifier(n_jobs=args.thread,
+           XGBClassifier(#n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
