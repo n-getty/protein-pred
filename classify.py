@@ -366,14 +366,14 @@ def main():
                           ,learning_rate=0.5
                           ,colsample_bytree=0.8
                           #,subsample=0.5
-                          ,max_bins=15
+                          #,max_bins=15
                           #,min_child_weight=6
                          ),
 
             LGBMClassifier(nthread=args.thread
-                           ,max_depth=6
+                           ,max_depth=4
                            ,num_leaves=31
-                           ,learning_rate=0.1
+                           ,learning_rate=0.3
                            ,n_estimators=est
                            ,max_bin=15
                            ,colsample_bytree=0.8
