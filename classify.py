@@ -58,7 +58,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
 
 
 def save_incorrect_csv(probs, y_test, test_idx):
-    if len(y_test) > 100000:
+    if len(y_test) > 10000:
         print "Loading coreseed functions"
         file = "data/coreseed.train.tsv"
         labels = pd.read_csv(file, names=["peg", "function"], usecols=[0, 2], delimiter='\t', header=0)
@@ -72,7 +72,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
     inc_idxs = np.where(preds != y_test)
     scores = probs[range(len(preds)),preds][inc_idxs]
     pegs = np.array(labels.peg[test_idx])[inc_idxs]
-    if len(y_test) > 100000:
+    if len(y_test) > 10000:
         print "Prepending url to pegs"
         pegs = ["http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&feature=" + x for x in pegs]
     true_funcs = np.array(labels.function[test_idx])[inc_idxs]
