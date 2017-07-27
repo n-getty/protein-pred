@@ -18,6 +18,7 @@ from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
 from collections import Counter
+import seaborn as sns; sns.set(color_codes=True)
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
@@ -358,7 +359,7 @@ def main():
                                    #,max_depth=12
                                    ),
 
-           XGBClassifier(#n_jobs=args.thread,
+           XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=4
@@ -444,6 +445,8 @@ def main():
         logging.info("Time elapsed for dimensionality reduction is %f" % elapsed)
 
     print "Final data shape:", features.shape
+
+
 
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
