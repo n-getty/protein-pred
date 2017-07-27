@@ -121,8 +121,8 @@ def test_train_split(clf, split, m, class_names):
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
-    if m == "LightGBM":
-        save_incorrect_csv(probs, y_test, test_idx)
+    #if m == "LightGBM":
+        #save_incorrect_csv(probs, y_test, test_idx)
 
     print "Top 5 accuracy:", t5
     logging.info("Top 5 accuracy: %f", t5)
