@@ -18,7 +18,6 @@ from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
 from collections import Counter
-import seaborn as sns; sns.set(color_codes=True)
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
@@ -99,14 +98,14 @@ def test_train_split(clf, split, m, class_names):
     """
 
     X_train, X_test, y_train, y_test, train_idx, test_idx = split
-    clf.fit(X_train, y_train)
-    '''if m == 'RandomForest' or m =='Regression':
+
+    if m == 'RandomForest' or m =='Regression':
         clf.fit(X_train, y_train)
     else:
         clf.fit(X_train, y_train,
                 eval_set=[(X_train, y_train), (X_test, y_test)],
                 early_stopping_rounds=2,
-                verbose=False,)'''
+                verbose=False,)
 
     probs = clf.predict_proba(X_test)
     t5, score = top_5_accuracy(probs, y_test)
@@ -447,8 +446,6 @@ def main():
         logging.info("Time elapsed for dimensionality reduction is %f" % elapsed)
 
     print "Final data shape:", features.shape
-
-
 
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
