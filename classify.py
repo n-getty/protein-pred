@@ -83,7 +83,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
     all_counts = Counter(tups)
     counts = np.array([all_counts[tup] for tup in tups])[inc_idxs]
     inc_df = pd.DataFrame({'peg': pegs, 'score': scores, 'true_function': true_funcs, 'pred_function': pred_funcs, 'counts': counts})
-    inc_df.to_csv("results/confs/incorrect_df_" + strftime("%Y-%m-%d %H:%M", gmtime()) + '.csv', index=0, columns=['peg', 'score', 'true_function', 'pred_function', 'counts'])
+    inc_df.to_csv("results/confs/incorrect_df_" + strftime("%m-%d-%H:%M", gmtime()) + '.csv', index=0, columns=['peg', 'score', 'true_function', 'pred_function', 'counts'])
 
 
 def test_train_split(clf, split, m, class_names):
@@ -116,7 +116,7 @@ def test_train_split(clf, split, m, class_names):
     stats_df, cnfm = pcm.class_statistics(y_test, test_pred, class_names)
     stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
                              'Most FN', 'Most FP'])
-    np.savetxt('results/stats/cnfm' + m + strftime("%Y-%m-%d %H:%M", gmtime()) + '.csv', cnfm, delimiter=',')
+    np.savetxt('results/stats/cnfm' + m + strftime("%m-%d:%H:%M", gmtime()) + '.csv', cnfm, delimiter=',')
     stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
 
     #pcm.pcm(y_test, test_pred, m)
