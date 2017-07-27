@@ -363,9 +363,9 @@ def main():
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=2
-                          ,learning_rate=0.3
+                          ,learning_rate=0.5
                           ,colsample_bytree=0.8
-                          #,subsample=0.5
+                          ,subsample=0.5
                           #,min_child_weight=6
                          ),
 
