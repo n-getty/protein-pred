@@ -378,7 +378,7 @@ def main():
                            ,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
-                           #,subsample=0.8
+                           ,subsample=0.8
                            #,min_child_weight=6
                            ),
             LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs', max_iter=est)
