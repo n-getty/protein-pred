@@ -372,14 +372,14 @@ def main():
                          ),
 
             LGBMClassifier(nthread=args.thread
-                           ,max_depth=4
+                           ,max_depth=6
                            ,num_leaves=31
-                           ,learning_rate=0.3
+                           ,learning_rate=0.1
                            ,n_estimators=est
                            ,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
-                           ,subsample=0.8
+                           #,subsample=0.8
                            #,min_child_weight=6
                            ),
             LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs', max_iter=est)
