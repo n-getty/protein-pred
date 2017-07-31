@@ -192,7 +192,8 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         if save_feat:
             feat_score = clf.feature_importances_
             sorted_feats = np.argsort(feat_score)[::-1]
-            np.savetxt('results/' + mn + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
+            np.savetxt('results/' + mn + strftime("%m-%d_%H_%M", gmtime()) + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
+            np.savetxt('results/' + mn + strftime("%m-%d_%H_%M", gmtime()) + '.feat_scores', feat_score)
             top_10_features = sorted_feats[:10]
             print "Top ten feature idxs", top_10_features
             logging.info("Top ten feature idxs: %s", str(top_10_features))
