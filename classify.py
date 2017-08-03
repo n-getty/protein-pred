@@ -74,7 +74,7 @@ def save_incorrect_csv(probs, y_test, test_idx):
     pegs = np.array(labels.peg[test_idx])[inc_idxs]
     if len(y_test) > 10000:
         print "Prepending url to pegs"
-        pegs = ["http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&feature=" + x for x in pegs]
+        pegs = ["< a href = \"http://core.theseed.org/FIG/seedviewer.cgi?page=Annotation&amp;feature=" + x + "\"> " + x + " < / a >" for x in pegs]
     true_funcs = np.array(labels.function[test_idx])[inc_idxs]
     #pred_funcs = uni_funcs[preds][inc_idxs]
     pred_funcs = np.array([uni_funcs[p] for p in preds])
@@ -108,6 +108,7 @@ def test_train_split(clf, split, m, class_names):
                 verbose=False,)
 
     probs = clf.predict_proba(X_test)
+    np.savetxt('results/stored_probs.csv', probs, delimiter=',')
     t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
@@ -330,6 +331,7 @@ def get_parser():
     parser.add_argument("--mem", default=False, action='store_true', help="store memory usage statistics")
     parser.add_argument("--trunc", default=0, type=int, help="Use only top k ")
     parser.add_argument("--save_feat", default=False, action='store_true', help="Save features and importances")
+    parser.add_argument("--use_prob", default=False, action='store_true', help="Use prior probabilities as features")
     parser.add_argument("--rf", default=False, action='store_true', help="build random forest model")
     parser.add_argument("--xgb", default=False, action='store_true', help="build xgboost model")
     parser.add_argument("--lgbm", default=True, action='store_true', help="build lightgbm model")
@@ -418,6 +420,10 @@ def main():
         "Removing %d features that do not have more than %s nonzero counts" % (features.shape[1] - np.sum(nonz), prune))
 
     features = features[:, nonz]
+
+    if args.use_probs:
+        probs = np.genfromtxt("results/stored_probs")
+        features = hstack([features, probs])
 
     if args.trunc > 0:
         fimp = np.genfromtxt("results/LightGBM.sorted_features")
