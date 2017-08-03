@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-#from xgboost import XGBClassifier
+from xgboost import XGBClassifier
 from scipy.sparse import csr_matrix, hstack, vstack
 from sklearn.decomposition import TruncatedSVD
 from memory_profiler import memory_usage
@@ -370,16 +370,16 @@ def main():
                                    #,max_depth=12
                                    ),
 
-           #XGBClassifier(n_jobs=args.thread,
-            #              n_estimators=est
-             #             ,objective="multi:softprob"
-              #            ,max_depth=2
-               #           ,learning_rate=0.5
-                #          ,colsample_bytree=0.8
+           XGBClassifier(n_jobs=args.thread,
+                          n_estimators=est
+                          ,objective="multi:softprob"
+                          ,max_depth=2
+                          ,learning_rate=0.5
+                          ,colsample_bytree=0.8
                           #,subsample=0.5
                           #,max_bins=15
                           #,min_child_weight=6
-                 #        ),
+                         ),
 
             LGBMClassifier(nthread=args.thread
                            ,max_depth=6
