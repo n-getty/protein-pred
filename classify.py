@@ -444,7 +444,7 @@ def main():
         '''tfer.fit(features)
         features = tfer.transform(features)'''
         labels = convert_labels(class_names)
-        for c in unique_class_names(class_names):
+        for c in set(labels):
             idxs = np.where(labels == c)
             tfer.fit(features[idxs])
             features[idxs] = tfer.transform(features[idxs])
