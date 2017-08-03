@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from xgboost import XGBClassifier
-from scipy.sparse import csr_matrix, hstack
+from scipy.sparse import csr_matrix, hstack, vstack
 from sklearn.decomposition import TruncatedSVD
 from memory_profiler import memory_usage
 from lightgbm import LGBMClassifier
@@ -108,7 +108,14 @@ def test_train_split(clf, split, m, class_names):
                 verbose=False,)
 
     probs = clf.predict_proba(X_test)
-    np.savetxt('results/stored_probs.csv', probs, delimiter=',')
+    train_probs = clf.predict_proba(X_train)
+    allp = vstack([probs, train_probs])
+    idxs = vstack([test_idx, train_idx])
+    all_probs = np.empty(len(allp))
+    for x in range(len(allp)):
+        all_probs[x] = allp[idxs[x]]
+        
+    np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
     t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
