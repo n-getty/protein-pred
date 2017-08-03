@@ -114,7 +114,7 @@ def test_train_split(clf, split, m, class_names):
     all_probs = np.empty(len(allp))
     for x in range(len(allp)):
         all_probs[x] = allp[idxs[x]]
-        
+
     np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
     t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
@@ -428,7 +428,7 @@ def main():
 
     features = features[:, nonz]
 
-    if args.use_probs:
+    if args.use_prob:
         probs = np.genfromtxt("results/stored_probs")
         features = hstack([features, probs])
 
