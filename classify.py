@@ -112,7 +112,7 @@ def test_train_split(clf, split, m, class_names):
     allp = vstack([probs, train_probs])
     idxs = test_idx + train_idx
     all_probs = np.empty(len(idxs))
-    for x in range(len(allp)):
+    for x in range(len(idxs)):
         all_probs[x] = allp[idxs[x]]
 
     np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
@@ -441,8 +441,13 @@ def main():
         print "Converting features to tfidf"
         logging.info("Converting features to tfidf")
         tfer = TfidfTransformer()
-        tfer.fit(features)
-        features = tfer.transform(features)
+        '''tfer.fit(features)
+        features = tfer.transform(features)'''
+        labels = convert_labels(class_names)
+        for c in unique_class_names(class_names):
+            idxs = np.where(labels == c)
+            tfer.fit(features[idxs])
+            features[idxs] = tfer.transform(features[idxs])
 
     features = features.astype('float32')
 
