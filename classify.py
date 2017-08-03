@@ -109,13 +109,14 @@ def test_train_split(clf, split, m, class_names):
 
     probs = clf.predict_proba(X_test)
     train_probs = clf.predict_proba(X_train)
-    allp = vstack([probs, train_probs], format='csr')
+    allp = np.vstack([probs, train_probs])
     idxs = test_idx + train_idx
     all_probs = [None] * len(idxs)
     for x in range(len(idxs)):
         all_probs[x] = allp[idxs[x]]
     all_probs = np.array(all_probs)
     np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
+
     t5, score = top_5_accuracy(probs, y_test)
     train_pred = clf.predict(X_train)
     train_score = accuracy_score(y_train, train_pred)
