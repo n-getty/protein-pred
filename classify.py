@@ -109,7 +109,7 @@ def test_train_split(clf, split, m, class_names):
 
     probs = clf.predict_proba(X_test)
     train_probs = clf.predict_proba(X_train)
-    allp = vstack([probs, train_probs])
+    allp = vstack([probs, train_probs], format='csr')
     idxs = test_idx + train_idx
     all_probs = np.empty(len(idxs))
     for x in range(len(idxs)):
