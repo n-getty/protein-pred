@@ -430,7 +430,7 @@ def main():
     features = features[:, nonz]
 
     if args.use_prob:
-        probs = np.genfromtxt("results/stored_probs")
+        probs = np.genfromtxt("results/stored_probs.csv")
         features = hstack([features, probs])
 
     if args.trunc > 0:
