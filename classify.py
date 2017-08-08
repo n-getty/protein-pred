@@ -185,7 +185,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
 
         args = (clf, tts_split, mn, class_names)
         if mem:
-            mem_usage, retval = memory_usage((test_train_split, args), interval=1.0, retval=True)
+            mem_usage, retval = memory_usage((test_train_split, args), interval=0.5, retval=True)
             tts_score, tts_train_score, clf, t5 = retval
 
             avg_mem = np.mean(mem_usage)
