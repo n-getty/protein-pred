@@ -153,7 +153,6 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
     """
     labels = convert_labels(class_names)
     class_names = unique_class_names(class_names)
-    print class_names
 
     tts_split = train_test_split(
         features, labels, range(len(labels)), test_size=0.2, random_state=0, stratify=labels)
