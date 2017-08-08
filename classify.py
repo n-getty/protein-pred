@@ -153,6 +153,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
     """
     labels = convert_labels(class_names)
     class_names = unique_class_names(class_names)
+    print class_names
 
     tts_split = train_test_split(
         features, labels, range(len(labels)), test_size=0.2, random_state=0, stratify=labels)
@@ -192,7 +193,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
             max_mem = max(mem_usage)
             print('Average memory usage: %s' % avg_mem)
             print('Maximum memory usage: %s' % max_mem)
-            # np.savetxt("results/mem-usage/mem." + args[0], mem_usage, delimiter=',')
+            np.savetxt("results/mem-usage/mem." + args[2], mem_usage, delimiter=',')
         else:
             tts_score, tts_train_score, clf, t5 = test_train_split(*args)
             avg_mem = -1
