@@ -5,6 +5,7 @@ from collections import Counter
 import networkx as nx
 import pandas as pd
 
+
 def process_raw_seqs():
     print "loading data"
     file = "data/uniprot_sprot.dat"
