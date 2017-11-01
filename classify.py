@@ -411,6 +411,12 @@ def main():
 
     features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
 
+    term_count = Counter(class_names)
+    sig_terms = set(term_count.values()[[i > 100 for i in term_count.values()]])
+    sig_rows = [c in sig_terms for c in class_names]
+    features = features[sig_rows]
+    class_names = class_names[sig_rows]
+    
     # Zero-out counts below the given threshold
     if thresh > 0:
         v = np.sum(features.data <= thresh)
@@ -466,6 +472,7 @@ def main():
         logging.info("Time elapsed for dimensionality reduction is %f" % elapsed)
 
     print "Final data shape:", features.shape
+
 
     logging.info("Final data shape: %s" % (features.shape,))
     results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
