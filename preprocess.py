@@ -242,6 +242,27 @@ def featurize_aa_counts(data):
     return csr_matrix(np.array(M))
 
 
+def read_cafa(file):
+    f = "cafa"
+    data = pd.read_csv(file, names=["label", "aa"], delimiter='\t', header=0)
+    labels = data.label
+    aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
+    print "generating aa 3mer features"
+    aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
+
+    aa_features4, aa_vocab4 = featurize_data(data.aa, 4, 'aa')
+    aa_counts = featurize_aa_counts(data.aa)
+    aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
+    aa_counts = hstack([aa_counts, aa_lens], format='csr')
+    if not os.path.exists("data/cafa"):
+        os.makedirs("data/cafa")
+
+    save_sparse_csr("data/" + f + "/feature_matrix.aa1.csr", aa_counts, labels, aa_vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa2.csr", aa_features, labels, aa_vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, labels, aa_vocab3)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, labels, aa_vocab4)
+
+
 def read_whole(file,f,k):
     if f == 'core':
         data = pd.read_csv(file, names=["label", "dna", "aa"], usecols=[1, 5, 6], delimiter='\t', header=0)
@@ -313,6 +334,9 @@ def main(fn='sm', k=3, chunksize=100000):
             read_chunks(file, fn, k, chunksize)
         else:
             read_whole(file, fn, k)
+    elif fn =="cafa":
+        file = "data/cafa_df"
+        read_cafa(file)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
         read_whole(file, fn, k)
