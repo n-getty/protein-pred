@@ -101,8 +101,8 @@ cafa_df.to_csv("data/cafa_df")
 
 #process_raw_seqs()
 
-data = np.load("data/uniprot.npy")
-go_dag, alts = construct_dag()
-data = add_parents(go_dag, data, alts)
-print_data_stats(data)
+#data = np.load("data/uniprot.npy")
+#go_dag, alts = construct_dag()
+#data = add_parents(go_dag, data, alts)
+#print_data_stats(data)
 
