@@ -276,6 +276,8 @@ def read_whole(file,f,k):
                 data.aa[x] = data.aa[x].replace("U", "")
             if 'X' in data.aa[x]:
                 data.aa[x] = data.aa[x].replace("X", "")
+            if 'B' in data.aa[x]:
+                data.aa[x] = data.aa[x].replace("B", "")
         print "Removed all U and X aas"
     else:
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
