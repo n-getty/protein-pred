@@ -245,6 +245,11 @@ def featurize_aa_counts(data):
 def read_cafa(file):
     f = "cafa"
     data = pd.read_csv(file, names=["label", "aa"], header=0)
+    for x in range(len(data.aa)):
+        if 'U' in data.aa[x]:
+            data.aa[x] = data.aa[x].replace("U", "")
+        if 'X' in data.aa[x]:
+            data.aa[x] = data.aa[x].replace("X", "")
     labels = data.label
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
     print "generating aa 3mer features"
