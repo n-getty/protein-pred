@@ -414,7 +414,7 @@ def main():
     if args.data == "cafa":
         term_count = Counter(class_names)
         idxs = [i > 100 for i in term_count.values()]
-        sig_terms = set(term_count.values()[idxs])
+        sig_terms = set(np.array(term_count.values())[idxs])
         sig_rows = [c in sig_terms for c in class_names]
         features = features[sig_rows]
         class_names = class_names[sig_rows]
