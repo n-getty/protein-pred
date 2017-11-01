@@ -244,7 +244,7 @@ def featurize_aa_counts(data):
 
 def read_cafa(file):
     f = "cafa"
-    data = pd.read_csv(file, names=["label", "aa"], header=0)
+    data = pd.read_csv(file,  header=0)
     for x in range(len(data.aa)):
         if 'U' in data.aa[x]:
             data.aa[x] = data.aa[x].replace("U", "")
@@ -320,7 +320,7 @@ def read_whole(file,f,k):
     save_sparse_csr("data/" + f + "/feature_matrix.10.csr", features10, labels, vocab)
 
 
-def main(fn='sm', k=3, chunksize=100000):
+def main(fn='cafa', k=3, chunksize=100000):
     start = time()
     k = int(k)
     chunksize = int(chunksize)

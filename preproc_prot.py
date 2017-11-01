@@ -98,7 +98,7 @@ def print_data_stats(data):
 
 
 cafa_df = proc_cafa()
-cafa_df.to_csv("data/cafa_df")
+cafa_df.to_csv("data/cafa_df", index=0)
 
 #process_raw_seqs()
 
