@@ -413,12 +413,15 @@ def main():
     print "Original data shape:", features.shape
 
     if args.data == "cafa":
+        print len(class_names)
         print "Removing insignificant go terms"
         term_count = Counter(class_names)
         idxs = [i > 100 for i in term_count.values()]
         print "Go terms with more than 100 seqs:", len(idxs)
         sig_terms = set(np.array(term_count.values())[idxs])
+        print len(sig_terms)
         sig_rows = [c in sig_terms for c in class_names]
+        print len(sig_rows)
         features = features[sig_rows]
         print features.shape
         class_names = class_names[sig_rows]
