@@ -422,7 +422,7 @@ def main():
         print "Go terms with more than 100 seqs:", len(sig_terms)
         sig_rows = [c in sig_terms for c in class_names]
         print "Seqs labeled with sig term:", sum(sig_rows)
-        features = features.astype('csr')
+        features = features.tocsr()
         features = features[sig_rows, :]
         print features.shape
         class_names = class_names[sig_rows]
