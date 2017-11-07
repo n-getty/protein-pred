@@ -418,11 +418,10 @@ def main():
         term_count = Counter(class_names)
         print "Unique go terms:", len(term_count)
         idxs = [i > 100 for i in term_count.values()]
-        sig_terms = set(np.array(term_count.values())[idxs])
+        sig_terms = set(np.array(term_count.keys())[idxs])
         print "Go terms with more than 100 seqs:", len(sig_terms)
         sig_rows = [c in sig_terms for c in class_names]
         print "Seqs labeled with sig term:", sum(sig_rows)
-        print sig_rows
         features = features[sig_rows]
         print features.shape
         class_names = class_names[sig_rows]
