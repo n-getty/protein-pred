@@ -412,14 +412,11 @@ def main():
     features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
 
     if args.data == "cafa":
-        print features.shape
-        print class_names.shape
         term_count = Counter(class_names)
         idxs = [i > 100 for i in term_count.values()]
         sig_terms = set(np.array(term_count.values())[idxs])
-        print len(sig_terms)
         sig_rows = [c in sig_terms for c in class_names]
-        features = features[:, sig_rows]
+        features = features[sig_rows]
         class_names = class_names[sig_rows]
 
     # Zero-out counts below the given threshold
