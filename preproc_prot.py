@@ -78,13 +78,18 @@ def proc_cafa():
 
     X = []
     y = []
+    seq_names = []
     with open(term_file, 'r') as f:
         terms = f.readlines()
         for term in terms:
             term = term.split()
             X.append(seq_dict[term[0]])
+            seq_names.append(term[0])
             y.append(term[1])
 
+    print Counter(y)
+    print Counter(seq_names)
+    print sum(i > 100 for i in Counter(y).values())
     cafa_df = pd.DataFrame({"label":y, "aa":X})
     return cafa_df
 
@@ -98,7 +103,7 @@ def print_data_stats(data):
 
 
 cafa_df = proc_cafa()
-cafa_df.to_csv("data/cafa_df", index=0)
+#cafa_df.to_csv("data/cafa_df", index=0)
 
 #process_raw_seqs()
 

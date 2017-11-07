@@ -18,6 +18,7 @@ from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
 from collections import Counter
+from sklearn.multiclass import OneVsRestClassifier
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
@@ -496,3 +497,31 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
     main()
+
+
+def fmax(preds,true):
+    max = 0
+    for i in range(0.01,1,0.01):
+        pr, rc = precision_recall(preds, true, i)
+        f = (2 * pr * rc)/(pr + rc)
+        if f < max:
+            max = f
+
+    return max
+
+
+
+def precision_recall(preds, true, thresh):
+    above_preds = []
+    for pred in preds:
+        pred = pred[pred>thresh]
+        if pred:
+            above_preds.append(pred)
+    m = len(above_preds)
+
+    tp = np.intersect2d(above_preds, true)
+    pr = 1/m * sum(sum(tp)/sum(above_preds))
+
+    rc = 1/len(preds) * sum(sum(tp)/sum(true))
+
+    return pr, rc
