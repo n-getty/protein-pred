@@ -314,7 +314,7 @@ def load_data(size, dna1, dna3, dna5, dna10, aa1, aa2, aa3, aa4):
         print "No dataset provided"
         exit(0)
 
-    features = hstack(files, format='csc')
+    features = hstack(files, format='csr')
 
     return features, labels
 
@@ -422,6 +422,7 @@ def main():
         print "Go terms with more than 100 seqs:", len(sig_terms)
         sig_rows = [c in sig_terms for c in class_names]
         print "Seqs labeled with sig term:", sum(sig_rows)
+        features = features.astype('csr')
         features = features[sig_rows, :]
         print features.shape
         class_names = class_names[sig_rows]
