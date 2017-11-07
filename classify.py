@@ -314,7 +314,7 @@ def load_data(size, dna1, dna3, dna5, dna10, aa1, aa2, aa3, aa4):
         print "No dataset provided"
         exit(0)
 
-    features = hstack(files, format='csr')
+    features = hstack(files, format='csc')
 
     return features, labels
 
