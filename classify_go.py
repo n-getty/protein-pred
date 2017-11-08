@@ -315,7 +315,7 @@ def precision_recall(preds, true, thresh):
     m = 0
     tps = []
     rcs = []
-    for x in range(len(true)):
+    for x in range(true.shape[0]):
         pred = preds[x] > thresh
         if len(pred):
             tp = len(np.intersect1d(pred, true[x]))
