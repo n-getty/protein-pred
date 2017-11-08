@@ -69,17 +69,11 @@ def test_train_split(clf, split, m, class_names):
 
     X_train, X_test, y_train, y_test, train_idx, test_idx = split
 
-    if m == 'RandomForest' or m =='Regression' or m=='LightGBM':
-        clf.fit(X_train, y_train)
-    else:
-        clf.fit(X_train, y_train,
-                eval_set=[(X_train, y_train), (X_test, y_test)],
-                early_stopping_rounds=2,
-                verbose=False,)
+    clf.fit(X_train, y_train)
 
     probs = clf.predict_proba(X_test)
     train_probs = clf.predict_proba(X_train)
-    
+
     score = fmax(probs, y_test)
     train_score = fmax(train_probs, y_train)
 
