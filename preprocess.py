@@ -256,6 +256,7 @@ def read_cafa(file):
             data.aa[x] = data.aa[x].replace("Z", "")
         if 'O' in data.aa[x]:
             data.aa[x] = data.aa[x].replace("O", "")
+
     labels = data.label
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
     print "generating aa 3mer features"

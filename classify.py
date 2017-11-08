@@ -18,7 +18,6 @@ from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
 from collections import Counter
-from sklearn.multiclass import OneVsRestClassifier
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):

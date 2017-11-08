@@ -77,7 +77,7 @@ def proc_cafa():
             seq_dict[seq[0]] = seq[1]
 
     X = []
-    y= []
+    y = []
     seq_names = []
     term_dict = defaultdict(list)
     term_vocab = {}
@@ -97,6 +97,12 @@ def proc_cafa():
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
+    y = np.array(y)
+    X = np.array(X)
+
+    print y.shape
+    print X.shape
+
     cafa_df = pd.DataFrame({"label":y, "aa":X})
     return cafa_df
 
@@ -110,7 +116,7 @@ def print_data_stats(data):
 
 
 cafa_df = proc_cafa()
-#cafa_df.to_csv("data/cafa_df", index=0)
+cafa_df.to_csv("data/cafa_df", index=0)
 
 #process_raw_seqs()
 

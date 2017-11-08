@@ -269,9 +269,6 @@ def main():
 
     features, labels = load_data("cafa", args.aa1, args.aa2, args.aa3, args.aa4)
 
-    labels = np.array(labels)
-    print labels[0]
-    print len(labels)
     print "Original data shape:", features.shape
 
     nonzero_counts = features.getnnz(1)
