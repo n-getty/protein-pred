@@ -274,7 +274,8 @@ def main():
     features, labels = load_data("cafa", args.aa1, args.aa2, args.aa3, args.aa4)
 
     print "Original data shape:", features.shape
-
+    print labels.shape
+    
     nonzero_counts = labels.getnnz(0)
     nonz = nonzero_counts > 1000
 
@@ -305,7 +306,7 @@ def fmax(preds,true):
     for i in np.arange(0.01,1,0.01):
         pr, rc = precision_recall(preds, true, i)
         f = (2 * pr * rc)/(pr + rc)
-        if f < max:
+        if f > max:
             max = f
 
     return max
@@ -317,8 +318,6 @@ def precision_recall(preds, true, thresh):
     rcs = []
     for x in range(true.shape[0]):
         t = true[x].todense()
-        print t.shape
-        print true.shape
         pred = preds[x] > thresh
         if len(pred):
             tp = sum(np.logical_and(pred, t == 1))
@@ -327,7 +326,6 @@ def precision_recall(preds, true, thresh):
             m += 1
 
     pr = 1/m * sum(tps)
-
     rc = 1/len(preds) * sum(rcs)
 
     return pr, rc
