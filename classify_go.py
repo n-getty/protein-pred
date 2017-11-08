@@ -280,6 +280,7 @@ def main():
         labels.shape[1] - np.sum(nonz), 100)
     labels = labels[:, nonz]
     labels = labels.todense()
+    print labels.shape
     # Remove feature columns that have sample below threshhold
     nonzero_counts = features.getnnz(0)
     nonz = nonzero_counts > int(prune)
