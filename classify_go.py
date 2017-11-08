@@ -18,7 +18,6 @@ import plot_cm as pcm
 import argparse
 from collections import Counter, defaultdict
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.multioutput import ClassifierChain
 
 
 def cross_validation_accuracy(clf, X, labels, skf, m):
