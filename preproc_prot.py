@@ -82,6 +82,7 @@ def proc_cafa():
     seq_names = []
     term_dict = defaultdict(list)
     term_vocab = {}
+    all_terms = []
     print "Reading terms"
     with open(term_file, 'r') as f:
         terms = f.readlines()
@@ -89,6 +90,7 @@ def proc_cafa():
             term = term.split()
             seq_names.append(term[0])
             term_dict[term[0]].append(term[1])
+            all_terms.append(term[1])
             if term[1] not in term_vocab:
                 term_vocab[term[1]] = len(term_vocab)
 
