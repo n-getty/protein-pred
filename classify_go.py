@@ -275,7 +275,7 @@ def main():
     nonz = nonzero_counts > 100
 
     print "Removing %d go terms that do not have more than %s nonzero counts" % (
-        labels.shape[1] - np.sum(nonz), prune)
+        labels.shape[1] - np.sum(nonz), 100)
     labels = labels[:, nonz]
 
     # Remove feature columns that have sample below threshhold
