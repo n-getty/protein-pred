@@ -274,7 +274,9 @@ def main():
     print "Original data shape:", features.shape
 
     nonzero_counts = features.getnnz(1)
+    print nonzero_counts
     nonz = nonzero_counts > 100
+    print nonz
 
     print "Removing %d go terms that do not have more than %s nonzero counts" % (
         labels.shape[1] - np.sum(nonz), 100)
