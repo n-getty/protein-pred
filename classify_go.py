@@ -36,7 +36,6 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     """
     scores = []
     train_scores = []
-    t5s = []
     for train_index, test_index in skf:
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
@@ -48,14 +47,12 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
                     early_stopping_rounds=2,
                     verbose=False,)
         probs = clf.predict_proba(X_test)
-        t5, score = top_5_accuracy(probs, y_test)
-        train_pred = clf.predict(X_train)
-        train_score = accuracy_score(y_train, train_pred)
-        scores.append(score)
-        t5s.append(t5)
+        train_probs = clf.predict_proba(X_train)
+        train_score = fmax(train_probs,y_train)
+        scores.append(fmax(probs,y_test))
         train_scores.append(train_score)
 
-    return np.mean(scores), np.mean(train_scores), np.mean(t5s)
+    return np.mean(scores), np.mean(train_scores)
 
 
 def test_train_split(clf, split, m, class_names):
@@ -89,29 +86,14 @@ def test_train_split(clf, split, m, class_names):
     all_probs = np.array(all_probs)
     np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
 
-    t5, score = top_5_accuracy(probs, y_test)
-    train_pred = clf.predict(X_train)
+    score = fmax(probs, X_test)
+    train_pred = clf.predict_proba(X_train)
     train_score = accuracy_score(y_train, train_pred)
 
-    test_pred = clf.predict(X_test)
-
-    stats_df, cnfm = pcm.class_statistics(y_test, test_pred, class_names)
-    stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
-                             'Most FN', 'Most FP'])
-    np.savetxt('results/stats/cnfm' + m + strftime("%m-%d_%H_%M", gmtime()) + '.csv', cnfm, delimiter=',')
-    stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
-
-    #pcm.pcm(y_test, test_pred, m)
-    #if m == "LightGBM":
-        #save_incorrect_csv(probs, y_test, test_idx)
-
-    print "Top 5 accuracy:", t5
-    logging.info("Top 5 accuracy: %f", t5)
-
-    return score, train_score, clf, t5
+    return score, train_score, clf
 
 
-def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_feat):
+def classify_all(labels, features, clfs, folds, model_names, cv, mem):
     """
     Compute the average testing accuracy over k folds of cross-validation.
     Params:
@@ -123,15 +105,13 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         cv...........Whether to use cross validation
         mem..........Whether to store memory usage
     """
-    labels = convert_labels(class_names)
-    class_names = unique_class_names(class_names)
 
     tts_split = train_test_split(
         features, labels, range(len(labels)), test_size=0.2, random_state=0, stratify=labels)
     if cv:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
-    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "CV T5 Acc", "Split Train Acc", "Split Val Acc", "Top 5 Val Acc", "Max Mem", "Avg Mem", "Time"])
+    results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Max Mem", "Avg Mem", "Time"])
 
     for x in range(len(model_names)):
         start = time()
@@ -143,19 +123,16 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         clf = OneVsRestClassifier(clfs[x])
 
         if cv:
-            cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
-            print "%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score)
-            logging.info("%s %d fold cross validation mean train accuracy: %f" % (mn, folds, cv_train_score))
-            print "%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5)
-            logging.info("%s %d fold cross validation mean top 5 accuracy: %f" % (mn, folds, cv_t5))
-            print "%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score)
-            logging.info("%s %d fold cross validation mean validation accuracy: %f" % (mn, folds, cv_score))
+            cv_score, cv_train_score = cross_validation_accuracy(clf, features, labels, skf, mn)
+            print "%s %d fold cross validation mean train fscore: %f" % (mn, folds, cv_train_score)
+            logging.info("%s %d fold cross validation mean train fscore: %f" % (mn, folds, cv_train_score))
+            print "%s %d fold cross validation mean validation fscore: %f" % (mn, folds, cv_score)
+            logging.info("%s %d fold cross validation mean validation fscore: %f" % (mn, folds, cv_score))
         else:
             cv_score = -1
             cv_train_score = -1
-            cv_t5 = -1
 
-        args = (clf, tts_split, mn, class_names)
+        args = (clf, tts_split, mn, labels)
         if mem:
             mem_usage, retval = memory_usage((test_train_split, args), interval=0.5, retval=True)
             tts_score, tts_train_score, clf, t5 = retval
@@ -170,88 +147,24 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
             avg_mem = -1
             max_mem = -1
 
-        if save_feat:
-            feat_score = clf.feature_importances_
-            sorted_feats = np.argsort(feat_score)[::-1]
-            np.savetxt('results/' + mn + strftime("%m-%d_%H_%M", gmtime()) + '.sorted_features', np.vstack((sorted_feats,feat_score[sorted_feats])))
-            np.savetxt('results/' + mn + strftime("%m-%d_%H_%M", gmtime()) + '.feat_scores', feat_score)
-            top_10_features = sorted_feats[:10]
-            print "Top ten feature idxs", top_10_features
-            logging.info("Top ten feature idxs: %s", str(top_10_features))
-
-        print "Training accuracy:", tts_train_score
-        print "Validation accuracy:", tts_score
-        logging.info("Training accuracy: %f", tts_train_score)
-        logging.info("test/train split accuracy: %f", tts_score)
+        print "Training fscore:", tts_train_score
+        print "Validation fscore", tts_score
+        logging.info("Training fscofre: %f", tts_train_score)
+        logging.info("test/train split fscore: %f", tts_score)
         end = time()
         elapsed = end-start
         print "Time elapsed for model %s is %f" % (mn, elapsed)
         logging.info("Time elapsed for model %s is %f" % (mn, elapsed))
-        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, cv_t5, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
+        results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, tts_train_score, tts_score, max_mem, avg_mem, elapsed])
 
     return results
-
-
-def convert_labels(labels):
-    """
-    Convert labels to indexes
-    Params:
-        labels...Original k class string labels
-    Returns:
-        Categorical label vector
-    """
-    label_idxs = {}
-    new_labels = np.empty(len(labels))
-    for x in range(len(labels)):
-        new_labels[x] = label_idxs.setdefault(labels[x], len(label_idxs))
-    return new_labels
-
-
-def unique_class_names(names):
-    """
-    Generate ordered unique class names
-    Params:
-        names....Label for every data point
-    Returns:
-        Name for each class in the set
-    """
-    cns = set()
-    unique = []
-    for c in names:
-        if c not in cns:
-            unique.append(c)
-            cns.add(c)
-
-    return unique
-
-
-def top_5_accuracy(probs, y_true):
-    """
-    Calculates top 5 and top 1 accuracy in 1 go
-    Params:
-        probs.....NxC matrix, class probabilities for each class
-        y_true....True class labels
-    Returns:
-        top5 accuracy
-        top1 accuracy
-    """
-    top5 = np.argsort(probs, axis=1)[:,-5:]
-    c = 0
-    top1c = 0
-    for x in range(len(top5)):
-        if np.in1d(y_true[x], top5[x], assume_unique=True)[0]:
-            c += 1
-        if y_true[x] == top5[x][4]:
-            top1c += 1
-
-    return float(c)/len(y_true), float(top1c)/len(y_true)
-
 
 
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
                          shape=loader['shape'], dtype="float32"), loader['labels']
+
 
 def load_data(size, aa1, aa2, aa3, aa4):
     path = "data/" + size + '/'
@@ -292,7 +205,9 @@ def get_parser():
     parser.add_argument("--gpu", default=False, action='store_true', help="use gpu for lgbm")
     parser.add_argument("--regr", default=False, action='store_true', help="build regression model")
     parser.add_argument("--thread",  default=-1, type=int, help="specify number of threads to to run with")
+    parser.add_argument("--prune", default=0, type=int, help="remove features with apperance below prune")
     return parser
+
 
 def main():
     parser = get_parser()
@@ -353,23 +268,16 @@ def main():
         model_names.append("Regression")
         clfs.append(all_clfs[3])
 
-    features, class_names = load_data(args.data, args.aa1, args.aa2, args.aa3, args.aa4)
+    features, labels = load_data(args.data, args.aa1, args.aa2, args.aa3, args.aa4)
 
     print "Original data shape:", features.shape
 
-    print len(class_names)
-    print "Removing insignificant go terms"
-    term_count = Counter(class_names)
-    print "Unique go terms:", len(term_count)
-    idxs = [i > 100 for i in term_count.values()]
-    sig_terms = set(np.array(term_count.keys())[idxs])
-    print "Go terms with more than 100 seqs:", len(sig_terms)
-    sig_rows = np.array([c in sig_terms for c in class_names])
-    print "Seqs labeled with sig term:", sum(sig_rows)
-    features = features[sig_rows, :]
-    print features.shape
-    class_names = class_names[sig_rows]
-    print len(class_names)
+    nonzero_counts = features.getnnz(1)
+    nonz = nonzero_counts > 100
+
+    print "Removing %d go terms that do not have more than %s nonzero counts" % (
+        labels.shape[1] - np.sum(nonz), prune)
+    labels = labels[:, nonz]
 
     # Remove feature columns that have sample below threshhold
     nonzero_counts = features.getnnz(0)
@@ -379,7 +287,7 @@ def main():
     features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
 
-    results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
+    results = classify_all(labels, features, clfs, folds, model_names, args.cv, args.mem)
     for t in results.Time:
         print t,
     print

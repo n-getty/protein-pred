@@ -487,7 +487,7 @@ def main():
 
     logging.info("Final data shape: %s" % (features.shape,))
     if args.data=='cafa':
-        results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat, True)
+        results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     else:
         results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     for t in results.Time:
