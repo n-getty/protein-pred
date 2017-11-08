@@ -307,7 +307,6 @@ def precision_recall(preds, true, thresh):
     tps = []
     rcs = []
     for x in range(true.shape[0]):
-        print preds[x]
         t = true[x].todense()
         pred = preds[x] > thresh
         if pred.any():
@@ -318,6 +317,8 @@ def precision_recall(preds, true, thresh):
         else:
             rcs.append(0)
 
+    print tps
+    print rcs
     pr = 1/m * np.sum(tps)
     rc = 1/len(preds) * np.sum(rcs)
 
