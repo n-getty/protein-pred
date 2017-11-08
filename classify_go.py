@@ -302,7 +302,7 @@ def main():
 
 def fmax(preds,true):
     max = 0
-    for i in range(0.01,1,0.01):
+    for i in np.arange(0.01,1,0.01):
         pr, rc = precision_recall(preds, true, i)
         f = (2 * pr * rc)/(pr + rc)
         if f < max:
