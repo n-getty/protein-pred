@@ -280,7 +280,10 @@ def main():
     features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
 
-    features = features[labels.getnnz(1)>0]
+    nonz_rows = labels.getnnz(1)>0
+    features = features[nonz_rows]
+    labels = labels[nonz_rows]
+
     results = classify_all(labels, features, clfs, folds, model_names, args.cv, args.mem)
     for t in results.Time:
         print t,
