@@ -69,6 +69,7 @@ def proc_cafa():
     seqs_file = "data/uniprot_sprot_exp.fasta"
     term_file = "data/uniprot_sprot_exp.txt"
     seq_dict = {}
+    print "Reading seqs"
     with open(seqs_file, 'r') as f:
         seqs = f.read().split(">")
         for seq in seqs[1:]:
@@ -81,6 +82,7 @@ def proc_cafa():
     seq_names = []
     term_dict = defaultdict(list)
     term_vocab = {}
+    print "Reading terms"
     with open(term_file, 'r') as f:
         terms = f.readlines()
         for term in terms:
@@ -125,7 +127,7 @@ def print_data_stats(data):
     print len(data)
 
 
-
+print "Saving data and labels"
 cafa_df, y = proc_cafa()
 save_sparse_csr("data/cafa_labels", y)
 cafa_df.to_csv("data/cafa_df", index=0)

@@ -5,7 +5,7 @@ from time import time, gmtime, strftime
 import logging
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split, StratifiedKFold, KFold
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.metrics import accuracy_score
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -108,7 +108,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
     tts_split = train_test_split(
         features, labels, range(labels.shape[0]), test_size=0.2, random_state=0)
     if cv:
-        skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
+        skf = list(KFold(n_splits=folds, shuffle=True).split(features, labels))
 
     results = pd.DataFrame(columns=["Model", "CV Train Acc", "CV Val Acc", "Split Train Acc", "Split Val Acc", "Max Mem", "Avg Mem", "Time"])
 
