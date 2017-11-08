@@ -35,10 +35,12 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     """
     scores = []
     train_scores = []
+    i = 0
     for train_index, test_index in skf:
+        print "Classifying on fold:", i
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
-        if m == 'RandomForest' or m == 'Regression' or m=='LightGBM':
+        if m == 'RandomForest' or m == 'Regression' or m == 'LightGBM':
             clf.fit(X_train, y_train)
         else:
             clf.fit(X_train, y_train,
@@ -119,7 +121,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
         print "Classiying with", mn
         logging.info("Classifying with %s", mn)
 
-        clf = OneVsRestClassifier(clfs[x])
+        clf = OneVsRestClassifier(clfs[x], n_jobs=100)
 
         if cv:
             cv_score, cv_train_score = cross_validation_accuracy(clf, features, labels, skf, mn)
