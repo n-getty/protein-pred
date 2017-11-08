@@ -315,7 +315,7 @@ def precision_recall(preds, true, thresh):
     above_preds = []
     for pred in preds:
         pred = pred[pred>thresh]
-        if pred:
+        if len(pred):
             above_preds.append(pred)
     m = len(above_preds)
 
