@@ -97,7 +97,7 @@ def proc_cafa():
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
-    cafa_df = pd.DataFrame({"label":y, "aa":X, "term_vocab":term_vocab, "seq_order":seq_dict})
+    cafa_df = pd.DataFrame({"label":y, "aa":X})
     return cafa_df
 
 
