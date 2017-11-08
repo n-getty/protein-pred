@@ -106,7 +106,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
     """
 
     tts_split = train_test_split(
-        features, labels, range(len(labels)), test_size=0.2, random_state=0, stratify=labels)
+        features, labels, range(labels.shape[0]), test_size=0.2, random_state=0, stratify=labels)
     if cv:
         skf = list(StratifiedKFold(n_splits=folds, shuffle=True).split(features, labels))
 
