@@ -275,7 +275,7 @@ def main():
 
     print "Original data shape:", features.shape
     print labels.shape
-    
+
     nonzero_counts = labels.getnnz(0)
     nonz = nonzero_counts > 1000
 
@@ -313,6 +313,7 @@ def fmax(preds,true):
 
 
 def precision_recall(preds, true, thresh):
+    print true.shape
     m = 0
     tps = []
     rcs = []
