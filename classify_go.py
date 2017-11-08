@@ -313,9 +313,13 @@ def precision_recall(preds, true, thresh):
         else:
             rcs.append(0)
 
+
     pr = 1/m * sum(tps)
     rc = 1/len(preds) * sum(rcs)
 
+    print pr
+    print rc
+    
     return pr, rc
 
 
