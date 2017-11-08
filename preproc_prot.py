@@ -125,8 +125,9 @@ def print_data_stats(data):
     print len(data)
 
 
+
+cafa_df, y = proc_cafa()
 save_sparse_csr("data/cafa_labels", y)
-cafa_df = proc_cafa()
 cafa_df.to_csv("data/cafa_df", index=0)
 
 #process_raw_seqs()
