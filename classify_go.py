@@ -267,7 +267,7 @@ def main():
         model_names.append("Regression")
         clfs.append(all_clfs[3])
 
-    features, labels = load_data(args.data, args.aa1, args.aa2, args.aa3, args.aa4)
+    features, labels = load_data("cafa", args.aa1, args.aa2, args.aa3, args.aa4)
 
     print "Original data shape:", features.shape
 
