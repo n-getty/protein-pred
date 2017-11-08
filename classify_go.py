@@ -305,6 +305,8 @@ def precision_recall(preds, true, thresh):
     for x in range(true.shape[0]):
         t = true[x].todense()
         print t
+        print sum(t)
+        print sum(t[0])
         exit(0)
         pred = preds[x] > thresh
         if pred.any():
