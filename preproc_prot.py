@@ -97,7 +97,7 @@ def proc_cafa():
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
-    y = pd.series(y)
+    y = pd.Series(y)
     X = np.array(X)
 
     print y.shape
