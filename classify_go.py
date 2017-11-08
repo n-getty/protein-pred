@@ -181,7 +181,7 @@ def load_data(size, aa1, aa2, aa3, aa4):
         features = load_sparse_csr(path + "feature_matrix.aa4.csr.npz")
         files.append(features)
 
-    labels = load_sparse_csr("data/cafa_labels")
+    labels = load_sparse_csr("data/cafa_labels.npz")
 
     if not files:
         print "No dataset provided"
