@@ -299,19 +299,22 @@ def fmax(preds,true):
 
 
 def precision_recall(preds, true, thresh):
-    print preds.shape
-    print true.shape
     m = 0
     tps = []
     rcs = []
     for x in range(true.shape[0]):
-        t = true[x].todense()
+        t = true[x]
         pred = preds[x] > thresh
+        print pred
+        print sum(pred)
+        print len(pred)
         if len(pred):
             tp = sum(np.logical_and(pred, t == 1))
             tps.append(tp/sum(pred))
             rcs.append(tp/sum(t))
             m += 1
+        else:
+            rcs.append(0)
 
     pr = 1/m * sum(tps)
     rc = 1/len(preds) * sum(rcs)
