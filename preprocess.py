@@ -259,7 +259,6 @@ def read_cafa(file):
         if 'O' in data.aa[x]:
             data.aa[x] = data.aa[x].replace("O", "")
 
-    labels = data.label
     print "generating aa 2mer features"
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
     print "generating aa 3mer features"
@@ -267,15 +266,15 @@ def read_cafa(file):
 
     aa_features4, aa_vocab4 = featurize_data(data.aa, 4, 'aa')
     aa_counts = featurize_aa_counts(data.aa)
-    aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
+    aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(data.aa), 1)))
     aa_counts = hstack([aa_counts, aa_lens], format='csr')
     if not os.path.exists("data/cafa"):
         os.makedirs("data/cafa")
 
-    save_sparse_csr("data/" + f + "/feature_matrix.aa1.csr", aa_counts, labels, aa_vocab)
-    save_sparse_csr("data/" + f + "/feature_matrix.aa2.csr", aa_features, labels, aa_vocab)
-    save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, labels, aa_vocab3)
-    save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, labels, aa_vocab4)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa1.csr", aa_counts, [], aa_vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa2.csr", aa_features, [], aa_vocab)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, [], aa_vocab3)
+    save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, [], aa_vocab4)
 
 
 def read_whole(file,f,k):

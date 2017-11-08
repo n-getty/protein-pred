@@ -162,24 +162,26 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
 def load_sparse_csr(filename):
     loader = np.load(filename)
     return csr_matrix((loader['data'], loader['indices'], loader['indptr']),
-                         shape=loader['shape'], dtype="float32"), loader['labels']
+                         shape=loader['shape'], dtype="float32")
 
 
 def load_data(size, aa1, aa2, aa3, aa4):
     path = "data/" + size + '/'
     files = []
     if aa1:
-        features, labels = load_sparse_csr(path + "feature_matrix.aa1.csr.npz")
+        features = load_sparse_csr(path + "feature_matrix.aa1.csr.npz")
         files.append(features)
     if aa2:
-        features, labels = load_sparse_csr(path + "feature_matrix.aa2.csr.npz")
+        features = load_sparse_csr(path + "feature_matrix.aa2.csr.npz")
         files.append(features)
     if aa3:
-        features, labels = load_sparse_csr(path + "feature_matrix.aa3.csr.npz")
+        features = load_sparse_csr(path + "feature_matrix.aa3.csr.npz")
         files.append(features)
     if aa4:
-        features, labels = load_sparse_csr(path + "feature_matrix.aa4.csr.npz")
+        features = load_sparse_csr(path + "feature_matrix.aa4.csr.npz")
         files.append(features)
+
+    labels = load_sparse_csr("data/cafa_labels")
 
     if not files:
         print "No dataset provided"

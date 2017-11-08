@@ -1,4 +1,4 @@
-
+from scipy.sparse import csr_matrix
 import numpy as np
 import re
 from collections import Counter, defaultdict
@@ -97,14 +97,24 @@ def proc_cafa():
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
-    y = pd.Series(y)
+    y = csr_matrix(y)
     X = np.array(X)
 
-    print y.shape
-    print X.shape
+    cafa_df = pd.DataFrame({"aa":X})
+    return cafa_df, y
 
-    cafa_df = pd.DataFrame({"label":y, "aa":X})
-    return cafa_df
+
+def save_sparse_csr(filename, array):
+    """
+    Save csr matrix in loadable format
+    Params:
+        filename...save path
+        array......csr matrix
+        labels.....ordered true labels
+        vocab......maps kmer to feature vector index
+    """
+    np.savez(filename,data = array.data, indices=array.indices,
+             indptr=array.indptr, shape=array.shape)
 
 
 def print_data_stats(data):
@@ -115,6 +125,7 @@ def print_data_stats(data):
     print len(data)
 
 
+save_sparse_csr("data/cafa_labels", y)
 cafa_df = proc_cafa()
 cafa_df.to_csv("data/cafa_df", index=0)
 
