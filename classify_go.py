@@ -320,6 +320,10 @@ def precision_recall(preds, true, thresh):
     pr = 1/m * float(np.sum(tps))
     rc = 1/len(preds) * float(np.sum(rcs))
 
+    print 1/m
+    print 1/len(preds)
+    print np.sum(tps)
+    print np.sum(rcs)
     print pr, rc
 
     return pr, rc
