@@ -312,17 +312,20 @@ def fmax(preds,true):
 
 
 def precision_recall(preds, true, thresh):
-    above_preds = []
-    for pred in preds:
-        pred = pred[pred>thresh]
+    m = 0
+    tps = []
+    rcs = []
+    for x in range(len(true)):
+        pred = preds[x] > thresh
         if len(pred):
-            above_preds.append(pred)
-    m = len(above_preds)
+            tp = len(np.intersect1d(pred, true[x]))
+            tps.append(tp/len(pred))
+            rcs.append(tp/len(true[x]))
+            m += 1
 
-    tp = np.intersect2d(above_preds, true)
-    pr = 1/m * sum(sum(tp)/sum(above_preds))
+    pr = 1/m * sum(tps)
 
-    rc = 1/len(preds) * sum(sum(tp)/sum(true))
+    rc = 1/len(preds) * sum(true)
 
     return pr, rc
 
