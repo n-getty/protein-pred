@@ -320,7 +320,7 @@ def precision_recall(preds, true, thresh):
         if len(pred):
             tp = len(np.intersect1d(pred, true[x]))
             tps.append(tp/len(pred))
-            rcs.append(tp/len(true[x]))
+            rcs.append(tp/true[x].shape[0])
             m += 1
 
     pr = 1/m * sum(tps)
