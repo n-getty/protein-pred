@@ -90,7 +90,7 @@ def proc_cafa():
             if term[1] not in term_vocab:
                 term_vocab[term[1]] = len(term_vocab)
 
-    for k,v in seq_dict.values():
+    for k,v in seq_dict.items():
         X.append(v)
         label_vec = [0] * len(term_vocab)
         for term in term_dict[k]:
