@@ -16,9 +16,99 @@ from memory_profiler import memory_usage
 from lightgbm import LGBMClassifier
 import plot_cm as pcm
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.multioutput import ClassifierChain
+
+
+def cross_validation_accuracy(clf, X, labels, skf, m):
+    """
+    Compute the average testing accuracy over k folds of cross-validation.
+    Params:
+        clf......A classifier.
+        X........A matrix of features.
+        labels...The true labels for each instance in X
+        split........The fold indices
+        m............The model name
+    Returns:
+        The average testing accuracy of the classifier
+        over each fold of cross-validation.
+    """
+    scores = []
+    train_scores = []
+    t5s = []
+    for train_index, test_index in skf:
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = labels[train_index], labels[test_index]
+        if m == 'RandomForest' or m == 'Regression':
+            clf.fit(X_train, y_train)
+        else:
+            clf.fit(X_train, y_train,
+                    eval_set=[(X_train, y_train), (X_test, y_test)],
+                    early_stopping_rounds=2,
+                    verbose=False,)
+        probs = clf.predict_proba(X_test)
+        t5, score = top_5_accuracy(probs, y_test)
+        train_pred = clf.predict(X_train)
+        train_score = accuracy_score(y_train, train_pred)
+        scores.append(score)
+        t5s.append(t5)
+        train_scores.append(train_score)
+
+    return np.mean(scores), np.mean(train_scores), np.mean(t5s)
+
+
+def test_train_split(clf, split, m, class_names):
+    """
+    Compute the accuracy of a train/test split
+    Params:
+        clf......A classifier.
+        split....indices
+    Returns:
+        The testing accuracy and the confusion
+        matrix.
+    """
+
+    X_train, X_test, y_train, y_test, train_idx, test_idx = split
+
+    if m == 'RandomForest' or m =='Regression':
+        clf.fit(X_train, y_train)
+    else:
+        clf.fit(X_train, y_train,
+                eval_set=[(X_train, y_train), (X_test, y_test)],
+                early_stopping_rounds=2,
+                verbose=False,)
+
+    probs = clf.predict_proba(X_test)
+    train_probs = clf.predict_proba(X_train)
+    allp = np.vstack([probs, train_probs])
+    idxs = test_idx + train_idx
+    all_probs = [None] * len(idxs)
+    for x in range(len(idxs)):
+        all_probs[x] = allp[idxs[x]]
+    all_probs = np.array(all_probs)
+    np.savetxt('results/stored_probs.csv', all_probs, delimiter=',')
+
+    t5, score = top_5_accuracy(probs, y_test)
+    train_pred = clf.predict(X_train)
+    train_score = accuracy_score(y_train, train_pred)
+
+    test_pred = clf.predict(X_test)
+
+    stats_df, cnfm = pcm.class_statistics(y_test, test_pred, class_names)
+    stats_df.to_csv('results/stats/' + m + '.csv', index=0, columns=["PGF", 'Sensitivity', 'Specicifity',
+                             'Most FN', 'Most FP'])
+    np.savetxt('results/stats/cnfm' + m + strftime("%m-%d_%H_%M", gmtime()) + '.csv', cnfm, delimiter=',')
+    stats_df.sort_values(by='Sensitivity', ascending=True, inplace=True, )
+
+    #pcm.pcm(y_test, test_pred, m)
+    #if m == "LightGBM":
+        #save_incorrect_csv(probs, y_test, test_idx)
+
+    print "Top 5 accuracy:", t5
+    logging.info("Top 5 accuracy: %f", t5)
+
+    return score, train_score, clf, t5
 
 
 def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_feat):
@@ -50,7 +140,7 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         print "Classiying with", mn
         logging.info("Classifying with %s", mn)
 
-        clf = clfs[x]
+        clf = OneVsRestClassifier(clfs[x])
 
         if cv:
             cv_score, cv_train_score, cv_t5 = cross_validation_accuracy(clf, features, labels, skf, mn)
@@ -100,6 +190,62 @@ def classify_all(class_names, features, clfs, folds, model_names, cv, mem, save_
         results.loc[results.shape[0]] = ([mn, cv_train_score, cv_score, cv_t5, tts_train_score, tts_score, t5, max_mem, avg_mem, elapsed])
 
     return results
+
+
+def convert_labels(labels):
+    """
+    Convert labels to indexes
+    Params:
+        labels...Original k class string labels
+    Returns:
+        Categorical label vector
+    """
+    label_idxs = {}
+    new_labels = np.empty(len(labels))
+    for x in range(len(labels)):
+        new_labels[x] = label_idxs.setdefault(labels[x], len(label_idxs))
+    return new_labels
+
+
+def unique_class_names(names):
+    """
+    Generate ordered unique class names
+    Params:
+        names....Label for every data point
+    Returns:
+        Name for each class in the set
+    """
+    cns = set()
+    unique = []
+    for c in names:
+        if c not in cns:
+            unique.append(c)
+            cns.add(c)
+
+    return unique
+
+
+def top_5_accuracy(probs, y_true):
+    """
+    Calculates top 5 and top 1 accuracy in 1 go
+    Params:
+        probs.....NxC matrix, class probabilities for each class
+        y_true....True class labels
+    Returns:
+        top5 accuracy
+        top1 accuracy
+    """
+    top5 = np.argsort(probs, axis=1)[:,-5:]
+    c = 0
+    top1c = 0
+    for x in range(len(top5)):
+        if np.in1d(y_true[x], top5[x], assume_unique=True)[0]:
+            c += 1
+        if y_true[x] == top5[x][4]:
+            top1c += 1
+
+    return float(c)/len(y_true), float(top1c)/len(y_true)
+
 
 
 def load_sparse_csr(filename):
@@ -152,7 +298,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     est = args.est
-    thresh = args.thresh
     prune = args.prune
 
     folds = 5
@@ -163,13 +308,13 @@ def main():
     else:
         device = 'cpu'
 
-    all_clfs = [OneVsRestClassifier(RandomForestClassifier(n_jobs=args.thread
+    all_clfs = [RandomForestClassifier(n_jobs=args.thread
                                    ,n_estimators=est
                                    #,oob_score=True
                                    #,max_depth=12
-                                   )),
+                                   ),
 
-                OneVsRestClassifier(XGBClassifier(n_jobs=args.thread,
+                XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
                           ,max_depth=2
@@ -178,9 +323,9 @@ def main():
                           #,subsample=0.5
                           #,max_bins=15
                           #,min_child_weight=6
-                         )),
+                         ),
 
-                OneVsRestClassifier(LGBMClassifier(nthread=args.thread
+                LGBMClassifier(nthread=args.thread
                            ,max_depth=6
                            ,num_leaves=31
                            ,learning_rate=0.1
@@ -190,8 +335,8 @@ def main():
                            ,device=device
                            #,subsample=0.8
                            #,min_child_weight=6
-                           )),
-                OneVsRestClassifier(LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs', max_iter=est))
+                           ),
+                LogisticRegression(multi_class='multinomial', n_jobs=-1, solver='lbfgs', max_iter=est)
             ]
     model_names = []
     clfs = []
@@ -208,23 +353,23 @@ def main():
         model_names.append("Regression")
         clfs.append(all_clfs[3])
 
-    features, class_names = load_data(args.data, args.dna1, args.dna3, args.dna5, args.dna10, args.aa1, args.aa2, args.aa3, args.aa4)
+    features, class_names = load_data(args.data, args.aa1, args.aa2, args.aa3, args.aa4)
+
     print "Original data shape:", features.shape
 
-    if args.data == "cafa":
-        print len(class_names)
-        print "Removing insignificant go terms"
-        term_count = Counter(class_names)
-        print "Unique go terms:", len(term_count)
-        idxs = [i > 100 for i in term_count.values()]
-        sig_terms = set(np.array(term_count.keys())[idxs])
-        print "Go terms with more than 100 seqs:", len(sig_terms)
-        sig_rows = np.array([c in sig_terms for c in class_names])
-        print "Seqs labeled with sig term:", sum(sig_rows)
-        features = features[sig_rows, :]
-        print features.shape
-        class_names = class_names[sig_rows]
-        print len(class_names)
+    print len(class_names)
+    print "Removing insignificant go terms"
+    term_count = Counter(class_names)
+    print "Unique go terms:", len(term_count)
+    idxs = [i > 100 for i in term_count.values()]
+    sig_terms = set(np.array(term_count.keys())[idxs])
+    print "Go terms with more than 100 seqs:", len(sig_terms)
+    sig_rows = np.array([c in sig_terms for c in class_names])
+    print "Seqs labeled with sig term:", sum(sig_rows)
+    features = features[sig_rows, :]
+    print features.shape
+    class_names = class_names[sig_rows]
+    print len(class_names)
 
     # Remove feature columns that have sample below threshhold
     nonzero_counts = features.getnnz(0)
@@ -239,6 +384,34 @@ def main():
         print t,
     print
     print results.to_string()
+
+
+def fmax(preds,true):
+    max = 0
+    for i in range(0.01,1,0.01):
+        pr, rc = precision_recall(preds, true, i)
+        f = (2 * pr * rc)/(pr + rc)
+        if f < max:
+            max = f
+
+    return max
+
+
+def precision_recall(preds, true, thresh):
+    above_preds = []
+    for pred in preds:
+        pred = pred[pred>thresh]
+        if pred:
+            above_preds.append(pred)
+    m = len(above_preds)
+
+    tp = np.intersect2d(above_preds, true)
+    pr = 1/m * sum(sum(tp)/sum(above_preds))
+
+    rc = 1/len(preds) * sum(sum(tp)/sum(true))
+
+    return pr, rc
+
 
 if __name__ == '__main__':
     main()

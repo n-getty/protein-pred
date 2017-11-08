@@ -486,7 +486,10 @@ def main():
 
 
     logging.info("Final data shape: %s" % (features.shape,))
-    results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
+    if args.data=='cafa':
+        results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat, True)
+    else:
+        results = classify_all(class_names, features, clfs, folds, model_names, args.cv, args.mem, args.save_feat)
     for t in results.Time:
         print t,
     print
@@ -497,31 +500,3 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename="results/results.log", filemode="a+",
                         format="%(asctime)-15s %(levelname)-8s %(message)s")
     main()
-
-
-def fmax(preds,true):
-    max = 0
-    for i in range(0.01,1,0.01):
-        pr, rc = precision_recall(preds, true, i)
-        f = (2 * pr * rc)/(pr + rc)
-        if f < max:
-            max = f
-
-    return max
-
-
-
-def precision_recall(preds, true, thresh):
-    above_preds = []
-    for pred in preds:
-        pred = pred[pred>thresh]
-        if pred:
-            above_preds.append(pred)
-    m = len(above_preds)
-
-    tp = np.intersect2d(above_preds, true)
-    pr = 1/m * sum(sum(tp)/sum(above_preds))
-
-    rc = 1/len(preds) * sum(sum(tp)/sum(true))
-
-    return pr, rc

@@ -1,7 +1,7 @@
 
 import numpy as np
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 import networkx as nx
 import pandas as pd
 
@@ -77,15 +77,25 @@ def proc_cafa():
             seq_dict[seq[0]] = seq[1]
 
     X = []
-    y = []
+    y= []
     seq_names = []
+    term_dict = defaultdict(list)
+    term_vocab = {}
     with open(term_file, 'r') as f:
         terms = f.readlines()
         for term in terms:
             term = term.split()
-            X.append(seq_dict[term[0]])
             seq_names.append(term[0])
-            y.append(term[1])
+            term_dict[term[0]].append(term[1])
+            if term[1] not in term_vocab:
+                term_vocab[term[1]] = len(term_vocab)
+
+    for k,v in seq_dict.values():
+        X.append(v)
+        label_vec = [0] * len(term_vocab)
+        for term in term_dict[k]:
+            label_vec[term_vocab[term]] = 1
+        y.append(label_vec)
 
     print Counter(y)
     print Counter(seq_names)
