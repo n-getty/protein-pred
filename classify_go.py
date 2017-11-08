@@ -313,6 +313,7 @@ def fmax(preds,true):
 
 
 def precision_recall(preds, true, thresh):
+    print preds.shape
     print true.shape
     m = 0
     tps = []
