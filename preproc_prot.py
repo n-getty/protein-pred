@@ -98,7 +98,6 @@ def proc_cafa():
         y.append(label_vec)
 
     y = pd.Series(y)
-    X = np.array(X)
 
     print y.shape
     print X.shape
