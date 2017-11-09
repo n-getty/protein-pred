@@ -56,7 +56,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     return np.mean(scores), np.mean(train_scores)
 
 
-def test_train_split(clf, split, m, class_names):
+def test_train_split(clf, split):
     """
     Compute the accuracy of a train/test split
     Params:
@@ -119,7 +119,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
             cv_score = -1
             cv_train_score = -1
 
-        args = (clf, tts_split, mn, labels)
+        args = (clf, tts_split)
         if mem:
             mem_usage, retval = memory_usage((test_train_split, args), interval=0.5, retval=True)
             tts_score, tts_train_score, clf, t5 = retval
@@ -130,7 +130,7 @@ def classify_all(labels, features, clfs, folds, model_names, cv, mem):
             print('Maximum memory usage: %s' % max_mem)
             np.savetxt("results/mem-usage/mem." + args[2], mem_usage, delimiter=',')
         else:
-            tts_score, tts_train_score, clf, t5 = test_train_split(*args)
+            tts_score, tts_train_score, clf = test_train_split(*args)
             avg_mem = -1
             max_mem = -1
 
