@@ -280,7 +280,10 @@ def main():
     features.shape[1] - np.sum(nonz), prune)
     features = features[:, nonz]
 
+
     nonz_rows = labels.getnnz(1)>0
+    print "Removing %d rows that have no associated terms" % (
+        features.shape[0] - np.sum(nonz_rows), prune)
     features = features[nonz_rows]
     labels = labels[nonz_rows]
 
@@ -294,7 +297,7 @@ def main():
 def fmax(preds,true):
     print "Maximizing f score with prob threshhold"
     max = 0
-    for i in np.arange(0.01,1,0.01):
+    for i in np.arange(0.1,1,0.1):
         pr, rc = precision_recall(preds, true, i)
         f = (2 * pr * rc)/(pr + rc)
         if f > max:
@@ -319,7 +322,7 @@ def precision_recall(preds, true, thresh):
             rcs.append(0)
 
     pr = 1/float(m) * float(np.sum(tps))
-    rc = 1/float(len(preds)) * float(np.sum(rcs))
+    rc = 1/float(len(true)) * float(np.sum(rcs))
 
     return pr, rc
 
