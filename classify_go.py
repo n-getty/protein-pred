@@ -38,6 +38,7 @@ def cross_validation_accuracy(clf, X, labels, skf, m):
     i = 0
     for train_index, test_index in skf:
         print "Classifying on fold:", i
+        i+=1
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = labels[train_index], labels[test_index]
         if m == 'RandomForest' or m == 'Regression' or m == 'LightGBM':
