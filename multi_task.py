@@ -35,7 +35,7 @@ def read_core():
     data = core_df.aa
 
     min = 1000
-    list_data = []
+    list_data = np.array([])
     print("Replacing seqs with char lists")
     for x in range(len(data)):
         list_data.append(list(data[x]))
@@ -58,7 +58,7 @@ def read_core():
     # transform to binary
     X_bin = OneHotEncoder().fit_transform(X_int).toarray()
 
-    return X_bin, to_categorical(labels)
+    return np.array(X_bin), to_categorical(labels)
 
 
 def build_attention_model(input_dim, nb_classes):
