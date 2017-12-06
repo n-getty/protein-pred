@@ -53,7 +53,7 @@ def read_core():
 
     print("Transforming seqs to int")
     # transform to integer
-    X_int = LabelEncoder().fit_transform(list_data)
+    X_int = LabelEncoder().fit_transform(list_data.ravel()).reshape(*list_data.shape)
     print("Transforming seqs to onehot")
     # transform to binary
     X_bin = OneHotEncoder().fit_transform(X_int).toarray()
