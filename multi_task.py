@@ -35,7 +35,7 @@ def read_core():
     data = core_df.aa
 
     min = 1000
-    list_data = np.array([])
+    list_data = []
     print("Replacing seqs with char lists")
     for x in range(len(data)):
         list_data.append(list(data[x]))
@@ -50,6 +50,8 @@ def read_core():
         list_data[x] = list_data[x][:l]
 
     labels = core_df.label
+
+    list_data = np.array(list_data)
 
     print("Transforming seqs to int")
     # transform to integer
