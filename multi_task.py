@@ -37,7 +37,7 @@ def seq_to_oh(data):
     for x in range(len(data)):
         list_data[x] = list_data[x][:l]
 
-    list_data = np.array(list_data)
+    list_data = np.array(list_data).reshape((len(list_data),l))
 
     print("Transforming seqs to int")
     # transform to integer
