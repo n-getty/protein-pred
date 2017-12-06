@@ -26,18 +26,18 @@ def seq_to_oh(data):
     list_data = []
     print("Replacing seqs with char lists")
     for x in range(len(data)):
-        list_data.append(np.array(list(data[x])))
+        list_data.append(list(data[x]))
         l = len(data[x])
         if l < min:
             min = l
 
-    print l
+    print min
 
     print("Slicing seqs")
     for x in range(len(data)):
-        list_data[x] = list_data[x][:l]
+        list_data[x] = list_data[x][:min]
 
-    list_data = np.array(list_data) #.reshape((len(list_data),l))
+    list_data = np.array(list_data)
 
     print("Transforming seqs to int")
     # transform to integer
@@ -45,9 +45,7 @@ def seq_to_oh(data):
     print("Fitting seqs to onehot")
     print(X_int.shape)
     # transform to binary
-    oh = OneHotEncoder().fit(X_int)
-    print("Transforming seqs to onehot")
-    X_bin = oh.transform(X_int)
+    X_bin = OneHotEncoder().fit_transform(X_int).toarray()
 
     return np.array(X_bin)
 
