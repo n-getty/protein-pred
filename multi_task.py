@@ -12,6 +12,7 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Input, merge
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 
 def load_sparse_csr(filename):
@@ -32,9 +33,28 @@ def read_core():
     file = "data/coreseed.train.tsv"
     core_df = pd.read_csv(file, names=["label", "dna", "aa"], usecols=[1, 5, 6], delimiter='\t', header=0)
     data = core_df.aa
+
+    min = 1000
+    list_data = []
+    for x in range(len(data)):
+        list_data.append(list(data[x]))
+        l = len(data[x])
+        if l<min:
+            min=l
+
+    print l
+
+    for x in range(len(data)):
+        list_data[x] = list_data[x][:l]
+
     labels = core_df.label
 
-    return to_categorical(data), to_categorical(labels)
+    # transform to integer
+    X_int = LabelEncoder().fit_transform(list_data)
+    # transform to binary
+    X_bin = OneHotEncoder().fit_transform(X_int).toarray()
+
+    return X_bin, to_categorical(labels)
 
 
 def build_attention_model(input_dim, nb_classes):
