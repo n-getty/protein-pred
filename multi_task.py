@@ -46,7 +46,7 @@ def seq_to_oh(data):
     print(X_int.shape)
     # transform to binary
     X_bin = OneHotEncoder().fit_transform(X_int).toarray()
-
+    print np.array(X_bin).shape
     return np.array(X_bin)
 
 
@@ -68,10 +68,10 @@ def read_core():
 
 
 def build_attention_model(input_dim, nb_classes):
-    inputs = Input(shape=(input_dim[0],))
+    inputs = Input(shape=(input_dim,))
 
     # ATTENTION PART STARTS HERE
-    attention_probs = Dense(input_dim[0], activation='softmax', name='attention_vec')(inputs)
+    attention_probs = Dense(input_dim, activation='softmax', name='attention_vec')(inputs)
     attention_mul = merge([inputs, attention_probs], output_shape=nb_classes, name='attention_mul', mode='mul')
     # ATTENTION PART FINISHES HERE
 
@@ -89,18 +89,17 @@ def main():
 
     print("Loading data")
     data, labels = read_core()
-
+    print data.shape
     X_train, X_test, y_train, y_test = train_test_split(
         data, labels, test_size=0.2, random_state=0, stratify=labels)
 
     nb_classes = 1000
-    input_shape = (data.shape[1], 1)
     print("Building model")
-    model = build_attention_model(input_shape, nb_classes)
+    model = build_attention_model(data.shape[1], nb_classes)
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy', 'top_k_categorical_accuracy'])
-    
+
     batch_size = 80
     epochs = 20
 
