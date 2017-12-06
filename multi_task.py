@@ -97,7 +97,10 @@ def main():
     input_shape = (data.shape[1], 1)
     print("Building model")
     model = build_attention_model(input_shape, nb_classes)
-
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy', 'top_k_categorical_accuracy'])
+    
     batch_size = 80
     epochs = 20
 
