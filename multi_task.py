@@ -93,7 +93,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         data, labels, test_size=0.2, random_state=0, stratify=labels)
 
-    nb_classes = 1000
+    nb_classes = 1001
     print("Building model")
     model = build_attention_model(data.shape[1], nb_classes)
     model.compile(loss='categorical_crossentropy',
