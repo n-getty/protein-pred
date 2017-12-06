@@ -21,27 +21,15 @@ def load_sparse_csr(filename):
                          shape=loader['shape'], dtype="int32")
 
 
-def read_cafa():
-    file = "data/cafa_df"
-    data = pd.read_csv(file, header=0)
-    labels = load_sparse_csr("data/cafa_labels.npz")
-
-    return to_categorical(data), labels
-
-
-def read_core():
-    file = "data/coreseed.train.tsv"
-    core_df = pd.read_csv(file, names=["label", "dna", "aa"], usecols=[1, 5, 6], delimiter='\t', header=0)
-    data = core_df.aa
-
+def seq_to_oh(data):
     min = 1000
     list_data = []
     print("Replacing seqs with char lists")
     for x in range(len(data)):
         list_data.append(list(data[x]))
         l = len(data[x])
-        if l<min:
-            min=l
+        if l < min:
+            min = l
 
     print l
 
@@ -49,18 +37,36 @@ def read_core():
     for x in range(len(data)):
         list_data[x] = list_data[x][:l]
 
-    labels = core_df.label
-
     list_data = np.array(list_data)
 
     print("Transforming seqs to int")
     # transform to integer
     X_int = LabelEncoder().fit_transform(list_data.ravel()).reshape(*list_data.shape)
-    print("Transforming seqs to onehot")
+    print("Fitting seqs to onehot")
+    print(X_int.shape)
     # transform to binary
-    X_bin = OneHotEncoder().fit_transform(X_int).toarray()
+    oh = OneHotEncoder().fit(X_int)
+    print("Transforming seqs to onehot")
+    X_bin = oh.transform(X_int)
 
-    return np.array(X_bin), to_categorical(labels)
+    return np.array(X_bin)
+
+
+def read_cafa():
+    file = "data/cafa_df"
+    data = pd.read_csv(file, header=0)
+    labels = load_sparse_csr("data/cafa_labels.npz")
+
+    return seq_to_oh(data), labels
+
+
+def read_core():
+    file = "data/coreseed.train.tsv"
+    core_df = pd.read_csv(file, names=["label", "aa"], usecols=[1, 6], delimiter='\t', header=0)
+    labels = core_df.label
+    data = core_df.aa
+
+    return seq_to_oh(data), to_categorical(labels)
 
 
 def build_attention_model(input_dim, nb_classes):
