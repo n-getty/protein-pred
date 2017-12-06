@@ -36,6 +36,7 @@ def read_core():
 
     min = 1000
     list_data = []
+    print("Replacing seqs with char lists")
     for x in range(len(data)):
         list_data.append(list(data[x]))
         l = len(data[x])
@@ -44,13 +45,16 @@ def read_core():
 
     print l
 
+    print("Slicing seqs")
     for x in range(len(data)):
         list_data[x] = list_data[x][:l]
 
     labels = core_df.label
 
+    print("Transforming seqs to int")
     # transform to integer
     X_int = LabelEncoder().fit_transform(list_data)
+    print("Transforming seqs to onehot")
     # transform to binary
     X_bin = OneHotEncoder().fit_transform(X_int).toarray()
 
@@ -77,6 +81,7 @@ def main():
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/multi_task.csv")
 
+    print("Loading data")
     data, labels = read_core()
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -84,11 +89,13 @@ def main():
 
     nb_classes = 1000
     input_shape = (data.shape[1], 1)
+    print("Building model")
     model = build_attention_model(input_shape, nb_classes)
 
     batch_size = 80
     epochs = 20
 
+    print("Training model")
     model.fit(X_train, y_train,
               batch_size=batch_size,
               epochs=epochs,
