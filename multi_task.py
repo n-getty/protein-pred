@@ -26,7 +26,7 @@ def seq_to_oh(data):
     list_data = []
     print("Replacing seqs with char lists")
     for x in range(len(data)):
-        list_data.append(np.array((data[x])))
+        list_data.append(np.array(list(data[x])))
         l = len(data[x])
         if l < min:
             min = l
