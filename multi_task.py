@@ -224,15 +224,17 @@ def main():
     cafa = 1
     if cafa:
         maxlen = 256
+        loss = 'binary_crossentropy'
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa(maxlen)
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
                         dropout=dropout,
                         activation=activation,
                         variation=model_variation,
-                        classes=classes)
+                        classes=classes, multi_label=True)
     else:
         maxlen = 1000
+        loss = 'categorical_crossentropy'
         (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen, set='protein')
         CHARLEN = aa_charlen
         model = Res50NT(input_shape=(maxlen, CHARLEN),
@@ -242,9 +244,9 @@ def main():
                         variation=model_variation,
                         classes=classes)
 
-    model.compile(loss='categorical_crossentropy',
+    model.compile(loss=loss,
                   optimizer='adam',
-                  metrics=['accuracy', 'top_k_categorical_accuracy'])
+                  metrics=['accuracy'])
 
     batch_size = 80
     epochs = 20
