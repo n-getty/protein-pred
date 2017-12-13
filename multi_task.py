@@ -148,9 +148,10 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
     ctable = CharacterTable(aa_chars.lower(), maxlen)
 
     file = "data/cafa_df"
-    df = pd.read_csv(file, header=0)
+    df = pd.read_csv(file, header=0).values()
     labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
+    print(df[0])
     n = df.shape[0]
     print(n)
 
