@@ -20,6 +20,7 @@ aa_chars = 'FSYCLIMVPTAHQNKDEWRGUXBZO'
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
 aa_charlen = len(aa_chars)
+CHARLEN = aa_charlen
 SEED = 2017
 
 
