@@ -220,7 +220,7 @@ def main():
     #model = build_attention_model(data.shape[1], nb_classes)
     cafa = 0
     if cafa:
-        maxlen = 50
+        maxlen = 128
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa(maxlen)
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
@@ -229,8 +229,8 @@ def main():
                         variation=model_variation,
                         classes=classes)
     else:
-        maxlen = 256
-        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen)
+        maxlen = 128
+        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen, set='protein')
         model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
                         dropout=dropout,
