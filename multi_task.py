@@ -19,6 +19,7 @@ from res50_nt import Res50NT
 aa_chars = 'FSYCLIMVPTAHQNKDEWRGUXBZO'
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
+aa_charlen = len(aa_chars)
 SEED = 2017
 
 
@@ -146,18 +147,16 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
 def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
     ctable = CharacterTable(aa_chars.lower(), maxlen)
 
-    CHARLEN = len(aa_chars)
-
     file = "data/cafa_df"
     df = pd.read_csv(file, header=0)
-    labels = load_sparse_csr("data/cafa_labels.npz")
+    labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
     n = df.shape[0]
     if snake2d:
         a = int(np.sqrt(maxlen))
-        x = np.zeros((n, a, a, CHARLEN), dtype=np.byte)
+        x = np.zeros((n, a, a, aa_charlen), dtype=np.byte)
     else:
-        x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
+        x = np.zeros((n, maxlen, aa_charlen), dtype=np.byte)
 
     for i, seq in enumerate(df):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
@@ -209,7 +208,7 @@ def main():
 
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
-    model = Res50NT(input_shape=(maxlen, CHARLEN),
+    model = Res50NT(input_shape=(maxlen, aa_charlen),
                     dense_layers=dense_layers,
                     dropout=dropout,
                     activation=activation,
