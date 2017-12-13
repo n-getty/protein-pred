@@ -206,6 +206,7 @@ def main():
 
     (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
 
+    print(classes)
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
     model = Res50NT(input_shape=(maxlen, aa_charlen),
