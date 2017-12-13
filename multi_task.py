@@ -198,25 +198,33 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         data, labels, test_size=0.2, random_state=0, stratify=labels)'''
 
-    maxlen = 100
+
     dense_layers = [256]
     dropout = .5
     activation = 'relu'
     model_variation = 'v1'
 
-    #(x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
-
-    (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
-
-    print(classes)
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
-    model = Res50NT(input_shape=(maxlen, aa_charlen),
-                    dense_layers=dense_layers,
-                    dropout=dropout,
-                    activation=activation,
-                    variation=model_variation,
-                    classes=classes)
+    cafa = 0
+    if cafa:
+        maxlen = 10
+        (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
+        model = Res50NT(input_shape=(maxlen, aa_charlen),
+                        dense_layers=dense_layers,
+                        dropout=dropout,
+                        activation=activation,
+                        variation=model_variation,
+                        classes=classes)
+    else:
+        maxlen = 1000
+        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
+        model = Res50NT(input_shape=(maxlen, CHARLEN),
+                        dense_layers=dense_layers,
+                        dropout=dropout,
+                        activation=activation,
+                        variation=model_variation,
+                        classes=classes)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
