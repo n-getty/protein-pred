@@ -152,6 +152,10 @@ def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed
 
     labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
+    print labels.shape
+    print labels[0]
+    exit(0)
+    
     n = len(df)
 
     if snake2d:
