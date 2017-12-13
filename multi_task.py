@@ -163,7 +163,7 @@ def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed
     min = 1000
     for i, seq in enumerate(df):
         if len(seq) < maxlen:
-            seq += 'x' * maxlen-len(seq)
+            seq += 'x' * (maxlen-len(seq))
             min = len(seq)
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
