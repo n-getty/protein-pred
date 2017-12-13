@@ -125,7 +125,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     ctable = CharacterTable(aa_chars.lower(), maxlen)
 
     df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
-                     usecols=['function_index', 'dna', 'aa'])
+                     usecols=['function_index', 'dna', 'protein'])
 
     n = df.shape[0]
     if snake2d:
@@ -134,7 +134,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     else:
         x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
 
-    for i, seq in enumerate(df['aa']):
+    for i, seq in enumerate(df['protein']):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = pd.get_dummies(df.iloc[:, 0]).values
