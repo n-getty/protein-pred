@@ -206,9 +206,9 @@ def main():
 
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
-    cafa = 0
+    cafa = 1
     if cafa:
-        maxlen = 10
+        maxlen = 8
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
