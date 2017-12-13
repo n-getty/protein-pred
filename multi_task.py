@@ -119,7 +119,7 @@ class CharacterTable(object):
 
 
 def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
-    ctable = CharacterTable(CHARS.lower(), maxlen)
+    ctable = CharacterTable(CHARS, maxlen)
 
     df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
                      usecols=['function_index', 'dna'])
@@ -144,7 +144,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
 
 
 def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
-    ctable = CharacterTable(aa_chars, maxlen)
+    ctable = CharacterTable(aa_chars.lower(), maxlen)
 
     file = "data/cafa_df"
     df = pd.read_csv(file, header=0)
