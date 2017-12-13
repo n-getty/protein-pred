@@ -143,6 +143,32 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     return (x_train, y_train), (x_val, y_val), classes
 
 
+def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
+    ctable = CharacterTable(aa_chars, maxlen)
+
+    file = "data/cafa_df"
+    df = pd.read_csv(file, header=0)
+    labels = load_sparse_csr("data/cafa_labels.npz")
+
+    n = df.shape[0]
+    if snake2d:
+        a = int(np.sqrt(maxlen))
+        x = np.zeros((n, a, a, CHARLEN), dtype=np.byte)
+    else:
+        x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
+
+    for i, seq in enumerate(df['dna']):
+        x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
+
+    y = labels
+    classes = labels.shape[1]
+
+    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2,
+                                                      random_state=seed,
+                                                      stratify=df.iloc[:, 0])
+    return (x_train, y_train), (x_val, y_val), classes
+
+
 def build_attention_model(input_dim, nb_classes):
     inputs = Input(shape=(input_dim,))
 
@@ -175,7 +201,9 @@ def main():
     activation = 'relu'
     model_variation = 'v1'
 
-    (x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
+    #(x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
+
+    (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
 
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
