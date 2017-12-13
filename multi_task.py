@@ -173,7 +173,7 @@ def main():
     dense_layers = [0]
     dropout = .5
     activation = 'relu'
-    model_variation = 'v1'
+    model_variation = 'v2'
 
     (x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
 
