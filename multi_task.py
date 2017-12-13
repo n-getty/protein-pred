@@ -221,7 +221,7 @@ def main():
     cafa = 0
     if cafa:
         maxlen = 50
-        (x_train, y_train), (x_test, y_test), classes = load_data_cafa(50)
+        (x_train, y_train), (x_test, y_test), classes = load_data_cafa(maxlen)
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
                         dropout=dropout,
@@ -230,7 +230,7 @@ def main():
                         classes=classes)
     else:
         maxlen = 1000
-        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(50)
+        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen)
         model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
                         dropout=dropout,
