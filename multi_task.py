@@ -170,10 +170,10 @@ def main():
         data, labels, test_size=0.2, random_state=0, stratify=labels)'''
 
     maxlen = 1000
-    dense_layers = [0]
+    dense_layers = [1024]
     dropout = .5
     activation = 'relu'
-    model_variation = 'v2'
+    model_variation = 'v1'
 
     (x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
 
