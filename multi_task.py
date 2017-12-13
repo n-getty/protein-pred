@@ -233,6 +233,7 @@ def main():
     else:
         maxlen = 1000
         (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen, set='protein')
+        CHARLEN = aa_charlen
         model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
                         dropout=dropout,
