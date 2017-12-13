@@ -229,7 +229,7 @@ def main():
                         variation=model_variation,
                         classes=classes)
     else:
-        maxlen = 50
+        maxlen = 1000
         (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(50)
         model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
