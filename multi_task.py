@@ -169,7 +169,7 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         data, labels, test_size=0.2, random_state=0, stratify=labels)'''
 
-    maxlen = 100
+    maxlen = 1000
     dense_layers = [256]
     dropout = .5
     activation = 'relu'
