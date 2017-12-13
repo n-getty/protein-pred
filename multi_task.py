@@ -16,7 +16,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
 
 
-aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'
+aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
 aa_charlen = len(aa_chars)
@@ -124,16 +124,18 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     #ctable = CharacterTable(CHARS, maxlen)
 
     if set == 'dna':
+        print("Using dna sequences")
         chars = CHARS
         clen = CHARLEN
     else:
+        print("Using aa sequences")
         chars = aa_chars
         clen = aa_charlen
 
     ctable = CharacterTable(chars, maxlen)
 
     df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
-                     usecols=['function_index', 'dna', 'protein'])
+                     usecols=['function_index', set])
 
     n = df.shape[0]
     if snake2d:
