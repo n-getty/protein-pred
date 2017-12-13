@@ -138,6 +138,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
                      usecols=['function_index', set])
 
     n = df.shape[0]
+
     if snake2d:
         a = int(np.sqrt(maxlen))
         x = np.zeros((n, a, a, clen), dtype=np.byte)
@@ -222,7 +223,7 @@ def main():
     #model = build_attention_model(data.shape[1], nb_classes)
     cafa = 1
     if cafa:
-        maxlen = 1000
+        maxlen = 256
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa(maxlen)
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
