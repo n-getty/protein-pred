@@ -20,7 +20,7 @@ aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
 aa_charlen = len(aa_chars)
-CHARLEN = aa_charlen
+#CHARLEN = aa_charlen
 SEED = 2017
 
 
@@ -120,10 +120,16 @@ class CharacterTable(object):
         return C
 
 
-def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
+def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False, seed=SEED, set='dna'):
     #ctable = CharacterTable(CHARS, maxlen)
 
-    ctable = CharacterTable(aa_chars.lower(), maxlen)
+    if set == 'dna':
+        chars = CHARS
+    else:
+        chars = aa_chars
+        CHARLEN = aa_charlen
+
+    ctable = CharacterTable(chars, maxlen)
 
     df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
                      usecols=['function_index', 'dna', 'protein'])
@@ -135,7 +141,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     else:
         x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
 
-    for i, seq in enumerate(df['protein']):
+    for i, seq in enumerate(df[set]):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = pd.get_dummies(df.iloc[:, 0]).values
