@@ -248,14 +248,19 @@ def main():
                   optimizer='adam',
                   metrics=['accuracy'])
 
-    batch_size = 80
-    epochs = 20
+    batch_size = 800
+    epochs = 1
 
     print("Training model")
     model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(x_test, y_test), callbacks=[lr_reducer, early_stopper, csv_logger])
+
+    preds = model.predict(x_test)
+    print preds[0]
+    #preds[preds >= 0.5] = 1
+    #preds[preds < 0.5] = 0
 
 
 if __name__ == '__main__':
