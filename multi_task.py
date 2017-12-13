@@ -157,15 +157,15 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
     else:
         x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
 
-    for i, seq in enumerate(df['dna']):
+    for i, seq in enumerate(df):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = labels
     classes = labels.shape[1]
 
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2,
-                                                      random_state=seed,
-                                                      stratify=df.iloc[:, 0])
+                                                      random_state=seed)
+    
     return (x_train, y_train), (x_val, y_val), classes
 
 
