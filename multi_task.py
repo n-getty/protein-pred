@@ -125,9 +125,10 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
 
     if set == 'dna':
         chars = CHARS
+        clen = CHARLEN
     else:
         chars = aa_chars
-        CHARLEN = aa_charlen
+        clen = aa_charlen
 
     ctable = CharacterTable(chars, maxlen)
 
@@ -137,9 +138,9 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     n = df.shape[0]
     if snake2d:
         a = int(np.sqrt(maxlen))
-        x = np.zeros((n, a, a, CHARLEN), dtype=np.byte)
+        x = np.zeros((n, a, a, clen), dtype=np.byte)
     else:
-        x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
+        x = np.zeros((n, maxlen, clen), dtype=np.byte)
 
     for i, seq in enumerate(df[set]):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
