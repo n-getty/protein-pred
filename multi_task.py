@@ -144,7 +144,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     return (x_train, y_train), (x_val, y_val), classes
 
 
-def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
+def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
     ctable = CharacterTable(aa_chars.lower(), maxlen)
 
     file = "data/cafa_df"
@@ -160,7 +160,11 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
     else:
         x = np.zeros((n, maxlen, aa_charlen), dtype=np.byte)
 
+    min = 1000
     for i, seq in enumerate(df):
+        if len(seq) < maxlen:
+            seq += 'x' * maxlen-len(seq)
+            min = len(seq)
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = labels
@@ -208,7 +212,7 @@ def main():
     #model = build_attention_model(data.shape[1], nb_classes)
     cafa = 1
     if cafa:
-        maxlen = 100
+        maxlen = 50
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
         model = Res50NT(input_shape=(maxlen, aa_charlen),
                         dense_layers=dense_layers,
