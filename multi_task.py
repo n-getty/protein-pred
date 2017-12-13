@@ -13,6 +13,7 @@ from keras.layers import Dense, Dropout, Activation, Input, merge
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+import resnet
 
 
 def load_sparse_csr(filename):
@@ -95,7 +96,8 @@ def main():
 
     nb_classes = 1001
     print("Building model")
-    model = build_attention_model(data.shape[1], nb_classes)
+    #model = build_attention_model(data.shape[1], nb_classes)
+    model = resnet.ResnetBuilder.build_resnet_101((1, data.shape[1], 1), nb_classes)
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy', 'top_k_categorical_accuracy'])
