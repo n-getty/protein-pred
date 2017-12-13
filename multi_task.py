@@ -152,6 +152,9 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
     labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
     n = df.shape[0]
+    print(n)
+    print df[0]
+
     if snake2d:
         a = int(np.sqrt(maxlen))
         x = np.zeros((n, a, a, aa_charlen), dtype=np.byte)
