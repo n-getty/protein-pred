@@ -98,7 +98,7 @@ def Res50NTv1(include_top=True, weights='',
               input_tensor=None, input_shape=None,
               pooling=None, classes=1000,
               dropout=0, activation='relu',
-              dense_layers=None):
+              dense_layers=None, multi_label=False):
 
     if input_tensor is None:
         seq_input = Input(shape=input_shape)
@@ -148,7 +148,10 @@ def Res50NTv1(include_top=True, weights='',
                 kernel_initializer = 'lecun_normal' if activation == 'selu' else 'glorot_uniform'
                 name = 'fc{}'.format(i+1)
                 x = Dense(layer, name=name, activation=activation, kernel_initializer=kernel_initializer)(x)
-        x = Dense(classes, activation='softmax', name='predictions')(x)
+        if multi_label:
+            x = Dense(classes, activation='sigmoid', name='predictions')(x)
+        else:
+            x = Dense(classes, activation='softmax', name='predictions')(x)
     else:
         if pooling == 'avg':
             x = GlobalAveragePooling1D()(x)
@@ -251,7 +254,7 @@ def Res50NT(include_top=True, weights='',
             input_tensor=None, input_shape=None,
             pooling=None, classes=1000,
             dropout=0, activation='relu',
-            dense_layers=None, variation='v1'):
+            dense_layers=None, variation='v1', multi_label=False):
 
     fn = globals()['Res50NT' + variation]
 
@@ -259,4 +262,4 @@ def Res50NT(include_top=True, weights='',
               input_tensor=input_tensor, input_shape=input_shape,
               pooling=pooling, classes=classes,
               dropout=dropout, activation=activation,
-              dense_layers=dense_layers)
+              dense_layers=dense_layers, multi_label=multi_label)
