@@ -153,7 +153,6 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
 
     n = df.shape[0]
     print(n)
-    print df[0]
 
     if snake2d:
         a = int(np.sqrt(maxlen))
@@ -162,6 +161,8 @@ def load_data_cafa(maxlen=100, val_split=0.2, batch_size=128, snake2d=False, see
         x = np.zeros((n, maxlen, aa_charlen), dtype=np.byte)
 
     for i, seq in enumerate(df):
+        print(seq)
+        exit(0)
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = labels
