@@ -16,6 +16,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
 
 
+aa_chars = 'FSYCLIMVPTAHQNKDEWRGUXBZO'
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
 SEED = 2017
@@ -120,7 +121,7 @@ class CharacterTable(object):
 def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
     ctable = CharacterTable(CHARS, maxlen)
 
-    df = pd.read_csv('coreseed.train.tsv', sep='\t', engine='c',
+    df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
                      usecols=['function_index', 'dna'])
 
     n = df.shape[0]
