@@ -120,10 +120,12 @@ class CharacterTable(object):
 
 
 def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False, seed=SEED):
-    ctable = CharacterTable(CHARS, maxlen)
+    #ctable = CharacterTable(CHARS, maxlen)
+
+    ctable = CharacterTable(aa_chars.lower(), maxlen)
 
     df = pd.read_csv('data/coreseed.train.tsv', sep='\t', engine='c',
-                     usecols=['function_index', 'dna'])
+                     usecols=['function_index', 'dna', 'aa'])
 
     n = df.shape[0]
     if snake2d:
@@ -132,7 +134,7 @@ def load_data_coreseed(maxlen=1000, val_split=0.2, batch_size=128, snake2d=False
     else:
         x = np.zeros((n, maxlen, CHARLEN), dtype=np.byte)
 
-    for i, seq in enumerate(df['dna']):
+    for i, seq in enumerate(df['aa']):
         x[i] = ctable.encode(seq[:maxlen].lower(), snake2d=snake2d)
 
     y = pd.get_dummies(df.iloc[:, 0]).values
@@ -152,10 +154,6 @@ def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed
 
     labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
-    print labels.shape
-    print labels[0]
-    exit(0)
-    
     n = len(df)
 
     if snake2d:
@@ -212,7 +210,7 @@ def main():
 
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
-    cafa = 1
+    cafa = 0
     if cafa:
         maxlen = 50
         (x_train, y_train), (x_test, y_test), classes = load_data_cafa()
@@ -223,7 +221,7 @@ def main():
                         variation=model_variation,
                         classes=classes)
     else:
-        maxlen = 1000
+        maxlen = 50
         (x_train, y_train), (x_test, y_test), classes = load_data_coreseed()
         model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
