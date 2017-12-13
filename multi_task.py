@@ -16,7 +16,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
 
 
-aa_chars = 'FSYCLIMVPTAHQNKDEWRGUXBZO'
+aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'
 CHARS = ' atgc'
 CHARLEN = len(CHARS)
 aa_charlen = len(aa_chars)
