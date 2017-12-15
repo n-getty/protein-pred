@@ -246,7 +246,7 @@ def main():
 
     model.compile(loss=loss,
                   optimizer='adam',
-                  metrics=['accuracy', 'fmeasure', 'precision', 'recall'])
+                  metrics=['accuracy'])
 
     batch_size = 800
     epochs = 1
