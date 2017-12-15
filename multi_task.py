@@ -246,7 +246,7 @@ def main():
 
     model.compile(loss=loss,
                   optimizer='adam',
-                  metrics=['accuracy'])
+                  metrics=['accuracy', 'fmeasure', 'precision', 'recall'])
 
     batch_size = 800
     epochs = 1
@@ -258,9 +258,40 @@ def main():
               validation_data=(x_test, y_test), callbacks=[lr_reducer, early_stopper, csv_logger])
 
     preds = model.predict(x_test)
-    print preds[0]
-    #preds[preds >= 0.5] = 1
-    #preds[preds < 0.5] = 0
+    print(fmax(preds, y_test))
+
+
+def fmax(preds,true):
+    print "Maximizing f score with prob threshhold"
+    max = 0
+    for i in np.arange(0.1,1,0.1):
+        pr, rc = precision_recall(preds, true, i)
+        f = (2 * pr * rc)/(pr + rc)
+        if f > max:
+            max = f
+
+    return max
+
+
+def precision_recall(preds, true, thresh):
+    m = 0
+    tps = []
+    rcs = []
+    for x in range(true.shape[0]):
+        t = true[x].todense()
+        pred = preds[x] > thresh
+        if pred.any():
+            tp = np.sum(np.logical_and(pred, t == 1))
+            tps.append(tp/np.sum(pred))
+            rcs.append(tp/np.sum(t))
+            m += 1
+        else:
+            rcs.append(0)
+
+    pr = 1/float(m) * float(np.sum(tps))
+    rc = 1/float(len(true)) * float(np.sum(rcs))
+
+    return pr, rc
 
 
 if __name__ == '__main__':
