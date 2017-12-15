@@ -14,6 +14,7 @@ from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
+from sklearn.metrics import f1_score
 
 
 aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
@@ -265,33 +266,13 @@ def fmax(preds,true):
     print "Maximizing f score with prob threshhold"
     max = 0
     for i in np.arange(0.1,1,0.1):
-        pr, rc = precision_recall(preds, true, i)
-        f = (2 * pr * rc)/(pr + rc)
-        if f > max:
-            max = f
-
+        preds[preds>i] = 1
+        preds[preds<1] = 0
+        f = f1_score(true, preds, average='weighted')
+        if f>max:
+            max=f
     return max
 
-
-def precision_recall(preds, true, thresh):
-    m = 0
-    tps = []
-    rcs = []
-    for x in range(true.shape[0]):
-        t = true[x] #.todense()
-        pred = preds[x] > thresh
-        if pred.any():
-            tp = np.sum(np.logical_and(pred, t == 1))
-            tps.append(tp/np.sum(pred))
-            rcs.append(tp/np.sum(t))
-            m += 1
-        else:
-            rcs.append(0)
-
-    pr = 1/float(m) * float(np.sum(tps))
-    rc = 1/float(len(true)) * float(np.sum(rcs))
-
-    return pr, rc
 
 
 if __name__ == '__main__':
