@@ -222,7 +222,7 @@ def main():
 
     print("Building model")
     #model = build_attention_model(data.shape[1], nb_classes)
-    cafa = 1
+    cafa = 0
     if cafa:
         maxlen = 256
         loss = 'binary_crossentropy'
@@ -249,7 +249,7 @@ def main():
                   optimizer='adam',
                   metrics=['accuracy'])
 
-    batch_size = 800
+    batch_size = 80
     epochs = 1
 
     print("Training model")

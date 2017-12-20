@@ -136,7 +136,7 @@ def Res50NTv1(include_top=True, weights='',
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
     x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
 
-    x = AveragePooling1D(7, name='avg_pool')(x)
+    x = AveragePooling1D(7, name='avg_pool', paddinng='same')(x)
 
     if include_top:
         x = Flatten()(x)
