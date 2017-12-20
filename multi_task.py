@@ -234,7 +234,7 @@ def main():
                         variation=model_variation,
                         classes=classes, multi_label=True)
     else:
-        maxlen = 1000
+        maxlen = 100
         loss = 'categorical_crossentropy'
         (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen, set='protein')
         CHARLEN = aa_charlen
