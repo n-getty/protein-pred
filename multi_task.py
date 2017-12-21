@@ -277,7 +277,7 @@ def main():
         preds = model.predict(x_test)
         print(fmax(preds, y_test))
     else:
-        print model.score(x_test, y_test)
+        print model.evaluate(x_test, y_test)
 
 
 def fmax(preds,true):
