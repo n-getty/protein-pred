@@ -265,7 +265,7 @@ def main():
                   metrics=['accuracy'])
 
     batch_size = 80
-    epochs = 1
+    epochs = 100
 
     print("Training model")
     model.fit(x_train, y_train,
