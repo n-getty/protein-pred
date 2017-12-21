@@ -9,7 +9,7 @@ from collections import Counter, defaultdict
 import keras
 from keras.utils import to_categorical
 from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Activation, Input, merge
+from keras.layers import Dense, Dropout, Activation, Input, merge, Conv1D, GlobalMaxPooling1D
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -23,6 +23,7 @@ CHARLEN = len(CHARS)
 aa_charlen = len(aa_chars)
 #CHARLEN = aa_charlen
 SEED = 2017
+MAXLEN = 100
 
 
 def load_sparse_csr(filename):
@@ -203,6 +204,17 @@ def build_attention_model(input_dim, nb_classes):
     return model
 
 
+def simple_model(classes=100):
+    model = Sequential(name='simple')
+    model.add(Conv1D(200, 3, padding='valid', activation='relu', strides=1, input_shape=(MAXLEN, CHARLEN)))
+    # model.add(Flatten())
+    model.add(GlobalMaxPooling1D())
+    model.add(Dense(1000, activation='relu'))
+    model.add(Dense(classes))
+    model.add(Activation('softmax'))
+    return model
+
+
 def main():
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
@@ -236,14 +248,17 @@ def main():
     else:
         maxlen = 100
         loss = 'categorical_crossentropy'
-        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen, set='protein')
-        CHARLEN = aa_charlen
-        model = Res50NT(input_shape=(maxlen, CHARLEN),
+        (x_train, y_train), (x_test, y_test), classes = load_data_coreseed(maxlen#, set='protein'
+                                                                           )
+        #CHARLEN = aa_charlen
+        '''model = Res50NT(input_shape=(maxlen, CHARLEN),
                         dense_layers=dense_layers,
                         dropout=dropout,
                         activation=activation,
                         variation=model_variation,
-                        classes=classes)
+                        classes=classes)'''
+        model = simple_model(classes)
+
 
     model.compile(loss=loss,
                   optimizer='adam',
@@ -258,8 +273,11 @@ def main():
               epochs=epochs,
               validation_data=(x_test, y_test), callbacks=[lr_reducer, early_stopper, csv_logger])
 
-    preds = model.predict(x_test)
-    print(fmax(preds, y_test))
+    if cafa:
+        preds = model.predict(x_test)
+        print(fmax(preds, y_test))
+    else:
+        print model.score(x_test, y_test)
 
 
 def fmax(preds,true):
