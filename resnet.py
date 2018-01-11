@@ -11,7 +11,7 @@ from keras.layers import (
     Flatten
 )
 from keras.layers.convolutional import (
-    Conv2D,
+    Conv1D,
     MaxPooling2D,
     AveragePooling2D
 )
@@ -39,7 +39,7 @@ def _conv_bn_relu(**conv_params):
     kernel_regularizer = conv_params.setdefault("kernel_regularizer", l2(1.e-4))
 
     def f(input):
-        conv = Conv2D(filters=filters, kernel_size=kernel_size,
+        conv = Conv1D(filters=filters, kernel_size=kernel_size,
                       strides=strides, padding=padding,
                       kernel_initializer=kernel_initializer,
                       kernel_regularizer=kernel_regularizer)(input)
@@ -61,7 +61,7 @@ def _bn_relu_conv(**conv_params):
 
     def f(input):
         activation = _bn_relu(input)
-        return Conv2D(filters=filters, kernel_size=kernel_size,
+        return Conv1D(filters=filters, kernel_size=kernel_size,
                       strides=strides, padding=padding,
                       kernel_initializer=kernel_initializer,
                       kernel_regularizer=kernel_regularizer)(activation)
@@ -84,7 +84,7 @@ def _shortcut(input, residual):
     shortcut = input
     # 1 X 1 conv if shape is different. Else identity.
     if stride_width > 1 or stride_height > 1 or not equal_channels:
-        shortcut = Conv2D(filters=residual_shape[CHANNEL_AXIS],
+        shortcut = Conv1D(filters=residual_shape[CHANNEL_AXIS],
                           kernel_size=(1, 1),
                           strides=(stride_width, stride_height),
                           padding="valid",
@@ -117,7 +117,7 @@ def basic_block(filters, init_strides=(1, 1), is_first_block_of_first_layer=Fals
 
         if is_first_block_of_first_layer:
             # don't repeat bn->relu since we just did bn->relu->maxpool
-            conv1 = Conv2D(filters=filters, kernel_size=(3, 1),
+            conv1 = Conv1D(filters=filters, kernel_size=(3, 1),
                            strides=init_strides,
                            padding="same",
                            kernel_initializer="he_normal",
@@ -142,7 +142,7 @@ def bottleneck(filters, init_strides=(1, 1), is_first_block_of_first_layer=False
 
         if is_first_block_of_first_layer:
             # don't repeat bn->relu since we just did bn->relu->maxpool
-            conv_1_1 = Conv2D(filters=filters, kernel_size=(1, 1),
+            conv_1_1 = Conv1D(filters=filters, kernel_size=(1, 1),
                               strides=init_strides,
                               padding="same",
                               kernel_initializer="he_normal",

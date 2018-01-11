@@ -4,7 +4,7 @@ import re
 from collections import Counter, defaultdict
 import networkx as nx
 import pandas as pd
-
+import math
 
 def process_raw_seqs():
     print "loading data"
@@ -26,7 +26,7 @@ def process_raw_seqs():
 
 
 def construct_dag():
-    G = nx.DiGraph()
+    Gs = {'m': nx.DiGraph(), 'c': nx.DiGraph(), 'b': nx.DiGraph()}
     print "Loading GO data"
     file = "data/go-basic.obo"
     with open (file, 'r') as f:
@@ -35,19 +35,27 @@ def construct_dag():
     alt_dict = {}
 
     for term in terms:
-        id = re.match("id: GO:\d+", term.strip()).group(0)[4:]
-        alts = re.findall("alt_id: GO:\d+", term)
-        if alts:
-            for alt in alts:
-                alt_dict[alt[8:]] = id
+        obs = re.search("is_obsolete: true", term)
+        if not obs:
+            id = re.match("id: GO:\d+", term.strip()).group(0)[4:]
+            alts = re.findall("alt_id: GO:\d+", term)
+            category = re.search("namespace: \w", term).group(0)[-1]
+            if alts:
+                for alt in alts:
+                    alt_dict[alt[8:]] = id
 
-        G.add_node(id)
-        is_as = re.findall("is_a: GO:\d+", term)
-        G.add_edges_from([(x[6:], id) for x in is_as if x])
-        part_ofs = re.findall("part_of GO:\d+", term)
-        G.add_edges_from([(x[8:], id) for x in part_ofs if x])
+            Gs[category].add_node(id)
+            is_as = re.findall("is_a: GO:\d+", term)
+            Gs[category].add_edges_from([(x[6:], id) for x in is_as if x])
+            part_ofs = re.findall("part_of GO:\d+", term)
+            Gs[category].add_edges_from([(x[8:], id) for x in part_ofs if x])
 
-    return G, alt_dict
+    for G in Gs.values():
+        print G.number_of_edges()
+        print G.number_of_nodes()
+        print [n for n,d in G.in_degree().items() if d==0]
+
+    return Gs, alt_dict
 
 
 def add_parents(G, data, alt_dict):
@@ -129,15 +137,69 @@ def print_data_stats(data):
     print len(data)
 
 
-print "Saving data and labels"
-cafa_df, y = proc_cafa()
-save_sparse_csr("data/cafa_labels", y)
-cafa_df.to_csv("data/cafa_df", index=0)
+def longest_paths():
+    print ''
+
+
+def term_probs():
+    term_file = "data/uniprot_sprot_exp.txt"
+    term_df = pd.read_csv(term_file, header=0, names=['id', 'term', 'category'], sep='\t')
+
+    m_df = term_df[term_df.category == 'F']
+    c_df = term_df[term_df.category == 'C']
+    b_df = term_df[term_df.category == 'P']
+
+    term_counts_m = Counter(m_df.term)
+    term_counts_c = Counter(c_df.term)
+    term_counts_b = Counter(b_df.term)
+
+    num_seqs = len(set(term_df.id))
+
+    term_sens_m = {}
+    sens_bins_m = defaultdict(list())
+    for k,v in term_counts_m.items():
+        sens = int(round(-1 * math.log(float(v)/num_seqs,2)))
+        term_sens_m[k] = sens
+        sens_bins_m[sens].append(k)
+
+    sens_counts_m = Counter(term_sens_m.values())
+
+    term_sens_c = {}
+    sens_bins_c = defaultdict(list())
+    for k, v in term_counts_c.items():
+        sens = int(round(-1 * math.log(float(v) / num_seqs, 2)))
+        term_sens_c[k] = sens
+        sens_bins_c[sens].append(k)
+
+    sens_counts_c = Counter(term_sens_c.values())
+
+    term_sens_b = {}
+    sens_bins_b = defaultdict(list())
+    for k, v in term_counts_b.items():
+        sens = int(round(-1 * math.log(float(v) / num_seqs, 2)))
+        term_sens_b[k] = sens
+        sens_bins_b[sens].append(k)
+
+    sens_counts_b = Counter(term_sens_b.values())
+
+    return term_sens_m, term_sens_c, term_sens_b
+
+#print "Saving data and labels"
+#cafa_df, y = proc_cafa()
+#save_sparse_csr("data/cafa_labels", y)
+#cafa_df.to_csv("data/cafa_df", index=0)
 
 #process_raw_seqs()
 
 #data = np.load("data/uniprot.npy")
-#go_dag, alts = construct_dag()
+#dags, alts = construct_dag()
+
+term_sens = term_probs()
+
+
+
+
+
 #data = add_parents(go_dag, data, alts)
 #print_data_stats(data)
 

@@ -15,6 +15,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
 from sklearn.metrics import f1_score
+import re
+import math
+import networkx as nx
 
 
 aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
@@ -164,7 +167,6 @@ def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed
 
     file = "data/cafa_df"
     df = pd.read_csv(file, header=0).aa
-
     labels = load_sparse_csr("data/cafa_labels.npz").todense()
 
     n = len(df)
@@ -186,7 +188,7 @@ def load_data_cafa(maxlen=50, val_split=0.2, batch_size=128, snake2d=False, seed
     x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2,
                                                       random_state=seed)
 
-    return (x_train, y_train), (x_val, y_val), classes
+    return (x_train, y_train), (x_val, y_val), classes, term_vocab
 
 
 def build_attention_model(input_dim, nb_classes):
@@ -290,7 +292,6 @@ def fmax(preds,true):
         if f>max:
             max=f
     return max
-
 
 
 if __name__ == '__main__':
