@@ -106,7 +106,7 @@ def simple_model(classes=100):
     # model.add(Flatten())
     model.add(GlobalMaxPooling1D())
     model.add(Dense(1000, activation='relu'))
-    model.add(Dense(classes), activation='sigmoid')
+    model.add(Dense(classes, activation='sigmoid'))
     #model.add(Activation('sigmoid'))
     return model
 
@@ -250,6 +250,8 @@ def main():
             epochs = 100
 
             y_train_sub = y_train[:,idxs]
+
+            
             y_test_sub = y_test[:,idxs]
             print("Training model")
             model.fit(x_train, y_train_sub,
