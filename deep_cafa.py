@@ -189,7 +189,7 @@ def proc_cafa():
 
 def term_sens(counts, num_seqs):
     term_sens = {}
-    sens_bins = defaultdict(list())
+    sens_bins = defaultdict(list)
     for k, v in counts.items():
         sens = int(round(-1 * math.log(float(v) / num_seqs, 2)))
         term_sens[k] = sens
