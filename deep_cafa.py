@@ -223,8 +223,7 @@ def main():
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/multi_task.csv")
-    maxlen = 256
-    (x_train, y_train), (x_test, y_test), classes, term_vocab = load_data_cafa(maxlen)
+    (x_train, y_train), (x_test, y_test), classes, term_vocab = load_data_cafa(MAXLEN)
     term_sens, sens_bins = term_probs()
     loss = 'binary_crossentropy'
 
