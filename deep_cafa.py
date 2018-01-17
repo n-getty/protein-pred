@@ -106,7 +106,7 @@ def simple_model(classes=100):
     # model.add(Flatten())
     model.add(GlobalMaxPooling1D())
     model.add(Dense(1000, activation='relu'))
-    model.add(Dense(classes))
+    #model.add(Dense(classes))
     model.add(Activation('sigmoid'))
     return model
 
