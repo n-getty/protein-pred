@@ -252,7 +252,7 @@ def main():
                       validation_data=(x_test, y_test_sub), callbacks=[lr_reducer, early_stopper, csv_logger])
 
             preds = model.predict(x_test)
-            print(fmax(preds, y_test))
+            print(fmax(preds, y_test_sub))
 
 
 def fmax(preds,true):
