@@ -229,9 +229,24 @@ def main():
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/multi_task.csv")
     (x_train, y_train), (x_test, y_test), classes, term_vocab = load_data_cafa(MAXLEN)
+
+    '''nonzero_counts = y_train.getnnz(0)
+    nonz = nonzero_counts > 50
+
+    print "Removing %d go terms that do not have more than %s nonzero counts" % (
+        y_train.shape[1] - np.sum(nonz), 50)
+    y_train = y_train[:, nonz]
+    y_test = y_test[:, nonz]'''
+
+
     term_sens, sens_bins = term_probs()
     #loss = 'binary_crossentropy'
     loss = sum_binary_crossentropy
+
+    dense_layers = [256]
+    dropout = .5
+    activation = 'relu'
+    model_variation = 'v1'
 
     for bins in sens_bins:
         for k,v in bins.items():
@@ -240,19 +255,27 @@ def main():
             print "Number of terms:", classes
             idxs = [term_vocab[term] for term in v]
 
-            model = simple_model(classes)
+            #model = simple_model(classes)
+
+            model = Res50NT(input_shape=(MAXLEN, aa_charlen),
+                            dense_layers=dense_layers,
+                            dropout=dropout,
+                            activation=activation,
+                            variation=model_variation,
+                            classes=classes, multi_label=True)
 
             model.compile(loss=loss,
                           optimizer='adam',
-                          metrics=['accuracy', 'categorical_accuracy'])
+                          metrics=['accuracy'])
 
             batch_size = 80
             epochs = 100
 
             y_train_sub = y_train[:,idxs]
+            y_test_sub = y_test[:, idxs]
+            '''for x in range(classes):
+                examps = sum(y_train_sub[:,x])'''
 
-            
-            y_test_sub = y_test[:,idxs]
             print("Training model")
             model.fit(x_train, y_train_sub,
                       batch_size=batch_size,
