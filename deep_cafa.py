@@ -234,7 +234,7 @@ def main():
             print "Training model with sensitivity of:", k
             print "Number of terms:", classes
             idxs = [term_vocab[term] for term in v]
-            
+
             model = simple_model(classes)
 
             model.compile(loss=loss,
