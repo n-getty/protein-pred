@@ -18,7 +18,7 @@ from sklearn.metrics import f1_score
 import re
 import math
 import networkx as nx
-
+import keras.backend as K
 
 aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
 aa_charlen = len(aa_chars)
@@ -106,8 +106,8 @@ def simple_model(classes=100):
     # model.add(Flatten())
     model.add(GlobalMaxPooling1D())
     model.add(Dense(1000, activation='relu'))
-    model.add(Dense(classes))
-    model.add(Activation('sigmoid'))
+    model.add(Dense(classes), activation='sigmoid')
+    #model.add(Activation('sigmoid'))
     return model
 
 
@@ -220,13 +220,18 @@ def term_probs():
     return [term_sens_m, term_sens_c, term_sens_b], [sens_bins_m, sens_bins_c, sens_bins_b]
 
 
+def sum_binary_crossentropy(y_true, y_pred):
+    return K.mean(K.binary_crossentropy(y_true, y_pred), axis=-1)
+
+
 def main():
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/multi_task.csv")
     (x_train, y_train), (x_test, y_test), classes, term_vocab = load_data_cafa(MAXLEN)
     term_sens, sens_bins = term_probs()
-    loss = 'binary_crossentropy'
+    #loss = 'binary_crossentropy'
+    loss = sum_binary_crossentropy
 
     for bins in sens_bins:
         for k,v in bins.items():
@@ -239,7 +244,7 @@ def main():
 
             model.compile(loss=loss,
                           optimizer='adam',
-                          metrics=['accuracy'])
+                          metrics=['accuracy', 'categorical_accuracy'])
 
             batch_size = 80
             epochs = 100
