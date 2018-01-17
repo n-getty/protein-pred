@@ -106,7 +106,7 @@ def simple_model(classes=100):
     # model.add(Flatten())
     model.add(GlobalMaxPooling1D())
     model.add(Dense(1000, activation='relu'))
-    #model.add(Dense(classes))
+    model.add(Dense(classes))
     model.add(Activation('sigmoid'))
     return model
 
@@ -180,7 +180,8 @@ def proc_cafa():
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
-    y = csr_matrix(y)
+    #y = csr_matrix(y)
+    y = np.array(y)
     X = np.array(X)
 
     cafa_df = pd.DataFrame({"aa":X})
