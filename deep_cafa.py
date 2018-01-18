@@ -244,7 +244,7 @@ def main():
     loss = sum_binary_crossentropy
 
     dense_layers = [1024, 512, 256]
-    dropout = .5
+    dropout = .2
     activation = 'relu'
     model_variation = 'v1'
 
