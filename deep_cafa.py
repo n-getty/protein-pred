@@ -274,8 +274,14 @@ def main():
                       epochs=epochs,
                       validation_data=(x_test, y_test_sub), callbacks=[lr_reducer, early_stopper, csv_logger])
 
-            preds = model.predict(x_test)
-            print(fmax(preds, y_test_sub))
+            train_preds = model.predict(x_train)
+            test_preds = model.predict(x_test)
+
+            x_train = np.hstack(x_train, train_preds)
+            x_test = np.hstack(x_test, test_preds)
+            print "Sum of train probs:", np.sum(train_preds)
+            print "Sum of test probs:", np.sum (test_preds)
+            print "fmax:", (fmax(test_preds, y_test_sub))
 
 
 def fmax(preds,true):
