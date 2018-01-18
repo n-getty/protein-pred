@@ -1,18 +1,10 @@
-import warnings
 import pandas as pd
 import numpy as np
-from time import time, gmtime, strftime
-import logging
-from scipy.sparse import csr_matrix, hstack, vstack
-import argparse
 from collections import Counter, defaultdict
-import keras
-from keras.utils import to_categorical
-from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Activation, Input, merge, Conv1D, GlobalMaxPooling1D
+from keras.models import Sequential
+from keras.layers import Dense, Conv1D, GlobalMaxPooling1D
 from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from res50_nt import Res50NT
 from sklearn.metrics import f1_score
 import re
@@ -24,7 +16,7 @@ aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
 aa_charlen = len(aa_chars)
 CHARLEN = aa_charlen
 SEED = 2017
-MAXLEN = 100
+MAXLEN = 256
 
 
 class CharacterTable(object):
@@ -243,8 +235,8 @@ def main():
     #loss = 'binary_crossentropy'
     loss = sum_binary_crossentropy
 
-    dense_layers = [1024, 512, 256]
-    dropout = .2
+    dense_layers = [768, 512]
+    dropout = .8
     activation = 'relu'
     model_variation = 'v1'
 
