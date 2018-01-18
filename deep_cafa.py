@@ -261,7 +261,7 @@ def main():
                           metrics=['accuracy'])
 
             batch_size = 80
-            epochs = 20
+            epochs = 5
 
             y_train_sub = y_train[:,idxs]
             y_test_sub = y_test[:, idxs]
@@ -277,8 +277,8 @@ def main():
             train_preds = model.predict(x_train)
             test_preds = model.predict(x_test)
 
-            x_train = np.hstack(x_train, train_preds)
-            x_test = np.hstack(x_test, test_preds)
+            x_train = np.hstack([x_train, train_preds])
+            x_test = np.hstack([x_test, test_preds])
             print "Sum of train probs:", np.sum(train_preds)
             print "Sum of test probs:", np.sum (test_preds)
             print "fmax:", (fmax(test_preds, y_test_sub))
