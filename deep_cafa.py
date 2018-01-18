@@ -243,7 +243,7 @@ def main():
     #loss = 'binary_crossentropy'
     loss = sum_binary_crossentropy
 
-    dense_layers = [256]
+    dense_layers = [1024, 512, 256]
     dropout = .5
     activation = 'relu'
     model_variation = 'v1'
@@ -269,7 +269,7 @@ def main():
                           metrics=['accuracy'])
 
             batch_size = 80
-            epochs = 100
+            epochs = 20
 
             y_train_sub = y_train[:,idxs]
             y_test_sub = y_test[:, idxs]
