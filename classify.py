@@ -382,13 +382,14 @@ def main():
                          ),
 
             LGBMClassifier(nthread=args.thread
-                           #,max_depth=6
-                           #,num_leaves=31
-                           #,learning_rate=0.1
+                           ,max_depth=6
+                           ,num_leaves=31
+                           ,learning_rate=0.1
                            ,n_estimators=est
-                           #,max_bin=15
+                           ,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
+                           ,gpu_platform_id=2
                            ,gpu_device_id=2
                            #,subsample=0.8
                            #,min_child_weight=6
