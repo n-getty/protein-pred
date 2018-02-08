@@ -390,6 +390,7 @@ def main():
                            #,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
+                           ,verbose=-1
                            #,gpu_platform_id=2
                            #,gpu_device_id=2
                            #,subsample=0.8
