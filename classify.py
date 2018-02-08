@@ -381,7 +381,7 @@ def main():
                           #,min_child_weight=6
                          ),
 
-            LGBMClassifier(nthread=args.thread
+            LGBMClassifier(n_jobs=args.thread
                            ,max_depth=6
                            ,num_leaves=31
                            ,learning_rate=0.1
