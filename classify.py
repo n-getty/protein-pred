@@ -373,8 +373,8 @@ def main():
            XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
-                          ,max_depth=2
-                          ,learning_rate=0.5
+                          ,max_depth=6
+                          ,learning_rate=0.1
                           ,colsample_bytree=0.8
                           #,subsample=0.5
                           #,max_bins=15
@@ -386,11 +386,11 @@ def main():
                            ,num_leaves=31
                            ,learning_rate=0.1
                            ,n_estimators=est
-                           ,max_bin=15
+                           #,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
-                           ,gpu_platform_id=2
-                           ,gpu_device_id=2
+                           #,gpu_platform_id=2
+                           #,gpu_device_id=2
                            #,subsample=0.8
                            #,min_child_weight=6
                            ),

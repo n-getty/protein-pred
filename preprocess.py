@@ -131,7 +131,7 @@ def get_kmer_counts(data, k):
         kmer counts for all sequences in dataset
     """
     data = zip(range(len(data)), data, [k]*len(data))
-    pool = Pool(processes=100)
+    pool = Pool(processes=8)
 
     res = [None] * len(data)
 
@@ -160,7 +160,7 @@ def featurize_data(data, k=3, mode='dna'):
     #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
     kmers = get_kmer_counts(data, k)
 
-    print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
+    #print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
     nrows = data.shape[0]
 
     if mode == 'dna':
@@ -171,19 +171,19 @@ def featurize_data(data, k=3, mode='dna'):
         ncols = len(vocab)
 
     start = time()
-    print "Generated vocab for complements in %d seconds" % (time() - start)
+    #print "Generated vocab for complements in %d seconds" % (time() - start)
     # comb_kmers = combine_complements(kmers, comps)
 
     # features = normalize_tfidf(vocab, comb_kmers)
     nonzero_data = 0
-    print "Counting nonzero data"
+    #print "Counting nonzero data"
     for kmer in kmers:
         nonzero_data += len(kmer)
 
     indptr = np.zeros(nrows+1, dtype="int32")
     col = np.empty(nonzero_data, dtype="int32")
     csr_data = np.empty(nonzero_data, dtype="int8")
-    print "Bulding feature matrix"
+    #print "Bulding feature matrix"
     #features = csr_matrix((nrows, ncols))
     data_counter = 0
     for x in range(nrows):
@@ -195,9 +195,9 @@ def featurize_data(data, k=3, mode='dna'):
             data_counter += 1
         indptr[x+1] = data_counter
 
-    #print "Size of sparse data vector is %f (mbs)" % (float(sys.getsizeof(csr_data)) / 1024 ** 2)
+    ##print "Size of sparse data vector is %f (mbs)" % (float(sys.getsizeof(csr_data)) / 1024 ** 2)
 
-    #print("Constructing sparse matrix")
+    ##print("Constructing sparse matrix")
     features = csr_matrix((csr_data, col, indptr), shape=(nrows, ncols))
     # normalize(features, copy=True)
     return features, vocab
@@ -224,8 +224,8 @@ def read_chunks(file,f,k,chunksize):
     for data in pd.read_csv(file, chunksize=chunksize, names=["label", "dna"], usecols=[0, 7], delimiter='\t', header=0):
         labels = data.label
         features, vocab = featurize_data(data, k)
-        # print "There are %d unique kmers" % len(features[0])
-        print "\nSize of sparse matrix chunk %d is %f (mbs)" % (c, float(sys.getsizeof(features)) / 1024 ** 2)
+        # #print "There are %d unique kmers" % len(features[0])
+        #print "\nSize of sparse matrix chunk %d is %f (mbs)" % (c, float(sys.getsizeof(features)) / 1024 ** 2)
         save_sparse_csr(path + "chunk." + str(c) + ".csr", features, labels, vocab)
         c += 1
 
@@ -243,10 +243,10 @@ def featurize_aa_counts(data):
 
 
 def read_cafa(file):
-    print "Reading cafa dataframe"
+    #print "Reading cafa dataframe"
     f = "cafa"
     data = pd.read_csv(file,  header=0)
-    print "Removing unknown proteins"
+    #print "Removing unknown proteins"
     for x in range(len(data.aa)):
         if 'U' in data.aa[x]:
             data.aa[x] = data.aa[x].replace("U", "")
@@ -259,9 +259,9 @@ def read_cafa(file):
         if 'O' in data.aa[x]:
             data.aa[x] = data.aa[x].replace("O", "")
 
-    print "generating aa 2mer features"
+    #print "generating aa 2mer features"
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
-    print "generating aa 3mer features"
+    #print "generating aa 3mer features"
     aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
 
     aa_features4, aa_vocab4 = featurize_data(data.aa, 4, 'aa')
@@ -286,17 +286,20 @@ def read_whole(file,f,k):
             if 'X' in data.aa[x]:
                 data.aa[x] = data.aa[x].replace("X", "")
 
-        print "Removed all U and X aas"
+        #print "Removed all U and X aas"
     else:
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
+    print np.mean(data.dna.str.len())
+    exit()
+
     features3, vocab = featurize_data(data.dna, 3)
     features5, vocab = featurize_data(data.dna, 5)
     features10, vocab = featurize_data(data.dna, 10)
-    print "generating aa 2mer features"
+    #print "generating aa 2mer features"
     aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
-    print "generating aa 3mer features"
+    #print "generating aa 3mer features"
     aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
 
     aa_features4, aa_vocab3 = featurize_data(data.aa, 4, 'aa')
@@ -319,23 +322,23 @@ def read_whole(file,f,k):
     save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, labels, vocab)
     save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, labels, vocab)
 
-    #print features.shape
+    ##print features.shape
     #seq_lens = seq_lens.reshape((seq_lens.shape[0],1))
-    #print "There are %d unique kmers" % len(features[0])
+    ##print "There are %d unique kmers" % len(features[0])
     nuc_features = hstack([nuc_features,seq_lens], format='csr')
-    #print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
+    ##print "\nSize of sparse matrix is %f (mbs)" % (float(sys.getsizeof(features))/1024**2)
     save_sparse_csr("data/" + f + "/feature_matrix.1.csr", nuc_features, labels, vocab)
     save_sparse_csr("data/" + f + "/feature_matrix.3.csr", features3, labels, vocab)
     save_sparse_csr("data/" + f + "/feature_matrix.5.csr", features5, labels, vocab)
     save_sparse_csr("data/" + f + "/feature_matrix.10.csr", features10, labels, vocab)
 
 
-def main(fn='cafa', k=3, chunksize=100000):
+def main(fn='sm', k=3, chunksize=0):
     start = time()
     k = int(k)
     chunksize = int(chunksize)
 
-    print "Generating labels and features"
+    #print "Generating labels and features"
 
     if fn == "lg":
         file = "data/rep.1000ec.pgf.seqs.filter"
@@ -356,7 +359,7 @@ def main(fn='cafa', k=3, chunksize=100000):
         file = "data/ref.100ec.pgf.seqs.filter"
         read_whole(file, fn, k)
 
-    print "Time elapsed to build %d mers is %f" % (k, time() - start)
+    #print "Time elapsed to build %d mers is %f" % (k, time() - start)
 
 
 if __name__ == '__main__':

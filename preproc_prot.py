@@ -6,6 +6,7 @@ import networkx as nx
 import pandas as pd
 import math
 
+
 def process_raw_seqs():
     print "loading data"
     file = "data/uniprot_sprot.dat"
@@ -156,7 +157,7 @@ def term_probs():
     num_seqs = len(set(term_df.id))
 
     term_sens_m = {}
-    sens_bins_m = defaultdict(list())
+    sens_bins_m = defaultdict(list)
     for k,v in term_counts_m.items():
         sens = int(round(-1 * math.log(float(v)/num_seqs,2)))
         term_sens_m[k] = sens
@@ -165,7 +166,7 @@ def term_probs():
     sens_counts_m = Counter(term_sens_m.values())
 
     term_sens_c = {}
-    sens_bins_c = defaultdict(list())
+    sens_bins_c = defaultdict(list)
     for k, v in term_counts_c.items():
         sens = int(round(-1 * math.log(float(v) / num_seqs, 2)))
         term_sens_c[k] = sens
@@ -174,7 +175,7 @@ def term_probs():
     sens_counts_c = Counter(term_sens_c.values())
 
     term_sens_b = {}
-    sens_bins_b = defaultdict(list())
+    sens_bins_b = defaultdict(list)
     for k, v in term_counts_b.items():
         sens = int(round(-1 * math.log(float(v) / num_seqs, 2)))
         term_sens_b[k] = sens

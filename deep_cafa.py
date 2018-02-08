@@ -97,7 +97,7 @@ def simple_model(classes=100):
     model.add(Conv1D(200, 3, padding='valid', activation='relu', strides=1, input_shape=(MAXLEN, CHARLEN)))
     # model.add(Flatten())
     model.add(GlobalMaxPooling1D())
-    model.add(Dense(1000, activation='relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(Dense(classes, activation='sigmoid'))
     #model.add(Activation('sigmoid'))
     return model
@@ -247,21 +247,21 @@ def main():
             print "Number of terms:", classes
             idxs = [term_vocab[term] for term in v]
 
-            #model = simple_model(classes)
+            model = simple_model(classes)
 
-            model = Res50NT(input_shape=(MAXLEN, aa_charlen),
+            '''model = Res50NT(input_shape=(MAXLEN, aa_charlen),
                             dense_layers=dense_layers,
                             dropout=dropout,
                             activation=activation,
                             variation=model_variation,
-                            classes=classes, multi_label=True)
+                            classes=classes, multi_label=True)'''
 
             model.compile(loss=loss,
                           optimizer='adam',
                           metrics=['accuracy'])
 
-            batch_size = 80
-            epochs = 5
+            batch_size = 800
+            epochs = 1
 
             y_train_sub = y_train[:,idxs]
             y_test_sub = y_test[:, idxs]
