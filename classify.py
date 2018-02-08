@@ -373,21 +373,21 @@ def main():
            XGBClassifier(n_jobs=args.thread,
                           n_estimators=est
                           ,objective="multi:softprob"
-                          #,max_depth=6
+                          ,max_depth=6
                           ,learning_rate=0.1
                           ,colsample_bytree=0.8
                           ,tree_method='hist'
                           #,subsample=0.5
-                          #,max_bins=15
+                          ,max_bins=15
                           #,min_child_weight=6
                          ),
 
             LGBMClassifier(n_jobs=args.thread
-                           #,max_depth=6
+                           ,max_depth=6
                            #,num_leaves=31
                            ,learning_rate=0.1
                            ,n_estimators=est
-                           #,max_bin=15
+                           ,max_bin=15
                            ,colsample_bytree=0.8
                            ,device=device
                            ,verbose=-1
