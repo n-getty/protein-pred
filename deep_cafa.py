@@ -137,7 +137,7 @@ def construct_dag():
 
 
 def add_parents(Gs, terms, alt_dict):
-    for G in Gs:
+    for G in Gs.values():
         ancs = []
         for term in terms:
             if G.has_node(term):
