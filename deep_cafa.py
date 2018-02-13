@@ -142,9 +142,10 @@ def add_parents(Gs, terms, alt_dict):
         for term in terms:
             if G.has_node(term):
                 a = G.predecessors(term)
+                ancs.extend(a)
             elif term in alt_dict:
                 a = G.predecessors(alt_dict[term])
-            ancs.extend(a)
+                ancs.extend(a)
         terms.extend(ancs)
 
     return terms
