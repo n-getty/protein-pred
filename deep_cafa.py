@@ -128,10 +128,10 @@ def construct_dag():
             part_ofs = re.findall("part_of GO:\d+", term)
             Gs[category].add_edges_from([(x[8:], id) for x in part_ofs if x])
 
-    for G in Gs.values():
+    '''for G in Gs.values():
         print G.number_of_edges()
         print G.number_of_nodes()
-        print [n for n,d in G.in_degree().items() if d==0]
+        print [n for n,d in G.in_degree().items() if d==0]'''
 
     return Gs, alt_dict
 
