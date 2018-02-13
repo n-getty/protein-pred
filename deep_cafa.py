@@ -136,6 +136,20 @@ def construct_dag():
     return Gs, alt_dict
 
 
+def add_parents(Gs, terms, alt_dict):
+    for G in Gs:
+        ancs = []
+        for term in terms:
+            if G.has_node(term):
+                a = G.predecessors(term)
+            elif term in alt_dict:
+                a = G.predecessors(alt_dict[term])
+            ancs.extend(a)
+        terms.extend(ancs)
+
+    return terms
+
+
 def proc_cafa():
     seqs_file = "data/uniprot_sprot_exp.fasta"
     term_file = "data/uniprot_sprot_exp.txt"
@@ -165,10 +179,14 @@ def proc_cafa():
             if term[1] not in term_vocab:
                 term_vocab[term[1]] = len(term_vocab)
 
+    dags, alts = construct_dag()
+
     for k,v in seq_dict.items():
         X.append(v)
         label_vec = [0] * len(term_vocab)
-        for term in term_dict[k]:
+        terms = term_dict[k]
+        terms = add_parents(dags, terms, alts)
+        for term in terms:
             label_vec[term_vocab[term]] = 1
         y.append(label_vec)
 
@@ -220,6 +238,7 @@ def main():
     lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
     early_stopper = EarlyStopping(min_delta=0.001, patience=10)
     csv_logger = CSVLogger("results/multi_task.csv")
+
     (x_train, y_train), (x_test, y_test), classes, term_vocab = load_data_cafa(MAXLEN)
 
     '''nonzero_counts = y_train.getnnz(0)
