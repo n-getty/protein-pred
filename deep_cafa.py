@@ -143,7 +143,7 @@ def add_parents(Gs, terms, alt_dict):
             if G.has_node(term):
                 a = G.predecessors(term)
                 ancs.extend(a)
-            elif term in alt_dict:
+            elif term in alt_dict and G.has_node(alt_dict[term]):
                 a = G.predecessors(alt_dict[term])
                 ancs.extend(a)
         terms.extend(ancs)
@@ -181,6 +181,14 @@ def proc_cafa():
                 term_vocab[term[1]] = len(term_vocab)
 
     dags, alts = construct_dag()
+
+    l = len(term_vocab)
+    for G in dags.values():
+        for n in G.nodes():
+            if n not in term_vocab:
+                term_vocab[n] = len(term_vocab)
+
+    print "added %d terms" % (len(term_vocab)-l)
 
     for k,v in seq_dict.items():
         X.append(v)
