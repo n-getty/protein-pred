@@ -268,6 +268,9 @@ def main():
     activation = 'relu'
     model_variation = 'v1'
 
+    batch_size = 80
+    epochs = 10
+
     for bins in sens_bins:
         for k,v in bins.items():
             classes = len(v)
@@ -275,21 +278,18 @@ def main():
             print "Number of terms:", classes
             idxs = [term_vocab[term] for term in v]
 
-            model = simple_model(classes)
+            #model = simple_model(classes)
 
-            '''model = Res50NT(input_shape=(MAXLEN, aa_charlen),
+            model = Res50NT(input_shape=(MAXLEN, aa_charlen),
                             dense_layers=dense_layers,
                             dropout=dropout,
                             activation=activation,
                             variation=model_variation,
-                            classes=classes, multi_label=True)'''
+                            classes=classes, multi_label=True)
 
             model.compile(loss=loss,
                           optimizer='adam',
                           metrics=['accuracy'])
-
-            batch_size = 80
-            epochs = 1
 
             y_train_sub = y_train[:,idxs]
             y_test_sub = y_test[:, idxs]
