@@ -11,6 +11,7 @@ import re
 import math
 import networkx as nx
 import keras.backend as K
+from sklearn.preprocessing import MinMaxScaler
 
 aa_chars = ' FSYCLIMVPTAHQNKDEWRGUXBZO'.lower()
 aa_charlen = len(aa_chars)
@@ -315,6 +316,8 @@ def main():
 def fmax(preds,true):
     print "Maximizing f score with prob threshhold"
     max = 0
+    scaler = MinMaxScaler()
+    preds = np.ravel(scaler.fit_transform(preds))
     for i in np.arange(0.1,1,0.1):
         preds[preds>i] = 1
         preds[preds<1] = 0
