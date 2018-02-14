@@ -270,7 +270,7 @@ def main():
     model_variation = 'v1'
 
     batch_size = 80
-    epochs = 10
+    epochs = 3
 
     for bins in sens_bins:
         for k,v in bins.items():
