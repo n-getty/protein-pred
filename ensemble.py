@@ -13,7 +13,7 @@ def main():
 
     for c in classes:
         cx = X[y == c]
-        cx_avg.append(np.array(csr_matrix.mean(cx, axis=0)))
+        cx_avg.append(np.array(csr_matrix.mean(cx, axis=0)).flatten())
 
     cx_avg = np.array(cx_avg)
     print cx_avg.shape
