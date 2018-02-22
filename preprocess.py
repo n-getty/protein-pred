@@ -291,9 +291,6 @@ def read_whole(file,f,k,p):
         data = pd.read_csv(file, names=["label", "aa", "dna"], usecols=[0, 6, 7], delimiter='\t', header=0)
     labels = data.label
 
-    print np.mean(data.dna.str.len())
-    exit()
-
     features3, vocab = featurize_data(data.dna, 3, p)
     features5, vocab = featurize_data(data.dna, 5, p)
     features10, vocab = featurize_data(data.dna, 10, p)
