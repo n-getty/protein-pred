@@ -2,6 +2,7 @@ from classify import load_data
 from sklearn.cluster import KMeans
 import numpy as np
 from collections import Counter
+from scipy.sparse import csr_matrix
 
 
 def main():
@@ -10,7 +11,7 @@ def main():
     cx_avg = []
     for c in classes:
         cx = X[y == c]
-        cx_avg.append(np.average(cx))
+        cx_avg.append(csr_matrix.mean(cx, axis=1))
 
     kmeans = KMeans(n_clusters=10, random_state=0).fit(cx_avg)
 
