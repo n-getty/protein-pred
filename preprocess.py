@@ -296,15 +296,12 @@ def read_whole(file,f,k,p):
     #features10, vocab = featurize_data(data.dna, 10, p)
     #print "generating aa 2mer features"
 
-
-
     aa_features, aa_vocab2 = featurize_data(data.aa, 2, 'aa', p)
     save_sparse_csr("data/" + f + "/feature_matrix.aa2.csr", aa_features, labels, aa_vocab2)
     aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa', p)
     save_sparse_csr("data/" + f + "/feature_matrix.aa3.csr", aa_features3, labels, aa_vocab3)
     aa_features4, aa_vocab4 = featurize_data(data.aa, 4, 'aa', p)
     save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, labels, aa_vocab4)
-
 
     aa_counts = featurize_aa_counts(data.aa)
     aa_lens = csr_matrix(np.array([len(seq) for seq in data.aa]).reshape((len(labels), 1)))
@@ -336,6 +333,7 @@ def read_whole(file,f,k,p):
 def main(fn='sm', k=3, chunksize=0, p=8):
     start = time()
     k = int(k)
+    p = int(p)
     chunksize = int(chunksize)
 
     #print "Generating labels and features"
