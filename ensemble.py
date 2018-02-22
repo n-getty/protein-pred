@@ -13,7 +13,7 @@ def main():
         cx_avg.append(np.average(cx))
 
     kmeans = KMeans(n_clusters=10, random_state=0).fit(cx_avg)
-    
+
     print zip(classes, kmeans.labels_)
     print Counter(kmeans.labels_)
 

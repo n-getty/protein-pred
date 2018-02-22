@@ -121,7 +121,7 @@ def work(seqnum_seq_k):
     return [seqnum, counts]
 
 
-def get_kmer_counts(data, k):
+def get_kmer_counts(data, k, p):
     """ 
     Pools workers and resequences results to match original order
     Params:
@@ -131,7 +131,7 @@ def get_kmer_counts(data, k):
         kmer counts for all sequences in dataset
     """
     data = zip(range(len(data)), data, [k]*len(data))
-    pool = Pool(processes=8)
+    pool = Pool(processes=p)
 
     res = [None] * len(data)
 
@@ -147,7 +147,7 @@ def get_kmer_counts(data, k):
     return counts
 
 
-def featurize_data(data, k=3, mode='dna'):
+def featurize_data(data, k=3, mode='dna', p=8):
     """ 
     Featurize sequences and index labels
     Params:
@@ -158,7 +158,7 @@ def featurize_data(data, k=3, mode='dna'):
     # labels = data.label
     start = time()
     #kmers = [Counter(list(window(x.lower(), k))) for x in data.dna]
-    kmers = get_kmer_counts(data, k)
+    kmers = get_kmer_counts(data, k, p)
 
     #print "\nCounted kmers for %d sequences in %d seconds" % (len(kmers), time()-start)
     nrows = data.shape[0]
@@ -277,7 +277,7 @@ def read_cafa(file):
     save_sparse_csr("data/" + f + "/feature_matrix.aa4.csr", aa_features4, [], aa_vocab4)
 
 
-def read_whole(file,f,k):
+def read_whole(file,f,k,p):
     if f == 'core':
         data = pd.read_csv(file, names=["label", "dna", "aa"], usecols=[1, 5, 6], delimiter='\t', header=0)
         for x in range(len(data.aa)):
@@ -294,15 +294,15 @@ def read_whole(file,f,k):
     print np.mean(data.dna.str.len())
     exit()
 
-    features3, vocab = featurize_data(data.dna, 3)
-    features5, vocab = featurize_data(data.dna, 5)
-    features10, vocab = featurize_data(data.dna, 10)
+    features3, vocab = featurize_data(data.dna, 3, p)
+    features5, vocab = featurize_data(data.dna, 5, p)
+    features10, vocab = featurize_data(data.dna, 10, p)
     #print "generating aa 2mer features"
-    aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa')
+    aa_features, aa_vocab = featurize_data(data.aa, 2, 'aa', p)
     #print "generating aa 3mer features"
-    aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa')
+    aa_features3, aa_vocab3 = featurize_data(data.aa, 3, 'aa', p)
 
-    aa_features4, aa_vocab3 = featurize_data(data.aa, 4, 'aa')
+    aa_features4, aa_vocab3 = featurize_data(data.aa, 4, 'aa', p)
 
     #aa_features, aa_vocab = featurize_data(data.aa, k)
 
@@ -333,7 +333,7 @@ def read_whole(file,f,k):
     save_sparse_csr("data/" + f + "/feature_matrix.10.csr", features10, labels, vocab)
 
 
-def main(fn='sm', k=3, chunksize=0):
+def main(fn='sm', k=3, chunksize=0, p=8):
     start = time()
     k = int(k)
     chunksize = int(chunksize)
@@ -345,19 +345,19 @@ def main(fn='sm', k=3, chunksize=0):
         if chunksize > 0:
             read_chunks(file, fn, k, chunksize)
         else:
-            read_whole(file, fn, k)
+            read_whole(file, fn, k, p)
     elif fn == "core":
         file = "data/coreseed.train.tsv"
         if chunksize > 0:
             read_chunks(file, fn, k, chunksize)
         else:
-            read_whole(file, fn, k)
+            read_whole(file, fn, k, p)
     elif fn =="cafa":
         file = "data/cafa_df"
         read_cafa(file)
     else:
         file = "data/ref.100ec.pgf.seqs.filter"
-        read_whole(file, fn, k)
+        read_whole(file, fn, k, p)
 
     #print "Time elapsed to build %d mers is %f" % (k, time() - start)
 
@@ -366,6 +366,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         #os.chdir("/home/ngetty/examples/protein-pred")
         args = sys.argv[1:]
-        main(args[0], args[1], args[2])
+        main(args[0], args[1], args[2], args[3])
     else:
         main()
