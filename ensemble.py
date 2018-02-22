@@ -8,11 +8,13 @@ from scipy.sparse import csr_matrix
 def main():
     X, y = load_data('sm', False, False, False, False, True, True, True, False)
     classes = list(set(y))
-    cx_avg = np.array([])
+    cx_avg = []
+
     for c in classes:
         cx = X[y == c]
         cx_avg.append(np.array(csr_matrix.mean(cx, axis=1)))
 
+    cx_avg = np.array(cx_avg)
     kmeans = KMeans(n_clusters=10, random_state=0).fit(cx_avg)
 
     print zip(classes, kmeans.labels_)
